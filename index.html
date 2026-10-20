@@ -554,6 +554,17 @@
         .btn-info { background-color: #0284c7; color: #fff; }
         .btn-danger { background-color: #dc2626; color: #fff; }
 
+        .filter-select {
+            background: #0f1c30;
+            border: 1px solid #1a2f4d;
+            color: #60a5fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            outline: none;
+        }
+
         .force-full-print {
             max-height: none !important;
             overflow: visible !important;
@@ -591,7 +602,7 @@
                 <div class="section-title">ACESSO AO SISTEMA</div>
                 <div class="input-group">
                     <label for="usernameInput">DIGITE SEU NICKNAME NO HABBO</label>
-                    <input type="text" id="usernameInput" class="input-field" placeholder="Ex: Solyta, Chantal..." autocomplete="off">
+                    <input type="text" id="usernameInput" class="input-field" placeholder="Ex: Solyta, Afrontoso, Chantal..." autocomplete="off">
                 </div>
 
                 <div class="error-msg" id="errorMessage">
@@ -761,7 +772,14 @@
                         <span style="font-size:0.75rem; color:#7b93b8;">SEMANA ATIVA:</span><br>
                         <strong id="adminWeekText" style="font-size:0.85rem; color:#60a5fa;">19/10/2026 à 25/10/2026</strong>
                     </div>
-                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                        <select id="sortFilter" class="filter-select action-col" onchange="renderAdminTable()">
+                            <option value="default">Ord: Padrão</option>
+                            <option value="alpha">Ord: Alfabética (A-Z)</option>
+                            <option value="turns-desc">Ord: Turnos Feitos (Maior)</option>
+                            <option value="turns-asc">Ord: Turnos Feitos (Menor)</option>
+                            <option value="role">Ord: Cargo Hierárquico</option>
+                        </select>
                         <button class="btn-sm btn-info" onclick="generateTableImage()">📷 Baixar Imagem (PNG)</button>
                         <button class="btn-sm btn-warning" onclick="advanceWeek()">🔄 Virar Semana</button>
                         <button class="btn-sm btn-success" onclick="addNewEmployeePrompt()">+ Add Funcionário</button>
@@ -806,7 +824,15 @@
             "Gerente": 10
         };
 
-        // CRONOGRAMA: SOLYTA SUBSTITUIU AFRONTOSO EM TODAS AS DATAS
+        const roleHierarchy = {
+            "Gerente": 1,
+            "Supervisor": 2,
+            "Encarregado de Loja": 3,
+            "Caixa": 4,
+            "Balconista": 5,
+            "Operador de Loja": 6
+        };
+
         const rotationSchedule = [
             { week: "19/10/2026 à 25/10/2026", resp: "Monica", refDate: "Até 18/10" },
             { week: "26/10/2026 à 01/11/2026", resp: "Solyta", refDate: "Até 25/10" },
@@ -821,8 +847,9 @@
             { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
-        // BASE DE DADOS COM SOLYTA COMO SUPERVISOR
+        // BASE DE DADOS INCLUINDO AFRONTOSO COMO GERENTE E SOLYTA COMO SUPERVISOR
         const defaultEmployees = [
+            { name: "Afrontoso", role: "Gerente", initial: 3401, current: 3401 },
             { name: "Solyta", role: "Supervisor", initial: 1606, current: 1606 },
             { name: "Chantal", role: "Supervisor", initial: 2181, current: 2181 },
             { name: "Monica", role: "Supervisor", initial: 2219, current: 2219 },
@@ -915,7 +942,7 @@
 
         function showAdminLogin() {
             const pass = prompt("Digite a senha de administrador ou seu nick de gerente/supervisor:");
-            if (pass && (pass === "admin123" || ["solyta", "chantal", "monica"].includes(pass.toLowerCase()))) {
+            if (pass && (pass === "admin123" || ["afrontoso", "solyta", "chantal", "monica"].includes(pass.toLowerCase()))) {
                 document.getElementById("loginScreen").style.display = "none";
                 document.getElementById("adminScreen").style.display = "block";
                 document.getElementById("mainWrapper").classList.add("wide");
@@ -996,7 +1023,22 @@
             const tbody = document.getElementById("tableBody");
             tbody.innerHTML = "";
 
-            employees.forEach((emp, index) => {
+            // FILTRAGEM E ORDENAÇÃO
+            let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
+            let sortedEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx }));
+
+            if (filterMode === "alpha") {
+                sortedEmployees.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (filterMode === "turns-desc") {
+                sortedEmployees.sort((a, b) => (b.current - b.initial) - (a.current - a.initial));
+            } else if (filterMode === "turns-asc") {
+                sortedEmployees.sort((a, b) => (a.current - a.initial) - (b.current - b.initial));
+            } else if (filterMode === "role") {
+                sortedEmployees.sort((a, b) => (roleHierarchy[a.role] || 99) - (roleHierarchy[b.role] || 99));
+            }
+
+            sortedEmployees.forEach((emp) => {
+                let index = emp.originalIndex;
                 let meta = roleMetas[emp.role] || 15;
                 let feitos = emp.current - emp.initial;
                 if (feitos < 0) feitos = 0;
@@ -1088,7 +1130,6 @@
             renderAdminTable();
         }
 
-        /* LÓGICA DE AUSENTES */
         function addAbsentRecord() {
             const nick = document.getElementById("absentNick").value.trim();
             const period = document.getElementById("absentPeriod").value.trim();
