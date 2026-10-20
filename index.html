@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado Habbo RP - Controle de Turnos</title>
+    <!-- html2canvas para exportar a imagem da tabela -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #070d18;
+            background-image: radial-gradient(circle at 50% 0%, #0f2342 0%, #070d18 70%);
+            color: #e1e1e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 10px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .pixel-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pixel-icon {
+            position: absolute;
+            font-size: 22px;
+            opacity: 0.12;
+            animation: floatDown linear infinite;
+        }
+
+        @keyframes floatDown {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.18; }
+            90% { opacity: 0.18; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 440px;
+            z-index: 10;
+            transition: max-width 0.3s ease;
+        }
+
+        .main-wrapper.wide {
+            max-width: 1100px;
+        }
+
+        .panel-card {
+            background-color: #0a1322;
+            border: 1px solid #162a4a;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            margin-bottom: 16px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #162a4a;
+            padding-bottom: 12px;
+        }
+
+        .panel-header h1 {
+            font-size: 1.25rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header h1 span {
+            color: #3b82f6;
+        }
+
+        .badge-live {
+            font-size: 0.65rem;
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-live::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .section-title {
+            font-size: 0.72rem;
+            color: #3b82f6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+        }
+
+        .section-title::before {
+            content: "■";
+            font-size: 0.6rem;
+        }
+
+        .profile-box {
+            background-color: #060b14;
+            border: 1px solid #12223c;
+            border-radius: 6px;
+            padding: 14px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .avatar-frame {
+            width: 64px;
+            height: 80px;
+            background: #0f1c30 url('https://www.habbo.com.br/habbo-imaging/avatarimage?user=Solyta&action=std&direction=2&head_direction=2&gesture=sml&size=m') center no-repeat;
+            border: 1px solid #1d365d;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+            width: 100%;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-item .lbl {
+            font-size: 0.65rem;
+            color: #7b93b8;
+            text-transform: uppercase;
+        }
+
+        .info-item .val {
+            font-size: 0.9rem;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .role-tag {
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 2px;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+
+        .supervisor-card {
+            background: #060b14;
+            border: 1px solid #12223c;
+            border-radius: 6px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .supervisor-card .resp-name {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .supervisor-card .resp-sub {
+            font-size: 0.7rem;
+            color: #7b93b8;
+        }
+
+        .display-box {
+            background-color: #060b14;
+            border: 1px solid #12223c;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .display-lbl {
+            font-size: 0.68rem;
+            color: #7b93b8;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .display-val {
+            font-size: 1.8rem;
+            text-align: right;
+            color: #60a5fa;
+            font-weight: bold;
+            min-height: 40px;
+        }
+
+        .result-card {
+            background-color: #060b14;
+            border: 1px dashed #60a5fa;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .result-card.danger {
+            border-color: #f87171;
+        }
+
+        .result-card .res-title {
+            font-size: 0.68rem;
+            color: #7b93b8;
+            text-transform: uppercase;
+        }
+
+        .result-card .res-val {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-top: 4px;
+        }
+
+        .result-card.danger .res-val {
+            color: #f87171;
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .btn-key {
+            background-color: #0f1c30;
+            border: 1px solid #1a2f4d;
+            border-radius: 5px;
+            color: #e1e1e6;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 12px 0;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-key:hover {
+            background-color: #162a4a;
+        }
+
+        .btn-key.action-c {
+            background-color: rgba(248, 113, 113, 0.15);
+            color: #f87171;
+        }
+
+        .btn-key.action-ok {
+            grid-column: span 3;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            margin-top: 4px;
+        }
+
+        .btn-key.action-ok:hover {
+            background-color: #1d4ed8;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .input-group label {
+            font-size: 0.72rem;
+            color: #7b93b8;
+            text-transform: uppercase;
+        }
+
+        .input-field {
+            background-color: #060b14;
+            border: 1px solid #12223c;
+            border-radius: 5px;
+            padding: 10px 12px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #3b82f6;
+        }
+
+        .btn-main {
+            background-color: #2563eb;
+            border: none;
+            border-radius: 5px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-main:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-sub {
+            background-color: #0f1c30;
+            border: 1px solid #1a2f4d;
+            color: #7b93b8;
+            font-size: 0.8rem;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .btn-sub:hover {
+            color: #ffffff;
+            background-color: #162a4a;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 0.78rem;
+            text-align: center;
+            display: none;
+            background: rgba(248, 113, 113, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        #userScreen, #adminScreen {
+            display: none;
+        }
+
+        .admin-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #060b14;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            border: 1px solid #12223c;
+        }
+
+        .schedule-box {
+            background: #060b14;
+            border: 1px solid #12223c;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .schedule-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 6px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .schedule-item {
+            background: #0f1c30;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .schedule-item.active {
+            border-left-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.15);
+        }
+
+        .warning-panel {
+            background: #060b14;
+            border: 1px solid #12223c;
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .warning-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .discord-output-box {
+            background: #03060a;
+            border: 1px dashed #1d4ed8;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .discord-output-box pre {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: #93c5fd;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #printableTableArea {
+            background-color: #060b14;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #12223c;
+            width: 100%;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            max-height: 480px;
+            width: 100%;
+        }
+
+        table.habbo-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            text-align: left;
+        }
+
+        table.habbo-table th {
+            background-color: #03060a;
+            color: #60a5fa;
+            padding: 10px 12px;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            border-bottom: 1px solid #12223c;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        table.habbo-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #0f1c30;
+            white-space: nowrap;
+        }
+
+        .badge-status {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .badge-success { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
+        .badge-danger { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+
+        .editable-input {
+            background: #0f1c30;
+            border: 1px solid #1a2f4d;
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            width: 90px;
+            text-align: center;
+        }
+
+        .editable-select {
+            background: #0f1c30;
+            border: 1px solid #1a2f4d;
+            color: #ffffff;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 0.72rem;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-success { background-color: #2563eb; color: #fff; }
+        .btn-warning { background-color: #e2a03f; color: #fff; }
+        .btn-info { background-color: #0284c7; color: #fff; }
+        .btn-danger { background-color: #dc2626; color: #fff; }
+
+        /* MODO ESPECIAL DE RENDERIZAÇÃO PARA PRINT INTEIRO */
+        .force-full-print {
+            max-height: none !important;
+            overflow: visible !important;
+            width: 1050px !important;
+        }
+
+        .force-full-print th {
+            position: static !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pixel-bg" id="pixelBg"></div>
+
+    <div class="main-wrapper" id="mainWrapper">
+        
+        <div class="panel-card">
+            <div class="panel-header">
+                <h1>Painel Operacional <span>• Mercado</span></h1>
+                <div class="badge-live">Turno Ativo</div>
+            </div>
+
+            <!-- TELA DE LOGIN -->
+            <div id="loginScreen">
+                <div class="section-title">DESTAQUES E SUPERVISÃO</div>
+                <div class="supervisor-card">
+                    <div>
+                        <div class="resp-sub">SUPERVISOR DA SEMANA</div>
+                        <div class="resp-name" id="currentSupervisorBanner">Carregando...</div>
+                    </div>
+                    <span style="font-size:1.4rem;">⭐</span>
+                </div>
+
+                <div class="section-title">ACESSO AO SISTEMA</div>
+                <div class="input-group">
+                    <label for="usernameInput">DIGITE SEU NICKNAME NO HABBO</label>
+                    <input type="text" id="usernameInput" class="input-field" placeholder="Ex: Solyta, Chantal..." autocomplete="off">
+                </div>
+
+                <div class="error-msg" id="errorMessage">
+                    Funcionário não encontrado no sistema!
+                </div>
+
+                <button class="btn-main" onclick="loginUser()">ACESSAR MEU PAINEL</button>
+                <button class="btn-sub" onclick="showAdminLogin()">Área Administrativa (Gerentes/Supervisores)</button>
+            </div>
+
+            <!-- TELA DO FUNCIONÁRIO -->
+            <div id="userScreen">
+                <div class="section-title">INFORMAÇÕES PESSOAIS</div>
+                <div class="profile-box">
+                    <div class="avatar-frame" id="avatarFrame"></div>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <span class="lbl">NICK</span>
+                            <span class="val" id="uName">Solyta</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="lbl">CARGO</span>
+                            <span class="role-tag" id="uRole">Encarregado de Loja</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="lbl">SITUAÇÃO</span>
+                            <span class="val" style="color:#60a5fa;">Ativo</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="lbl">AÇÕES</span>
+                            <span class="val" style="cursor:pointer; text-decoration:underline; font-size:0.75rem;" onclick="logout()">Sair</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">PRODUTIVIDADE DA SEMANA ATUAL</div>
+                <div class="profile-info" style="margin-bottom:14px; background:#060b14; padding:10px; border-radius:6px; border:1px solid #12223c;">
+                    <div class="info-item">
+                        <span class="lbl" id="refDateLabel">TURNOS INICIAIS (Até 18/10)</span>
+                        <span class="val" id="uInitial">1606</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="lbl">META DO CARGO</span>
+                        <span class="val" id="uMeta">25 turnos</span>
+                    </div>
+                </div>
+
+                <div class="display-box">
+                    <div class="display-lbl">INFORME SEU TURNO ATUAL</div>
+                    <div class="display-val" id="display">0</div>
+                </div>
+
+                <div class="result-card" id="resultCard">
+                    <div class="res-title">SITUAÇÃO NA SEMANA</div>
+                    <div class="res-val" id="resultText">Turnos Feitos: 0</div>
+                </div>
+
+                <div class="keypad-grid">
+                    <button class="btn-key" onclick="appendNum('7')">7</button>
+                    <button class="btn-key" onclick="appendNum('8')">8</button>
+                    <button class="btn-key" onclick="appendNum('9')">9</button>
+                    
+                    <button class="btn-key" onclick="appendNum('4')">4</button>
+                    <button class="btn-key" onclick="appendNum('5')">5</button>
+                    <button class="btn-key" onclick="appendNum('6')">6</button>
+                    
+                    <button class="btn-key" onclick="appendNum('1')">1</button>
+                    <button class="btn-key" onclick="appendNum('2')">2</button>
+                    <button class="btn-key" onclick="appendNum('3')">3</button>
+                    
+                    <button class="btn-key" onclick="appendNum('0')">0</button>
+                    <button class="btn-key action-c" onclick="clearNum()">C</button>
+                    <button class="btn-key" onclick="deleteNum()">⌫</button>
+
+                    <button class="btn-key action-ok" onclick="calculateShift()">Calcular Turnos Restantes</button>
+                </div>
+            </div>
+
+            <!-- TELA DE GERÊNCIA E SUPERVISÃO -->
+            <div id="adminScreen">
+                <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>PAINEL DE GERÊNCIA E SUPERVISÃO</span>
+                    <button class="btn-sub" style="width:auto; padding:4px 8px; margin:0;" onclick="logout()">Sair</button>
+                </div>
+
+                <div class="schedule-box">
+                    <div class="section-title">CRONOGRAMA DE SUPERVISÃO ATÉ O FIM DE 2026</div>
+                    <div class="schedule-list" id="scheduleList"></div>
+                </div>
+
+                <div class="warning-panel">
+                    <div class="section-title">⚠️ REGISTRO DE ADVERTÊNCIA (GERÊNCIA)</div>
+                    <div class="warning-form-grid">
+                        <div class="input-group" style="margin:0;">
+                            <label>NICK DO FUNCIONÁRIO</label>
+                            <input type="text" id="advNick" class="input-field" placeholder="Ex: Solyta">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>Nº DA ADVERTÊNCIA</label>
+                            <select id="advNum" class="input-field">
+                                <option value="1ª Advertência">1ª Advertência</option>
+                                <option value="2ª Advertência">2ª Advertência</option>
+                                <option value="3ª Advertência">3ª Advertência</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>MOTIVO DA PUNÇÃO</label>
+                            <input type="text" id="advMotivo" class="input-field" placeholder="Ex: Ausência em turno">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>LINK DO PRINT (IMGUR)</label>
+                            <input type="text" id="advImgur" class="input-field" placeholder="Ex: https://i.imgur.com/...">
+                        </div>
+                    </div>
+                    <button class="btn-sm btn-danger" style="width:100%; padding:8px;" onclick="generateWarningText()">
+                        🚨 APLICAR ADVERTÊNCIA E GERAR TEXTO
+                    </button>
+
+                    <div class="discord-output-box" id="discordOutputContainer" style="display:none;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-size:0.7rem; color:#7b93b8; font-weight:bold;">FORMATO PARA DISCORD:</span>
+                            <button class="btn-sm btn-info" onclick="copyDiscordText()">📋 Copiar para o Discord</button>
+                        </div>
+                        <pre id="discordTextOutput"></pre>
+                    </div>
+                </div>
+
+                <div class="admin-controls">
+                    <div>
+                        <span style="font-size:0.75rem; color:#7b93b8;">SEMANA ATIVA:</span><br>
+                        <strong id="adminWeekText" style="font-size:0.85rem; color:#60a5fa;">19/10/2026 à 25/10/2026</strong>
+                    </div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="btn-sm btn-info" onclick="generateTableImage()">📷 Baixar Imagem (PNG)</button>
+                        <button class="btn-sm btn-warning" onclick="advanceWeek()">🔄 Virar Semana</button>
+                        <button class="btn-sm btn-success" onclick="addNewEmployeePrompt()">+ Add Funcionário</button>
+                    </div>
+                </div>
+
+                <div id="printableTableArea">
+                    <div style="padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid #12223c;">
+                        <h2 style="font-size:1.1rem; color:#60a5fa; text-transform:uppercase;">MERCADO RP - Controle Semanal de Produtividade</h2>
+                        <span style="font-size:0.8rem; color:#7b93b8;" id="printWeekSpan">19/10/2026 à 25/10/2026</span>
+                    </div>
+                    <div class="table-responsive" id="tableResponsiveBox">
+                        <table class="habbo-table">
+                            <thead>
+                                <tr>
+                                    <th>Funcionário(a)</th>
+                                    <th>Cargo</th>
+                                    <th>Turnos Iniciais</th>
+                                    <th>Turnos Finais</th>
+                                    <th>Totais de Turnos Feitos na Semana</th>
+                                    <th>Meta Alcançada?</th>
+                                    <th class="action-col">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const roleMetas = {
+            "Operador de Loja": 15,
+            "Balconista": 15,
+            "Caixa": 25,
+            "Encarregado de Loja": 25,
+            "Supervisor": 10,
+            "Gerente": 10
+        };
+
+        const rotationSchedule = [
+            { week: "19/10/2026 à 25/10/2026", resp: "Monica", refDate: "Até 18/10" },
+            { week: "26/10/2026 à 01/11/2026", resp: "Afrontoso", refDate: "Até 25/10" },
+            { week: "02/11/2026 à 08/11/2026", resp: "Chantal", refDate: "Até 01/11" },
+            { week: "09/11/2026 à 15/11/2026", resp: "Monica", refDate: "Até 08/11" },
+            { week: "16/11/2026 à 22/11/2026", resp: "Afrontoso", refDate: "Até 15/11" },
+            { week: "23/11/2026 à 29/11/2026", resp: "Chantal", refDate: "Até 22/11" },
+            { week: "30/11/2026 à 06/12/2026", resp: "Monica", refDate: "Até 29/11" },
+            { week: "07/12/2026 à 13/12/2026", resp: "Afrontoso", refDate: "Até 06/12" },
+            { week: "14/12/2026 à 20/12/2026", resp: "Chantal", refDate: "Até 13/12" },
+            { week: "21/12/2026 à 27/12/2026", resp: "Monica", refDate: "Até 20/12" },
+            { week: "28/12/2026 à 03/01/2027", resp: "Afrontoso", refDate: "Até 27/12" }
+        ];
+
+        const defaultEmployees = [
+            { name: "Afrontoso", role: "Gerente", initial: 3401, current: 3401 },
+            { name: "Chantal", role: "Supervisor", initial: 2181, current: 2181 },
+            { name: "Monica", role: "Supervisor", initial: 2219, current: 2219 },
+            { name: "rxnan", role: "Encarregado de Loja", initial: 212, current: 212 },
+            { name: "Solyta", role: "Encarregado de Loja", initial: 1606, current: 1606 },
+            { name: "Latim", role: "Encarregado de Loja", initial: 144, current: 144 },
+            { name: "Victorgust1", role: "Encarregado de Loja", initial: 259, current: 259 },
+            { name: "mayy", role: "Encarregado de Loja", initial: 258, current: 258 },
+            { name: "Cachinhos", role: "Encarregado de Loja", initial: 855, current: 855 },
+            { name: "JpCooDz", role: "Encarregado de Loja", initial: 127, current: 127 },
+            { name: "death - AUS", role: "Caixa", initial: 107, current: 107 },
+            { name: "ys", role: "Caixa", initial: 80, current: 80 },
+            { name: "deprera", role: "Balconista", initial: 51, current: 51 },
+            { name: "HCN", role: "Balconista", initial: 64, current: 64 },
+            { name: "Janystar100", role: "Balconista", initial: 60, current: 60 },
+            { name: "kyos", role: "Balconista", initial: 50, current: 50 },
+            { name: "zfy", role: "Balconista", initial: 42, current: 42 },
+            { name: "Achila", role: "Operador de Loja", initial: 21, current: 21 },
+            { name: "dg", role: "Operador de Loja", initial: 32, current: 32 },
+            { name: "cityhunter", role: "Operador de Loja", initial: 17, current: 17 }
+        ];
+
+        let employees = JSON.parse(localStorage.getItem("habbo_mkt_emp")) || defaultEmployees;
+        let currentWeekText = localStorage.getItem("habbo_mkt_week") || "19/10/2026 à 25/10/2026";
+        let activeUser = null;
+        let currentInput = "0";
+
+        // FUNDO PIXEL
+        const bgIcons = ['🛒', '📦', '🪙', '🍎', '🥤', '🍞', '🏬'];
+        const bgContainer = document.getElementById('pixelBg');
+        for (let i = 0; i < 20; i++) {
+            let icon = document.createElement('div');
+            icon.className = 'pixel-icon';
+            icon.innerText = bgIcons[Math.floor(Math.random() * bgIcons.length)];
+            icon.style.left = Math.random() * 100 + '%';
+            icon.style.animationDuration = (6 + Math.random() * 8) + 's';
+            icon.style.animationDelay = (Math.random() * 5) + 's';
+            bgContainer.appendChild(icon);
+        }
+
+        function initApp() {
+            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
+            document.getElementById("currentSupervisorBanner").innerText = `${match.resp} (${match.week})`;
+        }
+        initApp();
+
+        function saveData() {
+            localStorage.setItem("habbo_mkt_emp", JSON.stringify(employees));
+            localStorage.setItem("habbo_mkt_week", currentWeekText);
+        }
+
+        function loginUser() {
+            const nick = document.getElementById("usernameInput").value.trim().toLowerCase();
+            const errorMsg = document.getElementById("errorMessage");
+
+            if (!nick) {
+                errorMsg.innerText = "Por favor, digite seu nickname!";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            const found = employees.find(e => e.name.toLowerCase() === nick);
+
+            if (found) {
+                activeUser = found;
+                errorMsg.style.display = "none";
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("userScreen").style.display = "block";
+
+                const meta = roleMetas[found.role] || 15;
+                const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
+
+                document.getElementById("uName").innerText = found.name;
+                document.getElementById("uRole").innerText = found.role;
+                document.getElementById("uInitial").innerText = found.initial;
+                document.getElementById("uMeta").innerText = meta + " turnos";
+                document.getElementById("refDateLabel").innerText = `TURNOS INICIAIS (${match.refDate || 'Até 18/10'})`;
+
+                document.getElementById("avatarFrame").style.backgroundImage = `url('https://www.habbo.com.br/habbo-imaging/avatarimage?user=${found.name}&action=std&direction=2&head_direction=2&gesture=sml&size=m')`;
+
+                currentInput = "0";
+                updateDisplay();
+                calculateShift();
+            } else {
+                errorMsg.innerText = "Funcionário não encontrado no sistema!";
+                errorMsg.style.display = "block";
+            }
+        }
+
+        function showAdminLogin() {
+            const pass = prompt("Digite a senha de administrador ou seu nick de gerente/supervisor:");
+            if (pass && (pass === "admin123" || ["afrontoso", "solyta", "chantal", "monica"].includes(pass.toLowerCase()))) {
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("adminScreen").style.display = "block";
+                document.getElementById("mainWrapper").classList.add("wide");
+                document.getElementById("adminWeekText").innerText = currentWeekText;
+                document.getElementById("printWeekSpan").innerText = currentWeekText;
+                renderSchedule();
+                renderAdminTable();
+            } else if (pass) {
+                alert("Acesso negado!");
+            }
+        }
+
+        function logout() {
+            activeUser = null;
+            document.getElementById("userScreen").style.display = "none";
+            document.getElementById("adminScreen").style.display = "none";
+            document.getElementById("loginScreen").style.display = "block";
+            document.getElementById("mainWrapper").classList.remove("wide");
+            document.getElementById("usernameInput").value = "";
+        }
+
+        const display = document.getElementById("display");
+
+        function updateDisplay() { display.innerText = currentInput; }
+
+        function appendNum(num) {
+            if (currentInput === "0") currentInput = num;
+            else currentInput += num;
+            updateDisplay();
+        }
+
+        function clearNum() { currentInput = "0"; updateDisplay(); }
+
+        function deleteNum() {
+            if (currentInput.length > 1) currentInput = currentInput.slice(0, -1);
+            else currentInput = "0";
+            updateDisplay();
+        }
+
+        function calculateShift() {
+            let currVal = parseInt(currentInput);
+            if (isNaN(currVal)) currVal = 0;
+
+            let meta = roleMetas[activeUser.role] || 15;
+            let feitos = (currVal >= activeUser.initial) ? (currVal - activeUser.initial) : currVal;
+
+            let faltando = meta - feitos;
+            const resCard = document.getElementById("resultCard");
+            const resText = document.getElementById("resultText");
+
+            if (faltando > 0) {
+                resCard.className = "result-card danger";
+                resText.innerHTML = `Feitos nesta semana: <span style="color:#ffffff;">${feitos}</span><br><span style="color:#f87171;">Faltam ${faltando} turnos para a meta</span>`;
+            } else {
+                resCard.className = "result-card";
+                resText.innerHTML = `Feitos nesta semana: <span style="color:#ffffff;">${feitos}</span><br><span style="color:#60a5fa;">🎉 Meta Alcançada!</span>`;
+            }
+        }
+
+        function renderSchedule() {
+            const container = document.getElementById("scheduleList");
+            container.innerHTML = "";
+
+            rotationSchedule.forEach(s => {
+                const isActive = s.week === currentWeekText;
+                const div = document.createElement("div");
+                div.className = `schedule-item ${isActive ? 'active' : ''}`;
+                div.innerHTML = `
+                    <span>${s.week}</span>
+                    <strong>${s.resp} ${isActive ? '(Atual)' : ''}</strong>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+
+            employees.forEach((emp, index) => {
+                let meta = roleMetas[emp.role] || 15;
+                let feitos = emp.current - emp.initial;
+                if (feitos < 0) feitos = 0;
+                let alcançou = feitos >= meta;
+
+                let roleOptions = Object.keys(roleMetas).map(r => 
+                    `<option value="${r}" ${r === emp.role ? 'selected' : ''}>${r}</option>`
+                ).join("");
+
+                let tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${emp.name}</strong></td>
+                    <td class="role-cell" data-role="${emp.role}">
+                        <select class="editable-select" onchange="updateEmpRole(${index}, this.value)">
+                            ${roleOptions}
+                        </select>
+                    </td>
+                    <td>${emp.initial}</td>
+                    <td class="turn-cell" data-val="${emp.current}">
+                        <input type="number" class="editable-input" id="emp-curr-${index}" value="${emp.current}">
+                    </td>
+                    <td><strong>${feitos}</strong></td>
+                    <td>
+                        <span class="badge-status ${alcançou ? 'badge-success' : 'badge-danger'}">
+                            ${alcançou ? 'Alcançada' : 'Não alcançada'}
+                        </span>
+                    </td>
+                    <td class="action-col">
+                        <button class="btn-sm btn-success" onclick="saveSingleTurn(${index})">💾 Salvar</button>
+                        <button class="btn-sm btn-sub" style="margin:0;" onclick="removeEmp(${index})">❌</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateEmpRole(index, newRole) {
+            employees[index].role = newRole;
+            saveData();
+            renderAdminTable();
+        }
+
+        function saveSingleTurn(index) {
+            const valInput = document.getElementById(`emp-curr-${index}`).value;
+            const newTurn = parseInt(valInput);
+            if (!isNaN(newTurn)) {
+                employees[index].current = newTurn;
+                saveData();
+                renderAdminTable();
+                alert(`Turnos de ${employees[index].name} atualizados com sucesso!`);
+            }
+        }
+
+        function removeEmp(index) {
+            if (confirm(`Remover ${employees[index].name} da lista?`)) {
+                employees.splice(index, 1);
+                saveData();
+                renderAdminTable();
+            }
+        }
+
+        function addNewEmployeePrompt() {
+            const name = prompt("Nome do Funcionário:");
+            if (!name) return;
+            const role = prompt("Cargo:", "Operador de Loja") || "Operador de Loja";
+            const initial = parseInt(prompt("Turno Inicial:", "0")) || 0;
+
+            employees.push({
+                name: name.trim(),
+                role: role.trim(),
+                initial: initial,
+                current: initial
+            });
+
+            saveData();
+            renderAdminTable();
+        }
+
+        function advanceWeek() {
+            if (confirm("Deseja virar a semana? Os Turnos Atuais virarão o novo Turno Inicial!")) {
+                employees.forEach(emp => {
+                    emp.initial = emp.current;
+                });
+
+                const newWeek = prompt("Digite o período da nova semana:", "26/10/2026 à 01/11/2026");
+                if (newWeek) {
+                    currentWeekText = newWeek;
+                }
+
+                saveData();
+                document.getElementById("adminWeekText").innerText = currentWeekText;
+                document.getElementById("printWeekSpan").innerText = currentWeekText;
+                initApp();
+                renderSchedule();
+                renderAdminTable();
+                alert("Semana virada com sucesso!");
+            }
+        }
+
+        function generateWarningText() {
+            const nick = document.getElementById("advNick").value.trim();
+            const numAdv = document.getElementById("advNum").value;
+            const motivo = document.getElementById("advMotivo").value.trim();
+            const imgur = document.getElementById("advImgur").value.trim();
+
+            if (!nick || !motivo) {
+                alert("Preencha ao menos o Nick e o Motivo da advertência!");
+                return;
+            }
+
+            const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
+            const cargoText = emp ? emp.role : "Funcionário";
+
+            const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
+                `👤 **Funcionário(a):** ${nick}\n` +
+                `💼 **Cargo:** ${cargoText}\n` +
+                `⚠️ **Punição:** ${numAdv}\n` +
+                `📝 **Motivo:** ${motivo}\n` +
+                `🖼️ **Comprovação (Print):** ${imgur || 'N/A'}\n` +
+                `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
+                `*Esta advertência foi registrada na Administração do Mercado RP.*`;
+
+            document.getElementById("discordTextOutput").innerText = discordFormatted;
+            document.getElementById("discordOutputContainer").style.display = "block";
+        }
+
+        function copyDiscordText() {
+            const text = document.getElementById("discordTextOutput").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Texto copiado para a área de transferência! Agora cole no Discord.");
+            });
+        }
+
+        // GERADOR DE IMAGEM COM CABEÇALHO FIXO E SEM CORTES DE COLUNA
+        function generateTableImage() {
+            const area = document.getElementById("printableTableArea");
+            const responsiveBox = document.getElementById("tableResponsiveBox");
+            const actionCols = document.querySelectorAll(".action-col");
+
+            actionCols.forEach(c => c.style.display = "none");
+
+            const turnCells = document.querySelectorAll(".turn-cell");
+            const roleCells = document.querySelectorAll(".role-cell");
+
+            turnCells.forEach(cell => {
+                const val = cell.getAttribute("data-val");
+                cell.innerHTML = `<strong>${val}</strong>`;
+            });
+
+            roleCells.forEach(cell => {
+                const role = cell.getAttribute("data-role");
+                cell.innerHTML = role;
+            });
+
+            responsiveBox.classList.add("force-full-print");
+
+            html2canvas(area, {
+                backgroundColor: "#060b14",
+                scale: 2,
+                useCORS: true,
+                windowWidth: 1200
+            }).then(canvas => {
+                responsiveBox.classList.remove("force-full-print");
+                actionCols.forEach(c => c.style.display = "");
+                renderAdminTable();
+
+                const link = document.createElement('a');
+                link.download = `Mercado_Habbo_${currentWeekText.replace(/[/]/g, '-')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        document.getElementById("usernameInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") loginUser();
+        });
+    </script>
+</body>
+</html>
