@@ -426,7 +426,7 @@
             background: rgba(96, 165, 250, 0.15);
         }
 
-        .warning-panel {
+        .warning-panel, .absent-panel {
             background: #060b14;
             border: 1px solid #12223c;
             border-radius: 6px;
@@ -436,7 +436,7 @@
 
         .warning-form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 10px;
             margin-bottom: 12px;
         }
@@ -526,6 +526,21 @@
             font-size: 0.8rem;
         }
 
+        .btn-edit-pencil {
+            background: none;
+            border: none;
+            color: #60a5fa;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-left: 6px;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .btn-edit-pencil:hover {
+            background: rgba(96, 165, 250, 0.2);
+        }
+
         .btn-sm {
             padding: 4px 8px;
             font-size: 0.72rem;
@@ -539,7 +554,6 @@
         .btn-info { background-color: #0284c7; color: #fff; }
         .btn-danger { background-color: #dc2626; color: #fff; }
 
-        /* MODO ESPECIAL DE RENDERIZAÇÃO PARA PRINT INTEIRO */
         .force-full-print {
             max-height: none !important;
             overflow: visible !important;
@@ -600,7 +614,7 @@
                         </div>
                         <div class="info-item">
                             <span class="lbl">CARGO</span>
-                            <span class="role-tag" id="uRole">Encarregado de Loja</span>
+                            <span class="role-tag" id="uRole">Supervisor</span>
                         </div>
                         <div class="info-item">
                             <span class="lbl">SITUAÇÃO</span>
@@ -621,7 +635,7 @@
                     </div>
                     <div class="info-item">
                         <span class="lbl">META DO CARGO</span>
-                        <span class="val" id="uMeta">25 turnos</span>
+                        <span class="val" id="uMeta">10 turnos</span>
                     </div>
                 </div>
 
@@ -668,6 +682,43 @@
                     <div class="schedule-list" id="scheduleList"></div>
                 </div>
 
+                <!-- PAINEL DE AUSENTES / LICENÇAS -->
+                <div class="absent-panel">
+                    <div class="section-title">🏖️ REGISTRO DE AUSENTES / LICENÇAS</div>
+                    <div class="warning-form-grid">
+                        <div class="input-group" style="margin:0;">
+                            <label>NICK DO FUNCIONÁRIO</label>
+                            <input type="text" id="absentNick" class="input-field" placeholder="Ex: Solyta">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>AUSÊNCIA (PERÍODO)</label>
+                            <input type="text" id="absentPeriod" class="input-field" placeholder="Ex: 20/10 à 25/10">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label>JUSTIFICATIVA</label>
+                            <input type="text" id="absentReason" class="input-field" placeholder="Ex: Viagem Pessoal / Saúde">
+                        </div>
+                    </div>
+                    <button class="btn-sm btn-success" style="width:100%; padding:8px; margin-bottom:12px;" onclick="addAbsentRecord()">
+                        + REGISTRAR AUSÊNCIA
+                    </button>
+
+                    <div style="overflow-x:auto;">
+                        <table class="habbo-table" style="font-size:0.75rem;">
+                            <thead>
+                                <tr>
+                                    <th>Nick</th>
+                                    <th>Ausência</th>
+                                    <th>Justificativa</th>
+                                    <th style="width:40px;">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="absentTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PAINEL DE ADVERTÊNCIAS -->
                 <div class="warning-panel">
                     <div class="section-title">⚠️ REGISTRO DE ADVERTÊNCIA (GERÊNCIA)</div>
                     <div class="warning-form-grid">
@@ -755,26 +806,27 @@
             "Gerente": 10
         };
 
+        // CRONOGRAMA: SOLYTA SUBSTITUIU AFRONTOSO EM TODAS AS DATAS
         const rotationSchedule = [
             { week: "19/10/2026 à 25/10/2026", resp: "Monica", refDate: "Até 18/10" },
-            { week: "26/10/2026 à 01/11/2026", resp: "Afrontoso", refDate: "Até 25/10" },
+            { week: "26/10/2026 à 01/11/2026", resp: "Solyta", refDate: "Até 25/10" },
             { week: "02/11/2026 à 08/11/2026", resp: "Chantal", refDate: "Até 01/11" },
             { week: "09/11/2026 à 15/11/2026", resp: "Monica", refDate: "Até 08/11" },
-            { week: "16/11/2026 à 22/11/2026", resp: "Afrontoso", refDate: "Até 15/11" },
+            { week: "16/11/2026 à 22/11/2026", resp: "Solyta", refDate: "Até 15/11" },
             { week: "23/11/2026 à 29/11/2026", resp: "Chantal", refDate: "Até 22/11" },
             { week: "30/11/2026 à 06/12/2026", resp: "Monica", refDate: "Até 29/11" },
-            { week: "07/12/2026 à 13/12/2026", resp: "Afrontoso", refDate: "Até 06/12" },
+            { week: "07/12/2026 à 13/12/2026", resp: "Solyta", refDate: "Até 06/12" },
             { week: "14/12/2026 à 20/12/2026", resp: "Chantal", refDate: "Até 13/12" },
             { week: "21/12/2026 à 27/12/2026", resp: "Monica", refDate: "Até 20/12" },
-            { week: "28/12/2026 à 03/01/2027", resp: "Afrontoso", refDate: "Até 27/12" }
+            { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
+        // BASE DE DADOS COM SOLYTA COMO SUPERVISOR
         const defaultEmployees = [
-            { name: "Afrontoso", role: "Gerente", initial: 3401, current: 3401 },
+            { name: "Solyta", role: "Supervisor", initial: 1606, current: 1606 },
             { name: "Chantal", role: "Supervisor", initial: 2181, current: 2181 },
             { name: "Monica", role: "Supervisor", initial: 2219, current: 2219 },
             { name: "rxnan", role: "Encarregado de Loja", initial: 212, current: 212 },
-            { name: "Solyta", role: "Encarregado de Loja", initial: 1606, current: 1606 },
             { name: "Latim", role: "Encarregado de Loja", initial: 144, current: 144 },
             { name: "Victorgust1", role: "Encarregado de Loja", initial: 259, current: 259 },
             { name: "mayy", role: "Encarregado de Loja", initial: 258, current: 258 },
@@ -793,6 +845,7 @@
         ];
 
         let employees = JSON.parse(localStorage.getItem("habbo_mkt_emp")) || defaultEmployees;
+        let absentRecords = JSON.parse(localStorage.getItem("habbo_mkt_absent")) || [];
         let currentWeekText = localStorage.getItem("habbo_mkt_week") || "19/10/2026 à 25/10/2026";
         let activeUser = null;
         let currentInput = "0";
@@ -818,6 +871,7 @@
 
         function saveData() {
             localStorage.setItem("habbo_mkt_emp", JSON.stringify(employees));
+            localStorage.setItem("habbo_mkt_absent", JSON.stringify(absentRecords));
             localStorage.setItem("habbo_mkt_week", currentWeekText);
         }
 
@@ -861,13 +915,14 @@
 
         function showAdminLogin() {
             const pass = prompt("Digite a senha de administrador ou seu nick de gerente/supervisor:");
-            if (pass && (pass === "admin123" || ["afrontoso", "solyta", "chantal", "monica"].includes(pass.toLowerCase()))) {
+            if (pass && (pass === "admin123" || ["solyta", "chantal", "monica"].includes(pass.toLowerCase()))) {
                 document.getElementById("loginScreen").style.display = "none";
                 document.getElementById("adminScreen").style.display = "block";
                 document.getElementById("mainWrapper").classList.add("wide");
                 document.getElementById("adminWeekText").innerText = currentWeekText;
                 document.getElementById("printWeekSpan").innerText = currentWeekText;
                 renderSchedule();
+                renderAbsentTable();
                 renderAdminTable();
             } else if (pass) {
                 alert("Acesso negado!");
@@ -931,7 +986,7 @@
                 div.className = `schedule-item ${isActive ? 'active' : ''}`;
                 div.innerHTML = `
                     <span>${s.week}</span>
-                    <strong>${s.resp} ${isActive ? '(Atual)' : ''}</strong>
+                    <strong>${s.resp}${isActive ? '(Atual)' : ''}</strong>
                 `;
                 container.appendChild(div);
             });
@@ -953,7 +1008,10 @@
 
                 let tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td><strong>${emp.name}</strong></td>
+                    <td>
+                        <strong>${emp.name}</strong>
+                        <button class="btn-edit-pencil action-col" title="Editar Nick" onclick="editEmpName(${index})">✏️</button>
+                    </td>
                     <td class="role-cell" data-role="${emp.role}">
                         <select class="editable-select" onchange="updateEmpRole(${index}, this.value)">
                             ${roleOptions}
@@ -971,153 +1029,4 @@
                     </td>
                     <td class="action-col">
                         <button class="btn-sm btn-success" onclick="saveSingleTurn(${index})">💾 Salvar</button>
-                        <button class="btn-sm btn-sub" style="margin:0;" onclick="removeEmp(${index})">❌</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateEmpRole(index, newRole) {
-            employees[index].role = newRole;
-            saveData();
-            renderAdminTable();
-        }
-
-        function saveSingleTurn(index) {
-            const valInput = document.getElementById(`emp-curr-${index}`).value;
-            const newTurn = parseInt(valInput);
-            if (!isNaN(newTurn)) {
-                employees[index].current = newTurn;
-                saveData();
-                renderAdminTable();
-                alert(`Turnos de ${employees[index].name} atualizados com sucesso!`);
-            }
-        }
-
-        function removeEmp(index) {
-            if (confirm(`Remover ${employees[index].name} da lista?`)) {
-                employees.splice(index, 1);
-                saveData();
-                renderAdminTable();
-            }
-        }
-
-        function addNewEmployeePrompt() {
-            const name = prompt("Nome do Funcionário:");
-            if (!name) return;
-            const role = prompt("Cargo:", "Operador de Loja") || "Operador de Loja";
-            const initial = parseInt(prompt("Turno Inicial:", "0")) || 0;
-
-            employees.push({
-                name: name.trim(),
-                role: role.trim(),
-                initial: initial,
-                current: initial
-            });
-
-            saveData();
-            renderAdminTable();
-        }
-
-        function advanceWeek() {
-            if (confirm("Deseja virar a semana? Os Turnos Atuais virarão o novo Turno Inicial!")) {
-                employees.forEach(emp => {
-                    emp.initial = emp.current;
-                });
-
-                const newWeek = prompt("Digite o período da nova semana:", "26/10/2026 à 01/11/2026");
-                if (newWeek) {
-                    currentWeekText = newWeek;
-                }
-
-                saveData();
-                document.getElementById("adminWeekText").innerText = currentWeekText;
-                document.getElementById("printWeekSpan").innerText = currentWeekText;
-                initApp();
-                renderSchedule();
-                renderAdminTable();
-                alert("Semana virada com sucesso!");
-            }
-        }
-
-        function generateWarningText() {
-            const nick = document.getElementById("advNick").value.trim();
-            const numAdv = document.getElementById("advNum").value;
-            const motivo = document.getElementById("advMotivo").value.trim();
-            const imgur = document.getElementById("advImgur").value.trim();
-
-            if (!nick || !motivo) {
-                alert("Preencha ao menos o Nick e o Motivo da advertência!");
-                return;
-            }
-
-            const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
-            const cargoText = emp ? emp.role : "Funcionário";
-
-            const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
-                `👤 **Funcionário(a):** ${nick}\n` +
-                `💼 **Cargo:** ${cargoText}\n` +
-                `⚠️ **Punição:** ${numAdv}\n` +
-                `📝 **Motivo:** ${motivo}\n` +
-                `🖼️ **Comprovação (Print):** ${imgur || 'N/A'}\n` +
-                `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
-                `*Esta advertência foi registrada na Administração do Mercado RP.*`;
-
-            document.getElementById("discordTextOutput").innerText = discordFormatted;
-            document.getElementById("discordOutputContainer").style.display = "block";
-        }
-
-        function copyDiscordText() {
-            const text = document.getElementById("discordTextOutput").innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Texto copiado para a área de transferência! Agora cole no Discord.");
-            });
-        }
-
-        // GERADOR DE IMAGEM COM CABEÇALHO FIXO E SEM CORTES DE COLUNA
-        function generateTableImage() {
-            const area = document.getElementById("printableTableArea");
-            const responsiveBox = document.getElementById("tableResponsiveBox");
-            const actionCols = document.querySelectorAll(".action-col");
-
-            actionCols.forEach(c => c.style.display = "none");
-
-            const turnCells = document.querySelectorAll(".turn-cell");
-            const roleCells = document.querySelectorAll(".role-cell");
-
-            turnCells.forEach(cell => {
-                const val = cell.getAttribute("data-val");
-                cell.innerHTML = `<strong>${val}</strong>`;
-            });
-
-            roleCells.forEach(cell => {
-                const role = cell.getAttribute("data-role");
-                cell.innerHTML = role;
-            });
-
-            responsiveBox.classList.add("force-full-print");
-
-            html2canvas(area, {
-                backgroundColor: "#060b14",
-                scale: 2,
-                useCORS: true,
-                windowWidth: 1200
-            }).then(canvas => {
-                responsiveBox.classList.remove("force-full-print");
-                actionCols.forEach(c => c.style.display = "");
-                renderAdminTable();
-
-                const link = document.createElement('a');
-                link.download = `Mercado_Habbo_${currentWeekText.replace(/[/]/g, '-')}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
-        }
-
-        document.getElementById("usernameInput").addEventListener("keypress", function(e) {
-            if (e.key === "Enter") loginUser();
-        });
-    </script>
-</body>
-</html>
+                        <button class="btn-sm btn-sub" style="margin:0;" onclick="removeEmp(${index})">❌
