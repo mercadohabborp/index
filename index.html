@@ -986,7 +986,7 @@
                 div.className = `schedule-item ${isActive ? 'active' : ''}`;
                 div.innerHTML = `
                     <span>${s.week}</span>
-                    <strong>${s.resp}${isActive ? '(Atual)' : ''}</strong>
+                    <strong>${s.resp} ${isActive ? '(Atual)' : ''}</strong>
                 `;
                 container.appendChild(div);
             });
@@ -1029,4 +1029,204 @@
                     </td>
                     <td class="action-col">
                         <button class="btn-sm btn-success" onclick="saveSingleTurn(${index})">💾 Salvar</button>
-                        <button class="btn-sm btn-sub" style="margin:0;" onclick="removeEmp(${index})">❌
+                        <button class="btn-sm btn-sub" style="margin:0;" onclick="removeEmp(${index})">❌</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function editEmpName(index) {
+            const oldName = employees[index].name;
+            const newName = prompt("Editar Nickname do funcionário:", oldName);
+            if (newName && newName.trim() !== "") {
+                employees[index].name = newName.trim();
+                saveData();
+                renderAdminTable();
+            }
+        }
+
+        function updateEmpRole(index, newRole) {
+            employees[index].role = newRole;
+            saveData();
+            renderAdminTable();
+        }
+
+        function saveSingleTurn(index) {
+            const valInput = document.getElementById(`emp-curr-${index}`).value;
+            const newTurn = parseInt(valInput);
+            if (!isNaN(newTurn)) {
+                employees[index].current = newTurn;
+                saveData();
+                renderAdminTable();
+                alert(`Turnos de ${employees[index].name} atualizados com sucesso!`);
+            }
+        }
+
+        function removeEmp(index) {
+            if (confirm(`Remover ${employees[index].name} da lista?`)) {
+                employees.splice(index, 1);
+                saveData();
+                renderAdminTable();
+            }
+        }
+
+        function addNewEmployeePrompt() {
+            const name = prompt("Nome do Funcionário:");
+            if (!name) return;
+            const role = prompt("Cargo:", "Operador de Loja") || "Operador de Loja";
+            const initial = parseInt(prompt("Turno Inicial:", "0")) || 0;
+
+            employees.push({
+                name: name.trim(),
+                role: role.trim(),
+                initial: initial,
+                current: initial
+            });
+
+            saveData();
+            renderAdminTable();
+        }
+
+        /* LÓGICA DE AUSENTES */
+        function addAbsentRecord() {
+            const nick = document.getElementById("absentNick").value.trim();
+            const period = document.getElementById("absentPeriod").value.trim();
+            const reason = document.getElementById("absentReason").value.trim();
+
+            if (!nick || !period) {
+                alert("Preencha ao menos o Nick e o Período da ausência!");
+                return;
+            }
+
+            absentRecords.push({ nick, period, reason: reason || "N/A" });
+            saveData();
+            renderAbsentTable();
+
+            document.getElementById("absentNick").value = "";
+            document.getElementById("absentPeriod").value = "";
+            document.getElementById("absentReason").value = "";
+        }
+
+        function renderAbsentTable() {
+            const tbody = document.getElementById("absentTableBody");
+            tbody.innerHTML = "";
+
+            absentRecords.forEach((rec, idx) => {
+                let tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${rec.nick}</strong></td>
+                    <td>${rec.period}</td>
+                    <td>${rec.reason}</td>
+                    <td><button class="btn-sm btn-sub" style="margin:0; padding:2px 6px;" onclick="removeAbsentRecord(${idx})">❌</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function removeAbsentRecord(idx) {
+            absentRecords.splice(idx, 1);
+            saveData();
+            renderAbsentTable();
+        }
+
+        function advanceWeek() {
+            if (confirm("Deseja virar a semana? Os Turnos Atuais virarão o novo Turno Inicial!")) {
+                employees.forEach(emp => {
+                    emp.initial = emp.current;
+                });
+
+                const newWeek = prompt("Digite o período da nova semana:", "26/10/2026 à 01/11/2026");
+                if (newWeek) {
+                    currentWeekText = newWeek;
+                }
+
+                saveData();
+                document.getElementById("adminWeekText").innerText = currentWeekText;
+                document.getElementById("printWeekSpan").innerText = currentWeekText;
+                initApp();
+                renderSchedule();
+                renderAdminTable();
+                alert("Semana virada com sucesso!");
+            }
+        }
+
+        function generateWarningText() {
+            const nick = document.getElementById("advNick").value.trim();
+            const numAdv = document.getElementById("advNum").value;
+            const motivo = document.getElementById("advMotivo").value.trim();
+            const imgur = document.getElementById("advImgur").value.trim();
+
+            if (!nick || !motivo) {
+                alert("Preencha ao menos o Nick e o Motivo da advertência!");
+                return;
+            }
+
+            const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
+            const cargoText = emp ? emp.role : "Funcionário";
+
+            const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
+                `👤 **Funcionário(a):** ${nick}\n` +
+                `💼 **Cargo:** ${cargoText}\n` +
+                `⚠️ **Punição:** ${numAdv}\n` +
+                `📝 **Motivo:** ${motivo}\n` +
+                `🖼️ **Comprovação (Print):** ${imgur || 'N/A'}\n` +
+                `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
+                `*Esta advertência foi registrada na Administração do Mercado RP.*`;
+
+            document.getElementById("discordTextOutput").innerText = discordFormatted;
+            document.getElementById("discordOutputContainer").style.display = "block";
+        }
+
+        function copyDiscordText() {
+            const text = document.getElementById("discordTextOutput").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Texto copiado para a área de transferência! Agora cole no Discord.");
+            });
+        }
+
+        function generateTableImage() {
+            const area = document.getElementById("printableTableArea");
+            const responsiveBox = document.getElementById("tableResponsiveBox");
+            const actionCols = document.querySelectorAll(".action-col");
+
+            actionCols.forEach(c => c.style.display = "none");
+
+            const turnCells = document.querySelectorAll(".turn-cell");
+            const roleCells = document.querySelectorAll(".role-cell");
+
+            turnCells.forEach(cell => {
+                const val = cell.getAttribute("data-val");
+                cell.innerHTML = `<strong>${val}</strong>`;
+            });
+
+            roleCells.forEach(cell => {
+                const role = cell.getAttribute("data-role");
+                cell.innerHTML = role;
+            });
+
+            responsiveBox.classList.add("force-full-print");
+
+            html2canvas(area, {
+                backgroundColor: "#060b14",
+                scale: 2,
+                useCORS: true,
+                windowWidth: 1200
+            }).then(canvas => {
+                responsiveBox.classList.remove("force-full-print");
+                actionCols.forEach(c => c.style.display = "");
+                renderAdminTable();
+
+                const link = document.createElement('a');
+                link.download = `Mercado_Habbo_${currentWeekText.replace(/[/]/g, '-')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        document.getElementById("usernameInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") loginUser();
+        });
+    </script>
+</body>
+</html>
