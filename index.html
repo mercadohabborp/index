@@ -6,6 +6,11 @@
     <title>Mercado Habbo RP - Controle de Turnos</title>
     <!-- html2canvas para exportar a imagem da tabela -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Firebase SDKs (Compat / Modular via CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -815,6 +820,20 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE COM AS SUAS CREDENCIAIS
+        const firebaseConfig = {
+            apiKey: "AIzaSyBEZ_UG7XgUu2FyVLpIyCF_VMVncXfP6zY",
+            authDomain: "mercado-habbo-rp.firebaseapp.com",
+            projectId: "mercado-habbo-rp",
+            storageBucket: "mercado-habbo-rp.firebasestorage.app",
+            messagingSenderId: "1017825094485",
+            appId: "1:1017825094485:web:e5691e969dad624afd1ddc",
+            measurementId: "G-MMYZEQ2J5E"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         const roleMetas = {
             "Operador de Loja": 15,
             "Balconista": 15,
@@ -847,7 +866,6 @@
             { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
-        // BASE DE DADOS INCLUINDO AFRONTOSO COMO GERENTE E SOLYTA COMO SUPERVISOR
         const defaultEmployees = [
             { name: "Afrontoso", role: "Gerente", initial: 3401, current: 3401 },
             { name: "Solyta", role: "Supervisor", initial: 1606, current: 1606 },
@@ -871,9 +889,9 @@
             { name: "cityhunter", role: "Operador de Loja", initial: 17, current: 17 }
         ];
 
-        let employees = JSON.parse(localStorage.getItem("habbo_mkt_emp")) || defaultEmployees;
-        let absentRecords = JSON.parse(localStorage.getItem("habbo_mkt_absent")) || [];
-        let currentWeekText = localStorage.getItem("habbo_mkt_week") || "19/10/2026 à 25/10/2026";
+        let employees = [];
+        let absentRecords = [];
+        let currentWeekText = "19/10/2026 à 25/10/2026";
         let activeUser = null;
         let currentInput = "0";
 
@@ -890,13 +908,55 @@
             bgContainer.appendChild(icon);
         }
 
+        // CARREGAR DADOS DO FIREfirestore EM TEMPO REAL
+        db.collection("mercadoData").doc("mainDoc").onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                employees = data.employees || defaultEmployees;
+                absentRecords = data.absentRecords || [];
+                currentWeekText = data.currentWeekText || "19/10/2026 à 25/10/2026";
+            } else {
+                // Se o documento não existir, cria com os dados padrão
+                employees = defaultEmployees;
+                absentRecords = [];
+                currentWeekText = "19/10/2026 à 25/10/2026";
+                saveData();
+            }
+
+            initApp();
+            document.getElementById("adminWeekText").innerText = currentWeekText;
+            document.getElementById("printWeekSpan").innerText = currentWeekText;
+            renderSchedule();
+            renderAbsentTable();
+            renderAdminTable();
+        }, (error) => {
+            console.error("Erro ao sincronizar com o Firebase: ", error);
+            // Fallback para localStorage se houver falha de rede
+            employees = JSON.parse(localStorage.getItem("habbo_mkt_emp")) || defaultEmployees;
+            absentRecords = JSON.parse(localStorage.getItem("habbo_mkt_absent")) || [];
+            currentWeekText = localStorage.getItem("habbo_mkt_week") || "19/10/2026 à 25/10/2026";
+            initApp();
+            renderSchedule();
+            renderAbsentTable();
+            renderAdminTable();
+        });
+
         function initApp() {
             const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
             document.getElementById("currentSupervisorBanner").innerText = `${match.resp} (${match.week})`;
         }
-        initApp();
 
         function saveData() {
+            // Salva no Firestore
+            db.collection("mercadoData").doc("mainDoc").set({
+                employees: employees,
+                absentRecords: absentRecords,
+                currentWeekText: currentWeekText
+            }).catch((error) => {
+                console.error("Erro ao salvar no Firestore: ", error);
+            });
+
+            // Backup local
             localStorage.setItem("habbo_mkt_emp", JSON.stringify(employees));
             localStorage.setItem("habbo_mkt_absent", JSON.stringify(absentRecords));
             localStorage.setItem("habbo_mkt_week", currentWeekText);
@@ -1023,7 +1083,6 @@
             const tbody = document.getElementById("tableBody");
             tbody.innerHTML = "";
 
-            // FILTRAGEM E ORDENAÇÃO
             let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
             let sortedEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx }));
 
@@ -1101,7 +1160,7 @@
                 employees[index].current = newTurn;
                 saveData();
                 renderAdminTable();
-                alert(`Turnos de ${employees[index].name} atualizados com sucesso!`);
+                alert(`Turnos de ${employees[index].name} atualizados e salvos na nuvem!`);
             }
         }
 
@@ -1172,7 +1231,7 @@
         }
 
         function advanceWeek() {
-            if (confirm("Deseja virar a semana? Os Turnos Atuais virarão o novo Turno Inicial!")) {
+            if (confirm("Deseja virar a semana? Os Turnos Atuais virarão o novo Turno Inicial para todos!")) {
                 employees.forEach(emp => {
                     emp.initial = emp.current;
                 });
@@ -1188,7 +1247,7 @@
                 initApp();
                 renderSchedule();
                 renderAdminTable();
-                alert("Semana virada com sucesso!");
+                alert("Semana virada e sincronizada com sucesso!");
             }
         }
 
