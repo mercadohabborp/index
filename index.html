@@ -773,9 +773,11 @@
                 </div>
 
                 <div class="admin-controls">
-                    <div>
-                        <span style="font-size:0.75rem; color:#7b93b8;">SEMANA ATIVA:</span><br>
-                        <strong id="adminWeekText" style="font-size:0.85rem; color:#60a5fa;">19/10/2026 à 25/10/2026</strong>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <span style="font-size:0.75rem; color:#7b93b8;">SELECIONAR / ALTERAR SEMANA ATIVA:</span>
+                        <select id="weekSelector" class="filter-select" onchange="changeWeekManual(this.value)">
+                            <!-- Preenchido via JavaScript -->
+                        </select>
                     </div>
                     <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                         <select id="sortFilter" class="filter-select action-col" onchange="renderAdminTable()">
@@ -820,7 +822,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBEZ_UG7XgUu2FyVLpIyCF_VMVncXfP6zY",
             authDomain: "mercado-habbo-rp.firebaseapp.com",
@@ -891,7 +892,7 @@
 
         let employees = [];
         let absentRecords = [];
-        let currentWeekText = "19/10/2026 à 25/10/2026";
+        let currentWeekText = "26/10/2026 à 01/11/2026";
         let activeUser = null;
         let currentInput = "0";
 
@@ -914,16 +915,16 @@
                 const data = doc.data();
                 employees = data.employees || defaultEmployees;
                 absentRecords = data.absentRecords || [];
-                currentWeekText = data.currentWeekText || "19/10/2026 à 25/10/2026";
+                currentWeekText = data.currentWeekText || "26/10/2026 à 01/11/2026";
             } else {
                 employees = defaultEmployees;
                 absentRecords = [];
-                currentWeekText = "19/10/2026 à 25/10/2026";
+                currentWeekText = "26/10/2026 à 01/11/2026";
                 saveData();
             }
 
             initApp();
-            document.getElementById("adminWeekText").innerText = currentWeekText;
+            populateWeekSelector();
             document.getElementById("printWeekSpan").innerText = currentWeekText;
             renderSchedule();
             renderAbsentTable();
@@ -932,8 +933,9 @@
             console.error("Erro ao sincronizar com o Firebase: ", error);
             employees = JSON.parse(localStorage.getItem("habbo_mkt_emp")) || defaultEmployees;
             absentRecords = JSON.parse(localStorage.getItem("habbo_mkt_absent")) || [];
-            currentWeekText = localStorage.getItem("habbo_mkt_week") || "19/10/2026 à 25/10/2026";
+            currentWeekText = localStorage.getItem("habbo_mkt_week") || "26/10/2026 à 01/11/2026";
             initApp();
+            populateWeekSelector();
             renderSchedule();
             renderAbsentTable();
             renderAdminTable();
@@ -942,6 +944,28 @@
         function initApp() {
             const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
             document.getElementById("currentSupervisorBanner").innerText = `${match.resp} (${match.week})`;
+        }
+
+        function populateWeekSelector() {
+            const selector = document.getElementById("weekSelector");
+            if (!selector) return;
+            selector.innerHTML = "";
+            rotationSchedule.forEach(s => {
+                let opt = document.createElement("option");
+                opt.value = s.week;
+                opt.innerText = `${s.week} (Sup: ${s.resp})`;
+                if (s.week === currentWeekText) opt.selected = true;
+                selector.appendChild(opt);
+            });
+        }
+
+        function changeWeekManual(selectedWeek) {
+            currentWeekText = selectedWeek;
+            saveData();
+            initApp();
+            renderSchedule();
+            renderAdminTable();
+            document.getElementById("printWeekSpan").innerText = currentWeekText;
         }
 
         function saveData() {
@@ -1002,8 +1026,8 @@
                 document.getElementById("loginScreen").style.display = "none";
                 document.getElementById("adminScreen").style.display = "block";
                 document.getElementById("mainWrapper").classList.add("wide");
-                document.getElementById("adminWeekText").innerText = currentWeekText;
                 document.getElementById("printWeekSpan").innerText = currentWeekText;
+                populateWeekSelector();
                 renderSchedule();
                 renderAbsentTable();
                 renderAdminTable();
@@ -1081,7 +1105,7 @@
 
             let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
             
-            // FILTRA APENAS QUEM TEM 15 OU MAIS TURNOS INICIAIS PARA EXIBIR NA TABELA
+            // FILTRA APENAS QUEM TEM 15 OU MAIS TURNOS INICIAIS PARA EXIBIR NA TABELA PRINCIPAL
             let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx })).filter(e => e.initial >= 15);
 
             if (filterMode === "alpha") {
@@ -1229,23 +1253,29 @@
         }
 
         function advanceWeek() {
-            if (confirm("Deseja virar a semana? Os Turnos Atuais virarão o novo Turno Inicial para todos!")) {
+            if (confirm("Deseja virar a semana? Os Turnos Atuais virarão o novo Turno Inicial para todos e avançará para a próxima semana do cronograma!")) {
                 employees.forEach(emp => {
                     emp.initial = emp.current;
                 });
 
-                const newWeek = prompt("Digite o período da nova semana exato:", "26/10/2026 à 01/11/2026");
-                if (newWeek && newWeek.trim() !== "") {
-                    currentWeekText = newWeek.trim();
+                // Procura a próxima semana automaticamente no cronograma
+                const currentIndex = rotationSchedule.findIndex(s => s.week === currentWeekText);
+                if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
+                    currentWeekText = rotationSchedule[currentIndex + 1].week;
+                } else {
+                    const newWeek = prompt("Digite o período da nova semana exato:", "02/11/2026 à 08/11/2026");
+                    if (newWeek && newWeek.trim() !== "") {
+                        currentWeekText = newWeek.trim();
+                    }
                 }
 
                 saveData();
-                document.getElementById("adminWeekText").innerText = currentWeekText;
+                populateWeekSelector();
                 document.getElementById("printWeekSpan").innerText = currentWeekText;
                 initApp();
                 renderSchedule();
                 renderAdminTable();
-                alert("Semana virada, supervisor atualizado e sincronizado com sucesso!");
+                alert("Semana virada, supervisor atualizado e sincronizado na nuvem com sucesso!");
             }
         }
 
