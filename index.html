@@ -7,7 +7,7 @@
     <!-- html2canvas para exportar a imagem da tabela -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Firebase SDKs (Compat / Modular via CDN) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -646,7 +646,7 @@
                 <div class="section-title">PRODUTIVIDADE DA SEMANA ATUAL</div>
                 <div class="profile-info" style="margin-bottom:14px; background:#060b14; padding:10px; border-radius:6px; border:1px solid #12223c;">
                     <div class="info-item">
-                        <span class="lbl" id="refDateLabel">TURNOS INICIAIS (Até 18/10)</span>
+                        <span class="lbl" id="refDateLabel">TURNOS INICIAIS</span>
                         <span class="val" id="uInitial">1606</span>
                     </div>
                     <div class="info-item">
@@ -820,7 +820,7 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO FIREBASE COM AS SUAS CREDENCIAIS
+        // CONFIGURAÇÃO DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBEZ_UG7XgUu2FyVLpIyCF_VMVncXfP6zY",
             authDomain: "mercado-habbo-rp.firebaseapp.com",
@@ -908,7 +908,7 @@
             bgContainer.appendChild(icon);
         }
 
-        // CARREGAR DADOS DO FIREfirestore EM TEMPO REAL
+        // CARREGAR DADOS DO FIRESTORE EM TEMPO REAL
         db.collection("mercadoData").doc("mainDoc").onSnapshot((doc) => {
             if (doc.exists) {
                 const data = doc.data();
@@ -916,7 +916,6 @@
                 absentRecords = data.absentRecords || [];
                 currentWeekText = data.currentWeekText || "19/10/2026 à 25/10/2026";
             } else {
-                // Se o documento não existir, cria com os dados padrão
                 employees = defaultEmployees;
                 absentRecords = [];
                 currentWeekText = "19/10/2026 à 25/10/2026";
@@ -931,7 +930,6 @@
             renderAdminTable();
         }, (error) => {
             console.error("Erro ao sincronizar com o Firebase: ", error);
-            // Fallback para localStorage se houver falha de rede
             employees = JSON.parse(localStorage.getItem("habbo_mkt_emp")) || defaultEmployees;
             absentRecords = JSON.parse(localStorage.getItem("habbo_mkt_absent")) || [];
             currentWeekText = localStorage.getItem("habbo_mkt_week") || "19/10/2026 à 25/10/2026";
@@ -947,7 +945,6 @@
         }
 
         function saveData() {
-            // Salva no Firestore
             db.collection("mercadoData").doc("mainDoc").set({
                 employees: employees,
                 absentRecords: absentRecords,
@@ -956,7 +953,6 @@
                 console.error("Erro ao salvar no Firestore: ", error);
             });
 
-            // Backup local
             localStorage.setItem("habbo_mkt_emp", JSON.stringify(employees));
             localStorage.setItem("habbo_mkt_absent", JSON.stringify(absentRecords));
             localStorage.setItem("habbo_mkt_week", currentWeekText);
@@ -987,7 +983,7 @@
                 document.getElementById("uRole").innerText = found.role;
                 document.getElementById("uInitial").innerText = found.initial;
                 document.getElementById("uMeta").innerText = meta + " turnos";
-                document.getElementById("refDateLabel").innerText = `TURNOS INICIAIS (${match.refDate || 'Até 18/10'})`;
+                document.getElementById("refDateLabel").innerText = `TURNOS INICIAIS (${match.refDate || 'Iniciais'})`;
 
                 document.getElementById("avatarFrame").style.backgroundImage = `url('https://www.habbo.com.br/habbo-imaging/avatarimage?user=${found.name}&action=std&direction=2&head_direction=2&gesture=sml&size=m')`;
 
@@ -1084,19 +1080,21 @@
             tbody.innerHTML = "";
 
             let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
-            let sortedEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx }));
+            
+            // FILTRA APENAS QUEM TEM 15 OU MAIS TURNOS INICIAIS PARA EXIBIR NA TABELA
+            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx })).filter(e => e.initial >= 15);
 
             if (filterMode === "alpha") {
-                sortedEmployees.sort((a, b) => a.name.localeCompare(b.name));
+                visibleEmployees.sort((a, b) => a.name.localeCompare(b.name));
             } else if (filterMode === "turns-desc") {
-                sortedEmployees.sort((a, b) => (b.current - b.initial) - (a.current - a.initial));
+                visibleEmployees.sort((a, b) => (b.current - b.initial) - (a.current - a.initial));
             } else if (filterMode === "turns-asc") {
-                sortedEmployees.sort((a, b) => (a.current - a.initial) - (b.current - b.initial));
+                visibleEmployees.sort((a, b) => (a.current - a.initial) - (b.current - b.initial));
             } else if (filterMode === "role") {
-                sortedEmployees.sort((a, b) => (roleHierarchy[a.role] || 99) - (roleHierarchy[b.role] || 99));
+                visibleEmployees.sort((a, b) => (roleHierarchy[a.role] || 99) - (roleHierarchy[b.role] || 99));
             }
 
-            sortedEmployees.forEach((emp) => {
+            visibleEmployees.forEach((emp) => {
                 let index = emp.originalIndex;
                 let meta = roleMetas[emp.role] || 15;
                 let feitos = emp.current - emp.initial;
@@ -1236,9 +1234,9 @@
                     emp.initial = emp.current;
                 });
 
-                const newWeek = prompt("Digite o período da nova semana:", "26/10/2026 à 01/11/2026");
-                if (newWeek) {
-                    currentWeekText = newWeek;
+                const newWeek = prompt("Digite o período da nova semana exato:", "26/10/2026 à 01/11/2026");
+                if (newWeek && newWeek.trim() !== "") {
+                    currentWeekText = newWeek.trim();
                 }
 
                 saveData();
@@ -1247,7 +1245,7 @@
                 initApp();
                 renderSchedule();
                 renderAdminTable();
-                alert("Semana virada e sincronizada com sucesso!");
+                alert("Semana virada, supervisor atualizado e sincronizado com sucesso!");
             }
         }
 
