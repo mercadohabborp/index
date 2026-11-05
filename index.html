@@ -1361,7 +1361,7 @@
             });
         }
 
-        function processBulkImport() {
+       function processBulkImport() {
             const rawText = document.getElementById("bulkImportText").value.trim();
             if (!rawText) {
                 alert("Cole os dados na caixa de texto primeiro!");
@@ -1381,10 +1381,14 @@
                     const rawName = match[1].trim().toLowerCase();
                     const newTurnVal = parseInt(match[2]);
 
+                    // Procura o funcionário limpando espaços e ignorando variações de hífens/maiúsculas
                     let emp = employees.find(e => {
                         const dbName = e.name.trim().toLowerCase();
+                        const cleanDbName = dbName.replace(/\s*-\s*aus/g, '').trim();
+                        const cleanRawName = rawName.replace(/\s*-\s*aus/g, '').trim();
+                        
                         return dbName === rawName || 
-                               dbName.replace(/\s*-\s*aus/g, '').trim() === rawName.replace(/\s*-\s*aus/g, '').trim() ||
+                               cleanDbName === cleanRawName ||
                                dbName.includes(rawName) || 
                                rawName.includes(dbName);
                     });
@@ -1393,6 +1397,7 @@
                         emp.current = newTurnVal;
                         updatedCount++;
                     } else {
+                        // Se realmente não existir, cadastra automaticamente como novo
                         employees.push({
                             name: match[1].trim(),
                             role: "Operador de Loja",
@@ -1413,7 +1418,6 @@
                 alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
             }
         }
-
         document.getElementById("usernameInput").addEventListener("keypress", function(e) {
             if (e.key === "Enter") loginUser();
         });
