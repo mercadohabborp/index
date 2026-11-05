@@ -1332,33 +1332,32 @@
 
                 const match = cleanLine.match(/^(.*?)\s+(\d+)$/);
                 if (match) {
-                    const inputName = match[1].trim().toLowerCase();
+                    const inputName = match[1].trim();
                     const newTurnVal = parseInt(match[2]);
+                    const cleanInput = inputName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-                    // Procura o funcionário limpando e normalizando todas as variações possíveis
+                    // Procura o funcionário no array local
                     let emp = employees.find(e => {
                         if (!e || !e.name) return false;
                         const dbName = e.name.trim().toLowerCase();
-                        
-                        // Remove hífens e espaços extras para comparar a raiz do nick (ex: "chantal - aus" vira "chantal")
                         const cleanDb = dbName.replace(/[^a-z0-9]/g, '');
-                        const cleanInput = inputName.replace(/[^a-z0-9]/g, '');
-
-                        return dbName === inputName || cleanDb === cleanInput;
+                        return cleanDb === cleanInput || dbName === inputName.toLowerCase();
                     });
 
                     if (emp) {
                         emp.current = newTurnVal;
                         updatedCount++;
+                        console.log(`Atualizado com sucesso: ${emp.name} para ${newTurnVal}`);
                     } else {
-                        // Se por algum motivo ainda não achar, adiciona como novo para não falhar
+                        // Se não encontrou por nenhuma regra, adiciona novo
                         employees.push({
-                            name: match[1].trim(),
+                            name: inputName,
                             role: "Operador de Loja",
                             initial: newTurnVal >= 15 ? newTurnVal : 15,
                             current: newTurnVal
                         });
                         addedCount++;
+                        console.log(`Adicionado como novo: ${inputName} com ${newTurnVal}`);
                     }
                 }
             });
@@ -1367,9 +1366,9 @@
                 saveData();
                 renderAdminTable();
                 document.getElementById("bulkImportText").value = "";
-                alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
+                alert(`Sucesso! ${updatedCount} atualizados, ${addedCount} novos.`);
             } else {
-                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
+                alert("Erro ao ler os dados. Verifique o formato.");
             }
         }
 
