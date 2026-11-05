@@ -1380,21 +1380,19 @@
                 const parts = line.trim().split(/\s+/);
                 if (parts.length >= 2) {
                     const newTurnVal = parseInt(parts[parts.length - 1]);
-                    const rawName = parts.slice(0, parts.length - 1).join(" ");
+                    const rawName = parts.slice(0, parts.length - 1).join(" ").trim();
 
                     if (!isNaN(newTurnVal)) {
-                        let emp = employees.find(e => e.name.toLowerCase() === rawName.toLowerCase());
+                        let emp = employees.find(e => e.name.trim().toLowerCase() === rawName.toLowerCase());
 
                         if (emp) {
                             emp.current = newTurnVal;
                             updatedCount++;
                         } else {
-                            // Ao criar novo funcionário, define o initial = current 
-                            // para ele passar pelo filtro de >= 15 e ser exibido na tabela
                             employees.push({
                                 name: rawName,
                                 role: "Operador de Loja",
-                                initial: newTurnVal,
+                                initial: newTurnVal >= 15 ? newTurnVal : 15,
                                 current: newTurnVal
                             });
                             addedCount++;
@@ -1407,7 +1405,7 @@
                 saveData();
                 renderAdminTable();
                 document.getElementById("bulkImportText").value = "";
-                alert(`Sucesso! ${updatedCount} atualizados e ${addedCount} novos funcionários cadastrados e sincronizados na nuvem.`);
+                alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
             } else {
                 alert("Não foi possível ler os dados. Certifique-se de que cada linha tem o Nome e o Número do Turno separados por espaço.");
             }
