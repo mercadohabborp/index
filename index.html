@@ -764,15 +764,15 @@
                     </button>
 
                     <div class="warning-panel" style="margin-top: 14px; border-color: #2563eb;">
-    <div class="section-title">📥 IMPORTAÇÃO RÁPIDA DE TURNOS EM MASSA</div>
-    <p style="font-size: 0.75rem; color: #7b93b8; margin-bottom: 8px;">
-        Cole abaixo os dados copiados (Nick e Turnos Finais separados por espaço ou tabulação):
-    </p>
-    <textarea id="bulkImportText" class="input-field" rows="4" placeholder="Ex:&#10;Afrontoso    3433&#10;Solyta    1810" style="width:100%; font-family:monospace; font-size:0.8rem; margin-bottom:8px;"></textarea>
-    <button class="btn-sm btn-success" style="width:100%; padding: 8px;" onclick="processBulkImport()">
-        ⚡ Processar e Atualizar Turnos Finais em Massa
-    </button>
-</div>
+                        <div class="section-title">📥 IMPORTAÇÃO RÁPIDA DE TURNOS EM MASSA</div>
+                        <p style="font-size: 0.75rem; color: #7b93b8; margin-bottom: 8px;">
+                            Cole abaixo os dados copiados (Nick e Turnos Finais separados por espaço ou tabulação):
+                        </p>
+                        <textarea id="bulkImportText" class="input-field" rows="4" placeholder="Ex:&#10;Afrontoso    3433&#10;Solyta    1810" style="width:100%; font-family:monospace; font-size:0.8rem; margin-bottom:8px;"></textarea>
+                        <button class="btn-sm btn-success" style="width:100%; padding: 8px;" onclick="processBulkImport()">
+                            ⚡ Processar e Atualizar Turnos Finais em Massa
+                        </button>
+                    </div>
 
                     <div class="discord-output-box" id="discordOutputContainer" style="display:none;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
@@ -1363,55 +1363,56 @@
             });
         }
 
-       function processBulkImport() {
-    const rawText = document.getElementById("bulkImportText").value.trim();
-    if (!rawText) {
-        alert("Cole os dados na caixa de texto primeiro!");
-        return;
-    }
+        function processBulkImport() {
+            const rawText = document.getElementById("bulkImportText").value.trim();
+            if (!rawText) {
+                alert("Cole os dados na caixa de texto primeiro!");
+                return;
+            }
 
-    const lines = rawText.split("\n");
-    let updatedCount = 0;
-    let addedCount = 0;
+            const lines = rawText.split("\n");
+            let updatedCount = 0;
+            let addedCount = 0;
 
-    lines.forEach(line => {
-        // Divide por tabulação, vírgula ou múltiplos espaços
-        const parts = line.trim().split(/\s{2,}|\t|,/);
-        if (parts.length >= 2) {
-            const rawName = parts[0].trim();
-            const newTurnVal = parseInt(parts[parts.length - 1].trim());
+            lines.forEach(line => {
+                if (!line.trim()) return;
 
-            if (!isNaN(newTurnVal)) {
-                // Procura o funcionário ignorando maiúsculas/minúsculas
-                let emp = employees.find(e => e.name.toLowerCase() === rawName.toLowerCase());
+                const parts = line.trim().split(/\s+/);
+                if (parts.length >= 2) {
+                    const newTurnVal = parseInt(parts[parts.length - 1]);
+                    const rawName = parts.slice(0, parts.length - 1).join(" ");
 
-                if (emp) {
-                    // Se já existe, atualiza apenas o turno final
-                    emp.current = newTurnVal;
-                    updatedCount++;
-                } else {
-                    // Se não existe na lista, adiciona automaticamente como Operador de Loja (ou cargo padrão)
-                    employees.push({
-                        name: rawName,
-                        role: "Operador de Loja",
-                        initial: 0,       // Define 0 ou o valor que preferir como inicial
-                        current: newTurnVal
-                    });
-                    addedCount++;
+                    if (!isNaN(newTurnVal)) {
+                        let emp = employees.find(e => e.name.toLowerCase() === rawName.toLowerCase());
+
+                        if (emp) {
+                            emp.current = newTurnVal;
+                            updatedCount++;
+                        } else {
+                            // Ao criar novo funcionário, define o initial = current 
+                            // para ele passar pelo filtro de >= 15 e ser exibido na tabela
+                            employees.push({
+                                name: rawName,
+                                role: "Operador de Loja",
+                                initial: newTurnVal,
+                                current: newTurnVal
+                            });
+                            addedCount++;
+                        }
+                    }
                 }
+            });
+
+            if (updatedCount > 0 || addedCount > 0) {
+                saveData();
+                renderAdminTable();
+                document.getElementById("bulkImportText").value = "";
+                alert(`Sucesso! ${updatedCount} atualizados e ${addedCount} novos funcionários cadastrados e sincronizados na nuvem.`);
+            } else {
+                alert("Não foi possível ler os dados. Certifique-se de que cada linha tem o Nome e o Número do Turno separados por espaço.");
             }
         }
-    });
 
-    if (updatedCount > 0 || addedCount > 0) {
-        saveData(); // Salva no Firebase e sincroniza em tempo real para todos os administradores
-        renderAdminTable();
-        document.getElementById("bulkImportText").value = "";
-        alert(`Sucesso! ${updatedCount} atualizados e ${addedCount} novos funcionários cadastrados e sincronizados na nuvem.`);
-    } else {
-        alert("Nenhum dado válido foi encontrado. Verifique o formato do texto colado.");
-    }
-}
         document.getElementById("usernameInput").addEventListener("keypress", function(e) {
             if (e.key === "Enter") loginUser();
         });
