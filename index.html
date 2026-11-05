@@ -763,6 +763,17 @@
                         🚨 APLICAR ADVERTÊNCIA E GERAR TEXTO
                     </button>
 
+                    <div class="warning-panel" style="margin-top: 14px; border-color: #2563eb;">
+    <div class="section-title">📥 IMPORTAÇÃO RÁPIDA DE TURNOS EM MASSA</div>
+    <p style="font-size: 0.75rem; color: #7b93b8; margin-bottom: 8px;">
+        Cole abaixo os dados copiados (Nick e Turnos Finais separados por espaço ou tabulação):
+    </p>
+    <textarea id="bulkImportText" class="input-field" rows="4" placeholder="Ex:&#10;Afrontoso    3433&#10;Solyta    1810" style="width:100%; font-family:monospace; font-size:0.8rem; margin-bottom:8px;"></textarea>
+    <button class="btn-sm btn-success" style="width:100%; padding: 8px;" onclick="processBulkImport()">
+        ⚡ Processar e Atualizar Turnos Finais em Massa
+    </button>
+</div>
+
                     <div class="discord-output-box" id="discordOutputContainer" style="display:none;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <span style="font-size:0.7rem; color:#7b93b8; font-weight:bold;">FORMATO PARA DISCORD:</span>
@@ -1351,6 +1362,44 @@
                 link.click();
             });
         }
+
+        function processBulkImport() {
+    const rawText = document.getElementById("bulkImportText").value.trim();
+    if (!rawText) {
+        alert("Cole os dados na caixa de texto primeiro!");
+        return;
+    }
+
+    const lines = rawText.split("\n");
+    let updatedCount = 0;
+
+    lines.forEach(line => {
+        // Divide por tabulação, vírgula ou múltiplos espaços
+        const parts = line.trim().split(/\s{2,}|\t|,/);
+        if (parts.length >= 2) {
+            const nameToFind = parts[0].trim().toLowerCase();
+            const newTurnVal = parseInt(parts[parts.length - 1].trim());
+
+            if (!isNaN(newTurnVal)) {
+                // Procura o funcionário ignorando maiúsculas/minúsculas (ex: "Chantal - AUS" vs "chantal")
+                const emp = employees.find(e => e.name.toLowerCase().includes(nameToFind) || nameToFind.includes(e.name.toLowerCase()));
+                if (emp) {
+                    emp.current = newTurnVal; // Atualiza apenas os turnos finais
+                    updatedCount++;
+                }
+            }
+        }
+    });
+
+    if (updatedCount > 0) {
+        saveData(); // Salva no Firebase e sincroniza em tempo real para todos os administradores[cite: 1, 2]
+        renderAdminTable();
+        document.getElementById("bulkImportText").value = "";
+        alert(`Sucesso! ${updatedCount} funcionários tiveram seus turnos finais atualizados e sincronizados na nuvem.`);
+    } else {
+        alert("Nenhum funcionário correspondente foi encontrado. Verifique se os nicks batem com a lista.");
+    }
+}
 
         document.getElementById("usernameInput").addEventListener("keypress", function(e) {
             if (e.key === "Enter") loginUser();
