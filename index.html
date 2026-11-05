@@ -1375,28 +1375,29 @@
             let addedCount = 0;
 
             lines.forEach(line => {
-                if (!line.trim()) return;
+                const cleanLine = line.trim();
+                if (!cleanLine) return;
 
-                const parts = line.trim().split(/\s+/);
-                if (parts.length >= 2) {
-                    const newTurnVal = parseInt(parts[parts.length - 1]);
-                    const rawName = parts.slice(0, parts.length - 1).join(" ").trim();
+                // Procura o último bloco de números na linha (que é sempre o turno final)
+                const match = cleanLine.match(/^(.*?)\s+(\d+)$/);
+                if (match) {
+                    const rawName = match[1].trim();
+                    const newTurnVal = parseInt(match[2]);
 
-                    if (!isNaN(newTurnVal)) {
-                        let emp = employees.find(e => e.name.trim().toLowerCase() === rawName.toLowerCase());
+                    // Procura ignorando maiúsculas/minúsculas e variações de espaçamento
+                    let emp = employees.find(e => e.name.trim().toLowerCase() === rawName.toLowerCase());
 
-                        if (emp) {
-                            emp.current = newTurnVal;
-                            updatedCount++;
-                        } else {
-                            employees.push({
-                                name: rawName,
-                                role: "Operador de Loja",
-                                initial: newTurnVal >= 15 ? newTurnVal : 15,
-                                current: newTurnVal
-                            });
-                            addedCount++;
-                        }
+                    if (emp) {
+                        emp.current = newTurnVal;
+                        updatedCount++;
+                    } else {
+                        employees.push({
+                            name: rawName,
+                            role: "Operador de Loja",
+                            initial: newTurnVal >= 15 ? newTurnVal : 15,
+                            current: newTurnVal
+                        });
+                        addedCount++;
                     }
                 }
             });
@@ -1407,7 +1408,7 @@
                 document.getElementById("bulkImportText").value = "";
                 alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
             } else {
-                alert("Não foi possível ler os dados. Certifique-se de que cada linha tem o Nome e o Número do Turno separados por espaço.");
+                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
             }
         }
 
