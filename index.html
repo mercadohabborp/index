@@ -1363,7 +1363,7 @@
             });
         }
 
-        function processBulkImport() {
+       function processBulkImport() {
     const rawText = document.getElementById("bulkImportText").value.trim();
     if (!rawText) {
         alert("Cole os dados na caixa de texto primeiro!");
@@ -1372,35 +1372,46 @@
 
     const lines = rawText.split("\n");
     let updatedCount = 0;
+    let addedCount = 0;
 
     lines.forEach(line => {
         // Divide por tabulação, vírgula ou múltiplos espaços
         const parts = line.trim().split(/\s{2,}|\t|,/);
         if (parts.length >= 2) {
-            const nameToFind = parts[0].trim().toLowerCase();
+            const rawName = parts[0].trim();
             const newTurnVal = parseInt(parts[parts.length - 1].trim());
 
             if (!isNaN(newTurnVal)) {
-                // Procura o funcionário ignorando maiúsculas/minúsculas (ex: "Chantal - AUS" vs "chantal")
-                const emp = employees.find(e => e.name.toLowerCase().includes(nameToFind) || nameToFind.includes(e.name.toLowerCase()));
+                // Procura o funcionário ignorando maiúsculas/minúsculas
+                let emp = employees.find(e => e.name.toLowerCase() === rawName.toLowerCase());
+
                 if (emp) {
-                    emp.current = newTurnVal; // Atualiza apenas os turnos finais
+                    // Se já existe, atualiza apenas o turno final
+                    emp.current = newTurnVal;
                     updatedCount++;
+                } else {
+                    // Se não existe na lista, adiciona automaticamente como Operador de Loja (ou cargo padrão)
+                    employees.push({
+                        name: rawName,
+                        role: "Operador de Loja",
+                        initial: 0,       // Define 0 ou o valor que preferir como inicial
+                        current: newTurnVal
+                    });
+                    addedCount++;
                 }
             }
         }
     });
 
-    if (updatedCount > 0) {
-        saveData(); // Salva no Firebase e sincroniza em tempo real para todos os administradores[cite: 1, 2]
+    if (updatedCount > 0 || addedCount > 0) {
+        saveData(); // Salva no Firebase e sincroniza em tempo real para todos os administradores
         renderAdminTable();
         document.getElementById("bulkImportText").value = "";
-        alert(`Sucesso! ${updatedCount} funcionários tiveram seus turnos finais atualizados e sincronizados na nuvem.`);
+        alert(`Sucesso! ${updatedCount} atualizados e ${addedCount} novos funcionários cadastrados e sincronizados na nuvem.`);
     } else {
-        alert("Nenhum funcionário correspondente foi encontrado. Verifique se os nicks batem com a lista.");
+        alert("Nenhum dado válido foi encontrado. Verifique o formato do texto colado.");
     }
 }
-
         document.getElementById("usernameInput").addEventListener("keypress", function(e) {
             if (e.key === "Enter") loginUser();
         });
