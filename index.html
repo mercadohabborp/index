@@ -1361,7 +1361,7 @@
             });
         }
 
-        function processBulkImport() {
+     function processBulkImport() {
             const rawText = document.getElementById("bulkImportText").value.trim();
             if (!rawText) {
                 alert("Cole os dados na caixa de texto primeiro!");
@@ -1390,9 +1390,18 @@
                     });
 
                     if (emp) {
+                        // Atualiza APENAS o turno final (current). 
+                        // Mantém o 'initial' intacto para o cálculo de turnos feitos funcionar no perfil!
                         emp.current = newTurnVal;
+                        
+                        // Garante que se o initial estiver zerado por algum erro anterior, ele receba um valor base seguro para aparecer na tabela
+                        if (!emp.initial || emp.initial < 15) {
+                            emp.initial = newTurnVal >= 15 ? newTurnVal : 15;
+                        }
+                        
                         updatedCount++;
                     } else {
+                        // Se for um funcionário totalmente novo
                         employees.push({
                             name: inputName,
                             role: "Operador de Loja",
