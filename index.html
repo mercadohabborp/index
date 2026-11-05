@@ -1315,6 +1315,52 @@
             document.getElementById("discordOutputContainer").style.display = "block";
         }
 
+        function copyDiscordText() {
+            const text = document.getElementById("discordTextOutput").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Texto copiado para a área de transferência! Agora cole no Discord.");
+            });
+        }
+
+        function generateTableImage() {
+            const area = document.getElementById("printableTableArea");
+            const responsiveBox = document.getElementById("tableResponsiveBox");
+            const actionCols = document.querySelectorAll(".action-col");
+
+            actionCols.forEach(c => c.style.display = "none");
+
+            const turnCells = document.querySelectorAll(".turn-cell");
+            const roleCells = document.querySelectorAll(".role-cell");
+
+            turnCells.forEach(cell => {
+                const val = cell.getAttribute("data-val");
+                cell.innerHTML = `<strong>${val}</strong>`;
+            });
+
+            roleCells.forEach(cell => {
+                const role = cell.getAttribute("data-role");
+                cell.innerHTML = role;
+            });
+
+            responsiveBox.classList.add("force-full-print");
+
+            html2canvas(area, {
+                backgroundColor: "#060b14",
+                scale: 2,
+                useCORS: true,
+                windowWidth: 1200
+            }).then(canvas => {
+                responsiveBox.classList.remove("force-full-print");
+                actionCols.forEach(c => c.style.display = "");
+                renderAdminTable();
+
+                const link = document.createElement('a');
+                link.download = `Mercado_Habbo_${currentWeekText.replace(/[/]/g, '-')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
         function processBulkImport() {
             const rawText = document.getElementById("bulkImportText").value.trim();
             if (!rawText) {
@@ -1336,7 +1382,6 @@
                     const newTurnVal = parseInt(match[2]);
                     const cleanInput = inputName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-                    // Procura o funcionário no array local
                     let emp = employees.find(e => {
                         if (!e || !e.name) return false;
                         const dbName = e.name.trim().toLowerCase();
@@ -1347,9 +1392,7 @@
                     if (emp) {
                         emp.current = newTurnVal;
                         updatedCount++;
-                        console.log(`Atualizado com sucesso: ${emp.name} para ${newTurnVal}`);
                     } else {
-                        // Se não encontrou por nenhuma regra, adiciona novo
                         employees.push({
                             name: inputName,
                             role: "Operador de Loja",
@@ -1357,7 +1400,6 @@
                             current: newTurnVal
                         });
                         addedCount++;
-                        console.log(`Adicionado como novo: ${inputName} com ${newTurnVal}`);
                     }
                 }
             });
@@ -1366,13 +1408,12 @@
                 saveData();
                 renderAdminTable();
                 document.getElementById("bulkImportText").value = "";
-                alert(`Sucesso! ${updatedCount} atualizados, ${addedCount} novos.`);
+                alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
             } else {
-                alert("Erro ao ler os dados. Verifique o formato.");
+                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
             }
         }
 
-        
         document.getElementById("usernameInput").addEventListener("keypress", function(e) {
             if (e.key === "Enter") loginUser();
         });
