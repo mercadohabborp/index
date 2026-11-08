@@ -1116,7 +1116,8 @@
 
             let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
             
-            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx })).filter(e => e.initial >= 15);
+            // Permite exibir quem tem 15+ turnos iniciais OU quem já movimentou turnos na semana atual
+            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx })).filter(e => e.initial >= 15 || e.current > 0);
 
             if (filterMode === "alpha") {
                 visibleEmployees.sort((a, b) => a.name.localeCompare(b.name));
@@ -1206,19 +1207,25 @@
 
         function addNewEmployeePrompt() {
             const name = prompt("Nome do Funcionário:");
-            if (!name) return;
-            const role = prompt("Cargo:", "Operador de Loja") || "Operador de Loja";
-            const initial = parseInt(prompt("Turno Inicial:", "0")) || 0;
+            if (!name || !name.trim()) return;
+            
+            const role = prompt("Cargo (Ex: Operador de Loja, Caixa, Supervisor):", "Operador de Loja") || "Operador de Loja";
+            const initial = parseInt(prompt("Turno Inicial:", "0"));
+            if (isNaN(initial)) return;
+
+            const current = parseInt(prompt("Turno Final atual:", initial.toString()));
+            if (isNaN(current)) return;
 
             employees.push({
                 name: name.trim(),
                 role: role.trim(),
                 initial: initial,
-                current: initial
+                current: current
             });
 
             saveData();
             renderAdminTable();
+            alert(`Funcionário ${name.trim()} cadastrado com sucesso!`);
         }
 
         function addAbsentRecord() {
@@ -1361,7 +1368,7 @@
             });
         }
 
-     function processBulkImport() {
+        function processBulkImport() {
             const rawText = document.getElementById("bulkImportText").value.trim();
             if (!rawText) {
                 alert("Cole os dados na caixa de texto primeiro!");
@@ -1390,18 +1397,13 @@
                     });
 
                     if (emp) {
-                        // Atualiza APENAS o turno final (current). 
-                        // Mantém o 'initial' intacto para o cálculo de turnos feitos funcionar no perfil!
+                        // Atualiza o turno final e preserva/corrige o initial se estivesse zerado
                         emp.current = newTurnVal;
-                        
-                        // Garante que se o initial estiver zerado por algum erro anterior, ele receba um valor base seguro para aparecer na tabela
                         if (!emp.initial || emp.initial < 15) {
                             emp.initial = newTurnVal >= 15 ? newTurnVal : 15;
                         }
-                        
                         updatedCount++;
                     } else {
-                        // Se for um funcionário totalmente novo
                         employees.push({
                             name: inputName,
                             role: "Operador de Loja",
