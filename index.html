@@ -1287,7 +1287,19 @@
             const name = prompt("Nome do Funcionário:");
             if (!name || !name.trim()) return;
             
-            const role = prompt("Cargo (Ex: Operador de Loja, Caixa, Supervisor):", "Operador de Loja") || "Operador de Loja";
+            // Cria a lista de cargos formatada para o prompt
+            const rolesList = Object.keys(roleMetas);
+            let rolePromptMsg = "Escolha o número correspondente ao cargo:\n";
+            rolesList.forEach((r, idx) => {
+                rolePromptMsg += `${idx + 1} - ${r}\n`;
+            });
+
+            const roleChoice = prompt(rolePromptMsg, "1");
+            if (!roleChoice) return;
+            
+            let roleIndex = parseInt(roleChoice) - 1;
+            let selectedRole = rolesList[roleIndex] || "Operador de Loja";
+
             const initial = parseInt(prompt("Turno Inicial:", "0"));
             if (isNaN(initial)) return;
 
@@ -1296,7 +1308,7 @@
 
             employees.push({
                 name: name.trim(),
-                role: role.trim(),
+                role: selectedRole,
                 initial: initial,
                 current: current,
                 customAvatar: "",
@@ -1305,7 +1317,7 @@
 
             saveData();
             renderAdminTable();
-            alert(`Funcionário ${name.trim()} cadastrado com sucesso!`);
+            alert(`Funcionário ${name.trim()} (${selectedRole}) cadastrado com sucesso!`);
         }
 
         function addAbsentRecord() {
@@ -1357,12 +1369,10 @@
             }
 
             if (confirm("Deseja virar a semana? Os Turnos Finais atuais passarão a ser os Turnos Iniciais para todos, garantindo o avanço correto!")) {
-                // Substitui o turno inicial pelo turno final atual de cada funcionário
                 employees.forEach(emp => {
                     emp.initial = emp.current;
                 });
 
-                // Avança para a próxima semana do cronograma automaticamente
                 const currentIndex = rotationSchedule.findIndex(s => s.week === currentWeekText);
                 if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
                     currentWeekText = rotationSchedule[currentIndex + 1].week;
@@ -1558,9 +1568,4 @@
             }
         }
 
-        document.getElementById("usernameInput").addEventListener("keypress", function(e) {
-            if (e.key === "Enter") loginUser();
-        });
-    </script>
-</body>
-</html>
+        document.getElementById("usernameInput").addEventListener("keypress", function
