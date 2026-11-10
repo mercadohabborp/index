@@ -655,7 +655,7 @@
 
                 <!-- PAINEL DE ADVERTÊNCIAS DO USUÁRIO -->
                 <div class="warning-panel" style="border-color:#f87171; margin-bottom:14px;">
-                    <div class="section-title" style="color:#f87171;">⚠️ MINHAS ADVERTÊNCIAS</div>
+                    <div class="section-title" style="color:#f87171;">⚠️ MINHAS ADVERTÊNCIAS / PUNIÇÕES</div>
                     <div id="userWarningsContainer" style="font-size:0.8rem; color:#e1e1e6; max-height:120px; overflow-y:auto;">
                         <span style="color:#7b93b8;">Nenhuma advertência registrada.</span>
                     </div>
@@ -754,15 +754,16 @@
 
                 <!-- PAINEL DE ADVERTÊNCIAS & NOTAS DE META NÃO ATINGIDA -->
                 <div class="warning-panel">
-                    <div class="section-title">⚠️ REGISTRO DE ADVERTÊNCIA (GERÊNCIA)</div>
+                    <div class="section-title">⚠️ REGISTRO DE ADVERTÊNCIA / INFRAÇÃO (GERÊNCIA)</div>
                     <div class="warning-form-grid">
                         <div class="input-group" style="margin:0;">
                             <label>NICK DO FUNCIONÁRIO</label>
                             <input type="text" id="advNick" class="input-field" placeholder="Ex: Solyta">
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>Nº DA ADVERTÊNCIA</label>
+                            <label>TIPO DE PUNIÇÃO</label>
                             <select id="advNum" class="input-field">
+                                <option value="Infração">Infração</option>
                                 <option value="1ª Advertência">1ª Advertência</option>
                                 <option value="2ª Advertência">2ª Advertência</option>
                                 <option value="3ª Advertência">3ª Advertência</option>
@@ -835,6 +836,7 @@
                             <option value="role">Ord: Cargo Hierárquico</option>
                         </select>
                         <button class="btn-sm btn-info" onclick="generateTableImage()">📷 Baixar Imagem (PNG)</button>
+                        <button class="btn-sm btn-warning" onclick="advanceWeek()">🔄 Virar Semana</button>
                         <button class="btn-sm btn-success" onclick="addNewEmployeePrompt()">+ Add Funcionário</button>
                     </div>
                 </div>
@@ -976,7 +978,6 @@
             renderAbsentTable();
             renderAdminTable();
 
-            // Atualiza sessão ativa se o usuário estiver logado
             if (activeUser) {
                 let updated = employees.find(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
                 if (updated) {
@@ -1081,14 +1082,13 @@
             document.getElementById("avatarFrame").style.backgroundImage = `url('${avatarBg}')`;
             document.getElementById("customAvatarInput").value = activeUser.customAvatar || "";
 
-            // Renderiza advertências do usuário
             const warnContainer = document.getElementById("userWarningsContainer");
             warnContainer.innerHTML = "";
             if (activeUser.warnings && activeUser.warnings.length > 0) {
                 activeUser.warnings.forEach((w, idx) => {
                     let div = document.createElement("div");
                     div.style.cssText = "background:#0f1c30; padding:8px; border-radius:4px; margin-bottom:6px; border-left:3px solid #f87171;";
-                    div.innerHTML = `<strong>${w.num}</strong> - Motivo: ${w.motivo}<br><span style="font-size:0.7rem; color:#7b93b8;">Print: ${w.imgur && w.imgur !== 'N/A' ? `<a href="${w.imgur}" target="_blank" style="color:#60a5fa;">Ver Print</a>` : 'Não se aplica'}</span>`;
+                    div.innerHTML = `<strong>${w.num}</strong> - Motivo: ${w.motivo}<br><span style="font-size:0.7rem; color:#7b93b8;">Print: ${w.imgur && w.imgur !== '-x-' ? `<a href="${w.imgur}" target="_blank" style="color:#60a5fa;">Ver Print</a>` : '-x-'}</span>`;
                     warnContainer.appendChild(div);
                 });
             } else {
@@ -1101,7 +1101,6 @@
             if (!activeUser) return;
 
             activeUser.customAvatar = link;
-            // Atualiza na lista geral
             let idx = employees.findIndex(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
             if (idx !== -1) {
                 employees[idx].customAvatar = link;
@@ -1113,8 +1112,8 @@
         }
 
         function showAdminLogin() {
-            const pass = prompt("Digite a senha de administrador ou seu nick de gerente/supervisor:");
-            if (pass && (pass === "admin123" || ["afrontoso", "solyta", "chantal", "monica"].includes(pass.toLowerCase()))) {
+            const pass = prompt("Digite a senha de administrador:");
+            if (pass === "tudomercado363") {
                 document.getElementById("loginScreen").style.display = "none";
                 document.getElementById("adminScreen").style.display = "block";
                 document.getElementById("mainWrapper").classList.add("wide");
@@ -1123,7 +1122,7 @@
                 renderSchedule();
                 renderAdminTable();
             } else if (pass) {
-                alert("Acesso negado!");
+                alert("Senha incorreta!");
             }
         }
 
@@ -1350,21 +1349,62 @@
             renderAbsentTable();
         }
 
+        function advanceWeek() {
+            const pass = prompt("Digite a senha de administrador para virar a semana:");
+            if (pass !== "tudomercado363") {
+                alert("Senha incorreta!");
+                return;
+            }
+
+            if (confirm("Deseja virar a semana? Os Turnos Finais atuais passarão a ser os Turnos Iniciais para todos, garantindo o avanço correto!")) {
+                // Substitui o turno inicial pelo turno final atual de cada funcionário
+                employees.forEach(emp => {
+                    emp.initial = emp.current;
+                });
+
+                // Avança para a próxima semana do cronograma automaticamente
+                const currentIndex = rotationSchedule.findIndex(s => s.week === currentWeekText);
+                if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
+                    currentWeekText = rotationSchedule[currentIndex + 1].week;
+                } else {
+                    const newWeek = prompt("Digite o período da nova semana:", "02/11/2026 à 08/11/2026");
+                    if (newWeek && newWeek.trim() !== "") {
+                        currentWeekText = newWeek.trim();
+                    }
+                }
+
+                saveData();
+                populateWeekSelector();
+                document.getElementById("printWeekSpan").innerText = currentWeekText;
+                initApp();
+                renderSchedule();
+                renderAdminTable();
+                alert("Semana virada com sucesso! Turnos iniciais atualizados com os finais e salvos na nuvem.");
+            }
+        }
+
         function generateWarningText() {
             const nick = document.getElementById("advNick").value.trim();
             const numAdv = document.getElementById("advNum").value;
             const motivo = document.getElementById("advMotivo").value.trim();
-            const imgur = document.getElementById("advImgur").value.trim();
+            let imgur = document.getElementById("advImgur").value.trim();
+            if (!imgur) imgur = "-x-";
 
             if (!nick || !motivo) {
                 alert("Preencha ao menos o Nick e o Motivo da advertência!");
                 return;
             }
 
+            const pass = prompt("Digite a senha de administrador para salvar e registrar a advertência:");
+            if (pass !== "tudomercado363") {
+                alert("Senha incorreta! Advertência não aplicada.");
+                return;
+            }
+
             const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
             if (emp) {
                 if (!emp.warnings) emp.warnings = [];
-                emp.warnings.push({ num: numAdv, motivo: motivo, imgur: imgur || 'N/A', date: new Date().toLocaleDateString('pt-BR') });
+                emp.warnings.push({ num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') });
                 saveData();
             }
 
@@ -1373,17 +1413,16 @@
                 `💼 **Cargo:** ${emp ? emp.role : 'Funcionário'}\n` +
                 `⚠️ **Punição:** ${numAdv}\n` +
                 `📝 **Motivo:** ${motivo}\n` +
-                `🖼️ **Comprovação (Print):** ${imgur || 'N/A'}\n` +
+                `🖼️ **Comprovação (Print):** ${imgur}\n` +
                 `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
                 `*Esta advertência foi registrada na Administração do Mercado RP.*`;
 
             document.getElementById("discordTextOutput").innerText = discordFormatted;
             document.getElementById("discordOutputContainer").style.display = "block";
-            alert("Advertência registrada com sucesso e aplicada ao perfil do usuário!");
+            alert("Senha correta! Advertência registrada com sucesso e aplicada ao perfil do usuário.");
         }
 
         function generateUnreachedList() {
-            // Filtra quem não bateu a meta
             let unreached = employees.filter(emp => {
                 let meta = roleMetas[emp.role] || 15;
                 let feitos = emp.current - emp.initial;
@@ -1399,10 +1438,9 @@
 
             let blocks = [];
             unreached.forEach(emp => {
-                blocks.push(`**Nick:** ${emp.name}\n**motivo:** cota de turnos não atingida\n**Nº DE Advertência:** \n**Print:** não se aplica`);
+                blocks.push(`**Nick:** ${emp.name}\n**motivo:** cota de turnos não atingida\n**Nº DE Advertência:** \n**Print:** -x-`);
             });
 
-            // Junta os blocos separados por um traço (-)
             let finalOutput = blocks.join("\n-\n");
 
             document.getElementById("unreachedTextOutput").innerText = finalOutput;
