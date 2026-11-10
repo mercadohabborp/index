@@ -1568,4 +1568,9 @@
             }
         }
 
-        document.getElementById("usernameInput").addEventListener("keypress", function
+        document.getElementById("usernameInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") loginUser();
+        });
+    </script>
+</body>
+</html>
