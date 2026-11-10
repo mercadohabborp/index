@@ -154,7 +154,8 @@
         .avatar-frame {
             width: 64px;
             height: 80px;
-            background: #0f1c30 url('https://www.habbo.com.br/habbo-imaging/avatarimage?user=Solyta&action=std&direction=2&head_direction=2&gesture=sml&size=m') center no-repeat;
+            background: #0f1c30 center no-repeat;
+            background-size: cover;
             border: 1px solid #1d365d;
             border-radius: 6px;
             flex-shrink: 0;
@@ -643,6 +644,23 @@
                     </div>
                 </div>
 
+                <!-- ALTERAR FOTO DE PERFIL -->
+                <div class="input-group" style="background:#060b14; padding:10px; border-radius:6px; border:1px solid #12223c; margin-bottom:14px;">
+                    <label style="color:#60a5fa;">🖼️ ALTERAR SUA FOTO DE PERFIL (LINK)</label>
+                    <div style="display:flex; gap:6px; margin-top:4px;">
+                        <input type="text" id="customAvatarInput" class="input-field" placeholder="Cole o link direto da imagem..." style="font-size:0.75rem;">
+                        <button class="btn-sm btn-success" onclick="saveCustomAvatar()">Salvar</button>
+                    </div>
+                </div>
+
+                <!-- PAINEL DE ADVERTÊNCIAS DO USUÁRIO -->
+                <div class="warning-panel" style="border-color:#f87171; margin-bottom:14px;">
+                    <div class="section-title" style="color:#f87171;">⚠️ MINHAS ADVERTÊNCIAS</div>
+                    <div id="userWarningsContainer" style="font-size:0.8rem; color:#e1e1e6; max-height:120px; overflow-y:auto;">
+                        <span style="color:#7b93b8;">Nenhuma advertência registrada.</span>
+                    </div>
+                </div>
+
                 <div class="section-title">PRODUTIVIDADE DA SEMANA ATUAL</div>
                 <div class="profile-info" style="margin-bottom:14px; background:#060b14; padding:10px; border-radius:6px; border:1px solid #12223c;">
                     <div class="info-item">
@@ -734,7 +752,7 @@
                     </div>
                 </div>
 
-                <!-- PAINEL DE ADVERTÊNCIAS -->
+                <!-- PAINEL DE ADVERTÊNCIAS & NOTAS DE META NÃO ATINGIDA -->
                 <div class="warning-panel">
                     <div class="section-title">⚠️ REGISTRO DE ADVERTÊNCIA (GERÊNCIA)</div>
                     <div class="warning-form-grid">
@@ -763,6 +781,32 @@
                         🚨 APLICAR ADVERTÊNCIA E GERAR TEXTO
                     </button>
 
+                    <div class="discord-output-box" id="discordOutputContainer" style="display:none;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-size:0.7rem; color:#7b93b8; font-weight:bold;">FORMATO PARA DISCORD:</span>
+                            <button class="btn-sm btn-info" onclick="copyDiscordText()">📋 Copiar para o Discord</button>
+                        </div>
+                        <pre id="discordTextOutput"></pre>
+                    </div>
+
+                    <!-- CAIXA DE NOTAS: QUEM NÃO BATEU A COTA -->
+                    <div style="margin-top: 16px; border-top: 1px solid #12223c; padding-top: 14px;">
+                        <div class="section-title">📋 NOTAS DE COTA NÃO ATINGIDA (DISCORD)</div>
+                        <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
+                            Gera automaticamente o relatório para copiar e colar de quem não bateu a meta:
+                        </p>
+                        <button class="btn-sm btn-info" style="width:100%; padding:8px; margin-bottom:8px;" onclick="generateUnreachedList()">
+                            🔄 Gerar Relatório de Quem Não Bateu a Meta
+                        </button>
+                        <div class="discord-output-box" id="unreachedOutputContainer" style="display:none;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="font-size:0.7rem; color:#7b93b8; font-weight:bold;">TEXTO FORMATADO:</span>
+                                <button class="btn-sm btn-success" onclick="copyUnreachedText()">📋 Copiar Relatório</button>
+                            </div>
+                            <pre id="unreachedTextOutput"></pre>
+                        </div>
+                    </div>
+
                     <div class="warning-panel" style="margin-top: 14px; border-color: #2563eb;">
                         <div class="section-title">📥 IMPORTAÇÃO RÁPIDA DE TURNOS EM MASSA</div>
                         <p style="font-size: 0.75rem; color: #7b93b8; margin-bottom: 8px;">
@@ -773,19 +817,11 @@
                             ⚡ Processar e Atualizar Turnos Finais em Massa
                         </button>
                     </div>
-
-                    <div class="discord-output-box" id="discordOutputContainer" style="display:none;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                            <span style="font-size:0.7rem; color:#7b93b8; font-weight:bold;">FORMATO PARA DISCORD:</span>
-                            <button class="btn-sm btn-info" onclick="copyDiscordText()">📋 Copiar para o Discord</button>
-                        </div>
-                        <pre id="discordTextOutput"></pre>
-                    </div>
                 </div>
 
                 <div class="admin-controls">
                     <div style="display:flex; flex-direction:column; gap:4px;">
-                        <span style="font-size:0.75rem; color:#7b93b8;">SELECIONAR / ALTERAR SEMANA ATIVA:</span>
+                        <span style="font-size:0.75rem; color:#7b93b8;">SEMANA ATIVA:</span>
                         <select id="weekSelector" class="filter-select" onchange="changeWeekManual(this.value)">
                             <!-- Preenchido via JavaScript -->
                         </select>
@@ -799,7 +835,6 @@
                             <option value="role">Ord: Cargo Hierárquico</option>
                         </select>
                         <button class="btn-sm btn-info" onclick="generateTableImage()">📷 Baixar Imagem (PNG)</button>
-                        <button class="btn-sm btn-warning" onclick="advanceWeek()">🔄 Virar Semana</button>
                         <button class="btn-sm btn-success" onclick="addNewEmployeePrompt()">+ Add Funcionário</button>
                     </div>
                 </div>
@@ -879,26 +914,26 @@
         ];
 
         const defaultEmployees = [
-            { name: "Afrontoso", role: "Gerente", initial: 3401, current: 3401 },
-            { name: "Solyta", role: "Supervisor", initial: 1606, current: 1606 },
-            { name: "Chantal", role: "Supervisor", initial: 2181, current: 2181 },
-            { name: "Monica", role: "Supervisor", initial: 2219, current: 2219 },
-            { name: "rxnan", role: "Encarregado de Loja", initial: 212, current: 212 },
-            { name: "Latim", role: "Encarregado de Loja", initial: 144, current: 144 },
-            { name: "Victorgust1", role: "Encarregado de Loja", initial: 259, current: 259 },
-            { name: "mayy", role: "Encarregado de Loja", initial: 258, current: 258 },
-            { name: "Cachinhos", role: "Encarregado de Loja", initial: 855, current: 855 },
-            { name: "JpCooDz", role: "Encarregado de Loja", initial: 127, current: 127 },
-            { name: "death - AUS", role: "Caixa", initial: 107, current: 107 },
-            { name: "ys", role: "Caixa", initial: 80, current: 80 },
-            { name: "deprera", role: "Balconista", initial: 51, current: 51 },
-            { name: "HCN", role: "Balconista", initial: 64, current: 64 },
-            { name: "Janystar100", role: "Balconista", initial: 60, current: 60 },
-            { name: "kyos", role: "Balconista", initial: 50, current: 50 },
-            { name: "zfy", role: "Balconista", initial: 42, current: 42 },
-            { name: "Achila", role: "Operador de Loja", initial: 21, current: 21 },
-            { name: "dg", role: "Operador de Loja", initial: 32, current: 32 },
-            { name: "cityhunter", role: "Operador de Loja", initial: 17, current: 17 }
+            { name: "Afrontoso", role: "Gerente", initial: 3401, current: 3401, customAvatar: "", warnings: [] },
+            { name: "Solyta", role: "Supervisor", initial: 1606, current: 1606, customAvatar: "", warnings: [] },
+            { name: "Chantal", role: "Supervisor", initial: 2181, current: 2181, customAvatar: "", warnings: [] },
+            { name: "Monica", role: "Supervisor", initial: 2219, current: 2219, customAvatar: "", warnings: [] },
+            { name: "rxnan", role: "Encarregado de Loja", initial: 212, current: 212, customAvatar: "", warnings: [] },
+            { name: "Latim", role: "Encarregado de Loja", initial: 144, current: 144, customAvatar: "", warnings: [] },
+            { name: "Victorgust1", role: "Encarregado de Loja", initial: 259, current: 259, customAvatar: "", warnings: [] },
+            { name: "mayy", role: "Encarregado de Loja", initial: 258, current: 258, customAvatar: "", warnings: [] },
+            { name: "Cachinhos", role: "Encarregado de Loja", initial: 855, current: 855, customAvatar: "", warnings: [] },
+            { name: "JpCooDz", role: "Encarregado de Loja", initial: 127, current: 127, customAvatar: "", warnings: [] },
+            { name: "death - AUS", role: "Caixa", initial: 107, current: 107, customAvatar: "", warnings: [] },
+            { name: "ys", role: "Caixa", initial: 80, current: 80, customAvatar: "", warnings: [] },
+            { name: "deprera", role: "Balconista", initial: 51, current: 51, customAvatar: "", warnings: [] },
+            { name: "HCN", role: "Balconista", initial: 64, current: 64, customAvatar: "", warnings: [] },
+            { name: "Janystar100", role: "Balconista", initial: 60, current: 60, customAvatar: "", warnings: [] },
+            { name: "kyos", role: "Balconista", initial: 50, current: 50, customAvatar: "", warnings: [] },
+            { name: "zfy", role: "Balconista", initial: 42, current: 42, customAvatar: "", warnings: [] },
+            { name: "Achila", role: "Operador de Loja", initial: 21, current: 21, customAvatar: "", warnings: [] },
+            { name: "dg", role: "Operador de Loja", initial: 32, current: 32, customAvatar: "", warnings: [] },
+            { name: "cityhunter", role: "Operador de Loja", initial: 17, current: 17, customAvatar: "", warnings: [] }
         ];
 
         let employees = [];
@@ -940,6 +975,15 @@
             renderSchedule();
             renderAbsentTable();
             renderAdminTable();
+
+            // Atualiza sessão ativa se o usuário estiver logado
+            if (activeUser) {
+                let updated = employees.find(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
+                if (updated) {
+                    activeUser = updated;
+                    renderUserProfile();
+                }
+            }
         }, (error) => {
             console.error("Erro ao sincronizar com o Firebase: ", error);
             employees = JSON.parse(localStorage.getItem("habbo_mkt_emp")) || defaultEmployees;
@@ -1011,16 +1055,7 @@
                 document.getElementById("loginScreen").style.display = "none";
                 document.getElementById("userScreen").style.display = "block";
 
-                const meta = roleMetas[found.role] || 15;
-                const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
-
-                document.getElementById("uName").innerText = found.name;
-                document.getElementById("uRole").innerText = found.role;
-                document.getElementById("uInitial").innerText = found.initial;
-                document.getElementById("uMeta").innerText = meta + " turnos";
-                document.getElementById("refDateLabel").innerText = `TURNOS INICIAIS (${match.refDate || 'Iniciais'})`;
-
-                document.getElementById("avatarFrame").style.backgroundImage = `url('https://www.habbo.com.br/habbo-imaging/avatarimage?user=${found.name}&action=std&direction=2&head_direction=2&gesture=sml&size=m')`;
+                renderUserProfile();
 
                 currentInput = "0";
                 updateDisplay();
@@ -1029,6 +1064,52 @@
                 errorMsg.innerText = "Funcionário não encontrado no sistema!";
                 errorMsg.style.display = "block";
             }
+        }
+
+        function renderUserProfile() {
+            if (!activeUser) return;
+            const meta = roleMetas[activeUser.role] || 15;
+            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
+
+            document.getElementById("uName").innerText = activeUser.name;
+            document.getElementById("uRole").innerText = activeUser.role;
+            document.getElementById("uInitial").innerText = activeUser.initial;
+            document.getElementById("uMeta").innerText = meta + " turnos";
+            document.getElementById("refDateLabel").innerText = `TURNOS INICIAIS (${match.refDate || 'Iniciais'})`;
+
+            const avatarBg = activeUser.customAvatar ? activeUser.customAvatar : `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${activeUser.name}&action=std&direction=2&head_direction=2&gesture=sml&size=m`;
+            document.getElementById("avatarFrame").style.backgroundImage = `url('${avatarBg}')`;
+            document.getElementById("customAvatarInput").value = activeUser.customAvatar || "";
+
+            // Renderiza advertências do usuário
+            const warnContainer = document.getElementById("userWarningsContainer");
+            warnContainer.innerHTML = "";
+            if (activeUser.warnings && activeUser.warnings.length > 0) {
+                activeUser.warnings.forEach((w, idx) => {
+                    let div = document.createElement("div");
+                    div.style.cssText = "background:#0f1c30; padding:8px; border-radius:4px; margin-bottom:6px; border-left:3px solid #f87171;";
+                    div.innerHTML = `<strong>${w.num}</strong> - Motivo: ${w.motivo}<br><span style="font-size:0.7rem; color:#7b93b8;">Print: ${w.imgur && w.imgur !== 'N/A' ? `<a href="${w.imgur}" target="_blank" style="color:#60a5fa;">Ver Print</a>` : 'Não se aplica'}</span>`;
+                    warnContainer.appendChild(div);
+                });
+            } else {
+                warnContainer.innerHTML = `<span style="color:#7b93b8;">Nenhuma advertência registrada. Parabéns!</span>`;
+            }
+        }
+
+        function saveCustomAvatar() {
+            const link = document.getElementById("customAvatarInput").value.trim();
+            if (!activeUser) return;
+
+            activeUser.customAvatar = link;
+            // Atualiza na lista geral
+            let idx = employees.findIndex(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
+            if (idx !== -1) {
+                employees[idx].customAvatar = link;
+                saveData();
+            }
+
+            renderUserProfile();
+            alert("Foto de perfil atualizada com sucesso!");
         }
 
         function showAdminLogin() {
@@ -1040,7 +1121,6 @@
                 document.getElementById("printWeekSpan").innerText = currentWeekText;
                 populateWeekSelector();
                 renderSchedule();
-                renderAbsentTable();
                 renderAdminTable();
             } else if (pass) {
                 alert("Acesso negado!");
@@ -1116,7 +1196,6 @@
 
             let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
             
-            // Permite exibir quem tem 15+ turnos iniciais OU quem já movimentou turnos na semana atual
             let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx })).filter(e => e.initial >= 15 || e.current > 0);
 
             if (filterMode === "alpha") {
@@ -1220,7 +1299,9 @@
                 name: name.trim(),
                 role: role.trim(),
                 initial: initial,
-                current: current
+                current: current,
+                customAvatar: "",
+                warnings: []
             });
 
             saveData();
@@ -1269,32 +1350,6 @@
             renderAbsentTable();
         }
 
-        function advanceWeek() {
-            if (confirm("Deseja virar a semana? Os Turnos Atuais virarão o novo Turno Inicial para todos e avançará para a próxima semana do cronograma!")) {
-                employees.forEach(emp => {
-                    emp.initial = emp.current;
-                });
-
-                const currentIndex = rotationSchedule.findIndex(s => s.week === currentWeekText);
-                if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
-                    currentWeekText = rotationSchedule[currentIndex + 1].week;
-                } else {
-                    const newWeek = prompt("Digite o período da nova semana exato:", "02/11/2026 à 08/11/2026");
-                    if (newWeek && newWeek.trim() !== "") {
-                        currentWeekText = newWeek.trim();
-                    }
-                }
-
-                saveData();
-                populateWeekSelector();
-                document.getElementById("printWeekSpan").innerText = currentWeekText;
-                initApp();
-                renderSchedule();
-                renderAdminTable();
-                alert("Semana virada, supervisor atualizado e sincronizado na nuvem com sucesso!");
-            }
-        }
-
         function generateWarningText() {
             const nick = document.getElementById("advNick").value.trim();
             const numAdv = document.getElementById("advNum").value;
@@ -1307,11 +1362,15 @@
             }
 
             const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
-            const cargoText = emp ? emp.role : "Funcionário";
+            if (emp) {
+                if (!emp.warnings) emp.warnings = [];
+                emp.warnings.push({ num: numAdv, motivo: motivo, imgur: imgur || 'N/A', date: new Date().toLocaleDateString('pt-BR') });
+                saveData();
+            }
 
             const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
                 `👤 **Funcionário(a):** ${nick}\n` +
-                `💼 **Cargo:** ${cargoText}\n` +
+                `💼 **Cargo:** ${emp ? emp.role : 'Funcionário'}\n` +
                 `⚠️ **Punição:** ${numAdv}\n` +
                 `📝 **Motivo:** ${motivo}\n` +
                 `🖼️ **Comprovação (Print):** ${imgur || 'N/A'}\n` +
@@ -1320,12 +1379,47 @@
 
             document.getElementById("discordTextOutput").innerText = discordFormatted;
             document.getElementById("discordOutputContainer").style.display = "block";
+            alert("Advertência registrada com sucesso e aplicada ao perfil do usuário!");
+        }
+
+        function generateUnreachedList() {
+            // Filtra quem não bateu a meta
+            let unreached = employees.filter(emp => {
+                let meta = roleMetas[emp.role] || 15;
+                let feitos = emp.current - emp.initial;
+                if (feitos < 0) feitos = 0;
+                return feitos < meta;
+            });
+
+            if (unreached.length === 0) {
+                document.getElementById("unreachedTextOutput").innerText = "Todos os funcionários atingiram a meta nesta semana!";
+                document.getElementById("unreachedOutputContainer").style.display = "block";
+                return;
+            }
+
+            let blocks = [];
+            unreached.forEach(emp => {
+                blocks.push(`**Nick:** ${emp.name}\n**motivo:** cota de turnos não atingida\n**Nº DE Advertência:** \n**Print:** não se aplica`);
+            });
+
+            // Junta os blocos separados por um traço (-)
+            let finalOutput = blocks.join("\n-\n");
+
+            document.getElementById("unreachedTextOutput").innerText = finalOutput;
+            document.getElementById("unreachedOutputContainer").style.display = "block";
         }
 
         function copyDiscordText() {
             const text = document.getElementById("discordTextOutput").innerText;
             navigator.clipboard.writeText(text).then(() => {
-                alert("Texto copiado para a área de transferência! Agora cole no Discord.");
+                alert("Texto copiado para a área de transferência!");
+            });
+        }
+
+        function copyUnreachedText() {
+            const text = document.getElementById("unreachedTextOutput").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Relatório copiado para a área de transferência!");
             });
         }
 
@@ -1397,7 +1491,6 @@
                     });
 
                     if (emp) {
-                        // Atualiza o turno final e preserva/corrige o initial se estivesse zerado
                         emp.current = newTurnVal;
                         if (!emp.initial || emp.initial < 15) {
                             emp.initial = newTurnVal >= 15 ? newTurnVal : 15;
@@ -1408,7 +1501,9 @@
                             name: inputName,
                             role: "Operador de Loja",
                             initial: newTurnVal >= 15 ? newTurnVal : 15,
-                            current: newTurnVal
+                            current: newTurnVal,
+                            customAvatar: "",
+                            warnings: []
                         });
                         addedCount++;
                     }
