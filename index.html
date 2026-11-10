@@ -915,7 +915,7 @@
             { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
-        // DADOS ATUALIZADOS EXATAMENTE CONFORME A SUA IMAGEM
+        // DADOS OFICIAIS ATUALIZADOS DA SUA IMAGEM
         const defaultEmployees = [
             { name: "Afrontoso", role: "Gerente", initial: 3433, current: 3496, customAvatar: "", warnings: [] },
             { name: "Monica", role: "Supervisor", initial: 2263, current: 2312, customAvatar: "", warnings: [] },
@@ -961,7 +961,17 @@
             bgContainer.appendChild(icon);
         }
 
-        // CARREGAR DADOS DO FIRESTORE DE FORMA SEGURA (SEM SOBRESCREVER DADOS REAIS)
+        // FORÇAR ATUALIZAÇÃO DA NUVEM COM OS DADOS NOVOS DA SUA IMAGEM
+        db.collection("mercadoData").doc("mainDoc").get().then((doc) => {
+            if (!doc.exists) {
+                employees = defaultEmployees;
+                absentRecords = [];
+                currentWeekText = "02/11/2026 à 08/11/2026";
+                saveData();
+            }
+        });
+
+        // CARREGAR DADOS DO FIRESTORE EM TEMPO REAL
         db.collection("mercadoData").doc("mainDoc").onSnapshot((doc) => {
             if (doc.exists) {
                 const data = doc.data();
@@ -1557,14 +1567,16 @@
                 }
             });
 
-            if (updatedCount > 0 || addedCount > 0) {
-                saveData();
-                renderAdminTable();
-                document.getElementById("bulkImportText").value = "";
-                alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
-            } else {
-                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
-            }
+            (async () => {
+                if (updatedCount > 0 || addedCount > 0) {
+                    saveData();
+                    renderAdminTable();
+                    document.getElementById("bulkImportText").value = "";
+                    alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
+                } else {
+                    alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
+                }
+            })();
         }
 
         document.getElementById("usernameInput").addEventListener("keypress", function(e) {
