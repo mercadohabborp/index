@@ -836,6 +836,10 @@
                             <option value="turns-asc">Ord: Turnos Feitos (Menor)</option>
                             <option value="role">Ord: Cargo Hierárquico</option>
                         </select>
+                        <select id="imageFilterToggle" class="filter-select action-col" onchange="renderAdminTable()">
+                            <option value="all">Exibir: Todos da Tabela</option>
+                            <option value="gt15">📸 Filtro de Imagem ( > 15 turnos )</option>
+                        </select>
                         <button class="btn-sm btn-info" onclick="generateTableImage()">📷 Baixar Imagem (PNG)</button>
                         <button class="btn-sm btn-warning" onclick="advanceWeek()">🔄 Virar Semana</button>
                         <button class="btn-sm btn-success" onclick="addNewEmployeePrompt()">+ Add Funcionário</button>
@@ -916,7 +920,6 @@
             { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
-        // LISTA COM ID DO JOGADOR INCLUÍDO (CAMPO 'id')
         const defaultEmployees = [
             { name: "Afrontoso", id: "", role: "Gerente", initial: 3433, current: 3496, customAvatar: "", warnings: [] },
             { name: "Monica", id: "", role: "Supervisor", initial: 2263, current: 2312, customAvatar: "", warnings: [] },
@@ -1205,8 +1208,18 @@
             tbody.innerHTML = "";
 
             let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
+            let imageFilterMode = document.getElementById("imageFilterToggle") ? document.getElementById("imageFilterToggle").value : "all";
             
-            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx })).filter(e => e.initial >= 15 || e.current > 0 || hasActiveAbsent(e.name));
+            // MOSTRA TODOS NA TABELA POR PADRÃO, A MENOS QUE O FILTRO DE IMAGEM ESTEJA ATIVADO
+            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx }));
+
+            if (imageFilterMode === "gt15") {
+                visibleEmployees = visibleEmployees.filter(emp => {
+                    let feitos = emp.current - emp.initial;
+                    if (feitos < 0) feitos = 0;
+                    return feitos > 15;
+                });
+            }
 
             if (filterMode === "alpha") {
                 visibleEmployees.sort((a, b) => a.name.localeCompare(b.name));
@@ -1461,7 +1474,7 @@
                 `📝 **Motivo:** ${motivo}\n` +
                 `🖼️ **Comprovação (Print):** ${imgur}\n` +
                 `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
-                `*Esta advertência foi registrada na Administração do Mercado RP.*`;
+                `*Esta advertência foi registrada na Administração du Mercado RP.*`;
 
             document.getElementById("discordTextOutput").innerText = discordFormatted;
             document.getElementById("discordOutputContainer").style.display = "block";
