@@ -838,7 +838,7 @@
                         </select>
                         <select id="imageFilterToggle" class="filter-select action-col" onchange="renderAdminTable()">
                             <option value="all">Exibir: Todos da Tabela</option>
-                            <option value="gt15">📸 Filtro de Imagem ( > 15 turnos )</option>
+                            <option value="gt15">📸 Filtro: > 15 turnos (ou com Aval)</option>
                         </select>
                         <button class="btn-sm btn-info" onclick="generateTableImage()">📷 Baixar Imagem (PNG)</button>
                         <button class="btn-sm btn-warning" onclick="advanceWeek()">🔄 Virar Semana</button>
@@ -1210,14 +1210,15 @@
             let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
             let imageFilterMode = document.getElementById("imageFilterToggle") ? document.getElementById("imageFilterToggle").value : "all";
             
-            // MOSTRA TODOS NA TABELA POR PADRÃO, A MENOS QUE O FILTRO DE IMAGEM ESTEJA ATIVADO
             let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx }));
 
             if (imageFilterMode === "gt15") {
                 visibleEmployees = visibleEmployees.filter(emp => {
                     let feitos = emp.current - emp.initial;
                     if (feitos < 0) feitos = 0;
-                    return feitos > 15;
+                    let isAbsent = hasActiveAbsent(emp.name);
+                    // Mostra se fez mais de 15 turnos OU se tem Aval ativo
+                    return feitos > 15 || isAbsent;
                 });
             }
 
@@ -1474,7 +1475,7 @@
                 `📝 **Motivo:** ${motivo}\n` +
                 `🖼️ **Comprovação (Print):** ${imgur}\n` +
                 `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
-                `*Esta advertência foi registrada na Administração du Mercado RP.*`;
+                `*Esta advertência foi registrada na Administração do Mercado RP.*`;
 
             document.getElementById("discordTextOutput").innerText = discordFormatted;
             document.getElementById("discordOutputContainer").style.display = "block";
