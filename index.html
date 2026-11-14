@@ -511,6 +511,7 @@
         }
         .badge-success { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
         .badge-danger { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+        .badge-aval { background: rgba(234, 179, 8, 0.2); color: #facc15; }
 
         .editable-input {
             background: #0f1c30;
@@ -734,7 +735,7 @@
                         </div>
                     </div>
                     <button class="btn-sm btn-success" style="width:100%; padding:8px; margin-bottom:12px;" onclick="addAbsentRecord()">
-                        + REGISTRAR AUSÊNCIA
+                        + REGISTRAR AUSÊNCIA / AVAL
                     </button>
 
                     <div style="overflow-x:auto;">
@@ -915,31 +916,31 @@
             { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
-        // DADOS OFICIAIS ATUALIZADOS DA SUA IMAGEM
+        // LISTA COM ID DO JOGADOR INCLUÍDO (CAMPO 'id')
         const defaultEmployees = [
-            { name: "Afrontoso", role: "Gerente", initial: 3433, current: 3496, customAvatar: "", warnings: [] },
-            { name: "Monica", role: "Supervisor", initial: 2263, current: 2312, customAvatar: "", warnings: [] },
-            { name: "Chantal", role: "Supervisor", initial: 2229, current: 2261, customAvatar: "", warnings: [] },
-            { name: "Solyta", role: "Supervisor", initial: 1810, current: 1900, customAvatar: "", warnings: [] },
-            { name: "SadLoveSong", role: "Encarregado de Loja", initial: 589, current: 665, customAvatar: "", warnings: [] },
-            { name: "JpCooDz", role: "Encarregado de Loja", initial: 440, current: 531, customAvatar: "", warnings: [] },
-            { name: "Angels", role: "Encarregado de Loja", initial: 244, current: 397, customAvatar: "", warnings: [] },
-            { name: "Victorgust1 - aus", role: "Encarregado de Loja", initial: 333, current: 333, customAvatar: "", warnings: [] },
-            { name: "mayy", role: "Encarregado de Loja", initial: 258, current: 278, customAvatar: "", warnings: [] },
-            { name: "ys - aus", role: "Encarregado de Loja", initial: 200, current: 207, customAvatar: "", warnings: [] },
-            { name: "knife", role: "Encarregado de Loja", initial: 133, current: 133, customAvatar: "", warnings: [] },
-            { name: "Manu", role: "Caixa", initial: 0, current: 114, customAvatar: "", warnings: [] },
-            { name: "laryssa", role: "Caixa", initial: 82, current: 97, customAvatar: "", warnings: [] },
-            { name: "Mandys", role: "Caixa", initial: 0, current: 82, customAvatar: "", warnings: [] },
-            { name: "hurt", role: "Balconista", initial: 0, current: 56, customAvatar: "", warnings: [] },
-            { name: "avrilavigne", role: "Balconista", initial: 0, current: 56, customAvatar: "", warnings: [] },
-            { name: "mel", role: "Balconista", initial: 0, current: 42, customAvatar: "", warnings: [] },
-            { name: "deprera", role: "Operador de Loja", initial: 51, current: 56, customAvatar: "", warnings: [] },
-            { name: "Juhmmz", role: "Operador de Loja", initial: 38, current: 40, customAvatar: "", warnings: [] },
-            { name: "stilf", role: "Operador de Loja", initial: 0, current: 21, customAvatar: "", warnings: [] },
-            { name: "x1", role: "Operador de Loja", initial: 0, current: 18, customAvatar: "", warnings: [] },
-            { name: "dk", role: "Operador de Loja", initial: 0, current: 15, customAvatar: "", warnings: [] },
-            { name: "In", role: "Operador de Loja", initial: 0, current: 17, customAvatar: "", warnings: [] }
+            { name: "Afrontoso", id: "", role: "Gerente", initial: 3433, current: 3496, customAvatar: "", warnings: [] },
+            { name: "Monica", id: "", role: "Supervisor", initial: 2263, current: 2312, customAvatar: "", warnings: [] },
+            { name: "Chantal", id: "", role: "Supervisor", initial: 2229, current: 2261, customAvatar: "", warnings: [] },
+            { name: "Solyta", id: "", role: "Supervisor", initial: 1810, current: 1900, customAvatar: "", warnings: [] },
+            { name: "SadLoveSong", id: "", role: "Encarregado de Loja", initial: 589, current: 665, customAvatar: "", warnings: [] },
+            { name: "JpCooDz", id: "", role: "Encarregado de Loja", initial: 440, current: 531, customAvatar: "", warnings: [] },
+            { name: "Angels", id: "", role: "Encarregado de Loja", initial: 244, current: 397, customAvatar: "", warnings: [] },
+            { name: "Victorgust1", id: "", role: "Encarregado de Loja", initial: 333, current: 333, customAvatar: "", warnings: [] },
+            { name: "mayy", id: "", role: "Encarregado de Loja", initial: 258, current: 278, customAvatar: "", warnings: [] },
+            { name: "ys", id: "", role: "Encarregado de Loja", initial: 200, current: 207, customAvatar: "", warnings: [] },
+            { name: "knife", id: "", role: "Encarregado de Loja", initial: 133, current: 133, customAvatar: "", warnings: [] },
+            { name: "Manu", id: "", role: "Caixa", initial: 0, current: 114, customAvatar: "", warnings: [] },
+            { name: "laryssa", id: "", role: "Caixa", initial: 82, current: 97, customAvatar: "", warnings: [] },
+            { name: "Mandys", id: "", role: "Caixa", initial: 0, current: 82, customAvatar: "", warnings: [] },
+            { name: "hurt", id: "", role: "Balconista", initial: 0, current: 56, customAvatar: "", warnings: [] },
+            { name: "avrilavigne", id: "", role: "Balconista", initial: 0, current: 56, customAvatar: "", warnings: [] },
+            { name: "mel", id: "", role: "Balconista", initial: 0, current: 42, customAvatar: "", warnings: [] },
+            { name: "deprera", id: "", role: "Operador de Loja", initial: 51, current: 56, customAvatar: "", warnings: [] },
+            { name: "Juhmmz", id: "", role: "Operador de Loja", initial: 38, current: 40, customAvatar: "", warnings: [] },
+            { name: "stilf", id: "", role: "Operador de Loja", initial: 0, current: 21, customAvatar: "", warnings: [] },
+            { name: "x1", id: "", role: "Operador de Loja", initial: 0, current: 18, customAvatar: "", warnings: [] },
+            { name: "dk", id: "", role: "Operador de Loja", initial: 0, current: 15, customAvatar: "", warnings: [] },
+            { name: "In", id: "", role: "Operador de Loja", initial: 0, current: 17, customAvatar: "", warnings: [] }
         ];
 
         let employees = [];
@@ -961,7 +962,7 @@
             bgContainer.appendChild(icon);
         }
 
-        // FORÇAR ATUALIZAÇÃO DA NUVEM COM OS DADOS NOVOS DA SUA IMAGEM
+        // VERIFICAR E CRIAR DOCUMENTO SE NÃO EXISTIR
         db.collection("mercadoData").doc("mainDoc").get().then((doc) => {
             if (!doc.exists) {
                 employees = defaultEmployees;
@@ -1205,7 +1206,7 @@
 
             let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
             
-            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx })).filter(e => e.initial >= 15 || e.current > 0);
+            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx })).filter(e => e.initial >= 15 || e.current > 0 || hasActiveAbsent(e.name));
 
             if (filterMode === "alpha") {
                 visibleEmployees.sort((a, b) => a.name.localeCompare(b.name));
@@ -1224,15 +1225,27 @@
                 if (feitos < 0) feitos = 0;
                 let alcançou = feitos >= meta;
 
+                let isAbsent = hasActiveAbsent(emp.name);
+
                 let roleOptions = Object.keys(roleMetas).map(r => 
                     `<option value="${r}" ${r === emp.role ? 'selected' : ''}>${r}</option>`
                 ).join("");
 
                 let tr = document.createElement("tr");
+                
+                let statusBadge = "";
+                if (isAbsent) {
+                    statusBadge = `<span class="badge-status badge-aval">⭐ COM AVAL</span>`;
+                } else {
+                    statusBadge = `<span class="badge-status ${alcançou ? 'badge-success' : 'badge-danger'}">
+                        ${alcançou ? 'Alcançada' : 'Não alcançada'}
+                    </span>`;
+                }
+
                 tr.innerHTML = `
                     <td>
-                        <strong>${emp.name}</strong>
-                        <button class="btn-edit-pencil action-col" title="Editar Nick" onclick="editEmpName(${index})">✏️</button>
+                        <strong>${emp.name}</strong> ${emp.id ? `<span style="color:#7b93b8; font-size:0.75rem;">(ID: ${emp.id})</span>` : ''}
+                        <button class="btn-edit-pencil action-col" title="Editar Nick/ID" onclick="editEmpInfo(${index})">✏️</button>
                     </td>
                     <td class="role-cell" data-role="${emp.role}">
                         <select class="editable-select" onchange="updateEmpRole(${index}, this.value)">
@@ -1244,11 +1257,7 @@
                         <input type="number" class="editable-input" id="emp-curr-${index}" value="${emp.current}">
                     </td>
                     <td><strong>${feitos}</strong></td>
-                    <td>
-                        <span class="badge-status ${alcançou ? 'badge-success' : 'badge-danger'}">
-                            ${alcançou ? 'Alcançada' : 'Não alcançada'}
-                        </span>
-                    </td>
+                    <td>${statusBadge}</td>
                     <td class="action-col">
                         <button class="btn-sm btn-success" onclick="saveSingleTurn(${index})">💾 Salvar</button>
                         <button class="btn-sm btn-sub" style="margin:0;" onclick="removeEmp(${index})">❌</button>
@@ -1258,14 +1267,21 @@
             });
         }
 
-        function editEmpName(index) {
-            const oldName = employees[index].name;
-            const newName = prompt("Editar Nickname do funcionário:", oldName);
-            if (newName && newName.trim() !== "") {
-                employees[index].name = newName.trim();
-                saveData();
-                renderAdminTable();
-            }
+        function hasActiveAbsent(name) {
+            return absentRecords.some(r => r.nick.trim().toLowerCase() === name.trim().toLowerCase());
+        }
+
+        function editEmpInfo(index) {
+            const emp = employees[index];
+            const newName = prompt("Editar Nickname do funcionário:", emp.name);
+            if (!newName || !newName.trim()) return;
+
+            const newId = prompt("Editar ID do funcionário no jogo:", emp.id || "");
+            
+            employees[index].name = newName.trim();
+            employees[index].id = newId ? newId.trim() : "";
+            saveData();
+            renderAdminTable();
         }
 
         function updateEmpRole(index, newRole) {
@@ -1296,6 +1312,8 @@
         function addNewEmployeePrompt() {
             const name = prompt("Nome do Funcionário:");
             if (!name || !name.trim()) return;
+
+            const empId = prompt("ID do funcionário no jogo (opcional):", "") || "";
             
             const rolesList = Object.keys(roleMetas);
             let rolePromptMsg = "Escolha o número correspondente ao cargo:\n";
@@ -1317,6 +1335,7 @@
 
             employees.push({
                 name: name.trim(),
+                id: empId.trim(),
                 role: selectedRole,
                 initial: initial,
                 current: current,
@@ -1342,6 +1361,7 @@
             absentRecords.push({ nick, period, reason: reason || "N/A" });
             saveData();
             renderAbsentTable();
+            renderAdminTable();
 
             document.getElementById("absentNick").value = "";
             document.getElementById("absentPeriod").value = "";
@@ -1368,6 +1388,7 @@
             absentRecords.splice(idx, 1);
             saveData();
             renderAbsentTable();
+            renderAdminTable();
         }
 
         function advanceWeek() {
@@ -1421,6 +1442,13 @@
             }
 
             const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
+            
+            // FORMATAÇÃO DO NICK COM O ID ENTRE PARÊNTESES (EX: Solyta (1234))
+            let formattedNickAndId = nick;
+            if (emp && emp.id) {
+                formattedNickAndId = `${emp.name} (${emp.id})`;
+            }
+
             if (emp) {
                 if (!emp.warnings) emp.warnings = [];
                 emp.warnings.push({ num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') });
@@ -1428,7 +1456,7 @@
             }
 
             const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
-                `👤 **Funcionário(a):** ${nick}\n` +
+                `👤 **Funcionário(a):** ${formattedNickAndId}\n` +
                 `💼 **Cargo:** ${emp ? emp.role : 'Funcionário'}\n` +
                 `⚠️ **Punição:** ${numAdv}\n` +
                 `📝 **Motivo:** ${motivo}\n` +
@@ -1446,18 +1474,21 @@
                 let meta = roleMetas[emp.role] || 15;
                 let feitos = emp.current - emp.initial;
                 if (feitos < 0) feitos = 0;
+                // Ignora quem tem aval/ausência ativa na lista de quem não bateu cota
+                if (hasActiveAbsent(emp.name)) return false;
                 return feitos < meta;
             });
 
             if (unreached.length === 0) {
-                document.getElementById("unreachedTextOutput").innerText = "Todos os funcionários atingiram a meta nesta semana!";
+                document.getElementById("unreachedTextOutput").innerText = "Todos os funcionários atingiram a meta nesta semana (ou estão de licença/com aval)!";
                 document.getElementById("unreachedOutputContainer").style.display = "block";
                 return;
             }
 
             let blocks = [];
             unreached.forEach(emp => {
-                blocks.push(`**Nick:** ${emp.name}\n**motivo:** cota de turnos não atingida\n**Nº DE Advertência:** \n**Print:** -x-`);
+                let displayName = emp.id ? `${emp.name} (${emp.id})` : emp.name;
+                blocks.push(`**Nick:** ${displayName}\n**motivo:** cota de turnos não atingida\n**Nº DE Advertência:** \n**Print:** -x-`);
             });
 
             let finalOutput = blocks.join("\n-\n");
@@ -1556,6 +1587,7 @@
                     } else {
                         employees.push({
                             name: inputName,
+                            id: "",
                             role: "Operador de Loja",
                             initial: newTurnVal >= 15 ? newTurnVal : 15,
                             current: newTurnVal,
@@ -1567,16 +1599,14 @@
                 }
             });
 
-            (async () => {
-                if (updatedCount > 0 || addedCount > 0) {
-                    saveData();
-                    renderAdminTable();
-                    document.getElementById("bulkImportText").value = "";
-                    alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
-                } else {
-                    alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
-                }
-            })();
+            if (updatedCount > 0 || addedCount > 0) {
+                saveData();
+                renderAdminTable();
+                document.getElementById("bulkImportText").value = "";
+                alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
+            } else {
+                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
+            }
         }
 
         document.getElementById("usernameInput").addEventListener("keypress", function(e) {
