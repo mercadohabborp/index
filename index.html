@@ -1443,7 +1443,6 @@
 
             const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
             
-            // FORMATAÇÃO DO NICK COM O ID ENTRE PARÊNTESES (EX: Solyta (1234))
             let formattedNickAndId = nick;
             if (emp && emp.id) {
                 formattedNickAndId = `${emp.name} (${emp.id})`;
@@ -1474,7 +1473,6 @@
                 let meta = roleMetas[emp.role] || 15;
                 let feitos = emp.current - emp.initial;
                 if (feitos < 0) feitos = 0;
-                // Ignora quem tem aval/ausência ativa na lista de quem não bateu cota
                 if (hasActiveAbsent(emp.name)) return false;
                 return feitos < meta;
             });
