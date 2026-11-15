@@ -708,7 +708,7 @@
                 <div class="warning-panel" style="border-color: #22c55e;">
                     <div class="section-title" style="color: #4ade80;">🏆 PRÊMIOS DA CORRIDA (5 SLOTS COM EMOJIS)</div>
                     <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
-                        Escolha o emoji e preencha os 5 prêmios correspondentes de cada posição:
+                        Preencha os prêmios de cada posição e clique em salvar para registrar na nuvem:
                     </p>
                     <div style="overflow-x: auto; margin-bottom: 8px;">
                         <table class="habbo-table" style="font-size: 0.75rem;">
@@ -722,7 +722,10 @@
                             <tbody id="racePrizesTableBody"></tbody>
                         </table>
                     </div>
-                    <button id="btnAddPrize" class="btn-sm btn-success race-admin-action" style="width: 100%; padding: 6px; background-color: #16a34a; display:none;" onclick="addRacePrizeRow()">+ Adicionar Nova Linha de Prêmio</button>
+                    <div style="display: none; gap: 8px;" class="race-admin-action">
+                        <button class="btn-sm btn-sub" style="flex: 1; background-color: #16a34a; color: #fff; margin: 0;" onclick="addRacePrizeRow()">+ Adicionar Linha</button>
+                        <button class="btn-sm btn-success" style="flex: 2; padding: 8px;" onclick="saveRacePrizes()">💾 Salvar Prêmios na Nuvem</button>
+                    </div>
                 </div>
 
                 <!-- RANKING DOS PARTICIPANTES DA CORRIDA -->
@@ -1275,19 +1278,37 @@
             renderRaceScreen();
         }
 
-        function updatePrizePlace(index, value) {
-            racePrizes[index].place = value;
-            saveData();
-        }
+        function saveRacePrizes() {
+            if (!isRaceAdminUnlocked) {
+                alert("Apenas administradores podem salvar os prêmios!");
+                return;
+            }
 
-        function updatePrizeSlotSymbol(prizeIdx, slotIdx, value) {
-            racePrizes[prizeIdx].slots[slotIdx].symbol = value;
-            saveData();
-        }
+            const rows = document.querySelectorAll("#racePrizesTableBody tr");
+            let newPrizes = [];
 
-        function updatePrizeSlotText(prizeIdx, slotIdx, value) {
-            racePrizes[prizeIdx].slots[slotIdx].text = value;
+            rows.forEach((tr, prizeIdx) => {
+                const placeInput = tr.querySelector(".prize-place-input");
+                if (!placeInput) return;
+
+                const place = placeInput.value.trim() || `${prizeIdx + 1}º Lugar`;
+                
+                let slots = [];
+                for (let sIdx = 0; sIdx < 5; sIdx++) {
+                    const symbolSelect = tr.querySelector(`.slot-symbol-${prizeIdx}-${sIdx}`);
+                    const textInput = tr.querySelector(`.slot-text-${prizeIdx}-${sIdx}`);
+                    slots.push({
+                        symbol: symbolSelect ? symbolSelect.value : "",
+                        text: textInput ? textInput.value : ""
+                    });
+                }
+
+                newPrizes.push({ place, slots });
+            });
+
+            racePrizes = newPrizes;
             saveData();
+            alert("Prêmios da corrida salvos com sucesso na nuvem!");
         }
 
         function removeRacePrize(index) {
@@ -1335,11 +1356,11 @@
 
         function renderRaceScreen() {
             const actionCols = document.querySelectorAll(".race-admin-col");
-            const actionBtns = document.querySelectorAll(".race-admin-action");
+            const actionDivs = document.querySelectorAll(".race-admin-action");
             const addContainer = document.getElementById("raceAddContainer");
 
             actionCols.forEach(col => col.style.display = isRaceAdminUnlocked ? "" : "none");
-            actionBtns.forEach(btn => btn.style.display = isRaceAdminUnlocked ? "block" : "none");
+            actionDivs.forEach(div => div.style.display = isRaceAdminUnlocked ? "flex" : "none");
             if (addContainer) addContainer.style.display = isRaceAdminUnlocked ? "flex" : "none";
 
             // Renderizar Prêmios
@@ -1349,7 +1370,7 @@
                 const emojiChoices = ['', '💰', '🔫', '🔋', '🧪', '🧨', '📄', '🎣', '⛏️', '🌱', '🥇', '🥈', '🥉', '🎁', '⭐', '💎'];
 
                 if (racePrizes.length === 0) {
-                    prizesTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#7b93b8; padding:12px;">Nenhum prêmio cadastrado. Clique no botão abaixo para adicionar.</td></tr>`;
+                    prizesTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#7b93b8; padding:12px;">Nenhum prêmio cadastrado. Desbloqueie o painel para adicionar.</td></tr>`;
                 } else {
                     racePrizes.forEach((p, prizeIdx) => {
                         let tr = document.createElement("tr");
@@ -1363,8 +1384,8 @@
 
                             slotsHtml += `
                                 <div class="prize-slot-item">
-                                    <select class="editable-select" ${!isRaceAdminUnlocked ? 'disabled' : ''} onchange="updatePrizeSlotSymbol(${prizeIdx}, ${sIdx}, this.value)" style="width: 60px; text-align: center;">${symbolOptions}</select>
-                                    <input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} placeholder="Prêmio ${sIdx + 1}" value="${slot.text || ''}" onchange="updatePrizeSlotText(${prizeIdx}, ${sIdx}, this.value)" style="width: 240px; text-align: left; padding: 4px 8px;">
+                                    <select class="editable-select slot-symbol-${prizeIdx}-${sIdx}" ${!isRaceAdminUnlocked ? 'disabled' : ''} style="width: 60px; text-align: center;">${symbolOptions}</select>
+                                    <input type="text" class="editable-input slot-text-${prizeIdx}-${sIdx}" ${!isRaceAdminUnlocked ? 'readonly' : ''} placeholder="Prêmio ${sIdx + 1}" value="${slot.text || ''}" style="width: 240px; text-align: left; padding: 4px 8px;">
                                 </div>
                             `;
                         }
@@ -1373,7 +1394,7 @@
                         let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRacePrize(${prizeIdx})">❌</button></td>` : '';
 
                         tr.innerHTML = `
-                            <td><input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.place || ''}" onchange="updatePrizePlace(${prizeIdx}, this.value)" style="width:110px; font-weight:bold;"></td>
+                            <td><input type="text" class="editable-input prize-place-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.place || ''}" style="width:110px; font-weight:bold;"></td>
                             <td>${slotsHtml}</td>
                             ${actionTd}
                         `;
