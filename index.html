@@ -350,6 +350,7 @@
             width: 100%;
             cursor: pointer;
             transition: background 0.2s;
+            margin-bottom: 8px;
         }
 
         .btn-main:hover {
@@ -364,7 +365,7 @@
             padding: 10px;
             border-radius: 5px;
             width: 100%;
-            margin-top: 8px;
+            margin-top: 4px;
             cursor: pointer;
         }
 
@@ -384,7 +385,7 @@
             margin-bottom: 10px;
         }
 
-        #userScreen, #adminScreen {
+        #userScreen, #adminScreen, #raceScreen {
             display: none;
         }
 
@@ -581,6 +582,50 @@
         .force-full-print th {
             position: static !important;
         }
+
+        /* TEMA ESPECIAL: CORRIDA DOS TURNOS */
+        .race-banner {
+            background: linear-gradient(135deg, #0f1c30 0%, #1a365d 100%);
+            border: 2px solid #22c55e;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+        }
+
+        .race-banner h2 {
+            color: #4ade80;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .race-banner p {
+            font-size: 0.78rem;
+            color: #93c5fd;
+            line-height: 1.4;
+        }
+
+        .race-rules {
+            background: #060b14;
+            border: 1px dashed #22c55e;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 0.75rem;
+        }
+
+        .race-rules ul {
+            padding-left: 18px;
+            color: #e1e1e6;
+            margin-top: 4px;
+        }
+
+        .race-rules li {
+            margin-bottom: 3px;
+        }
     </style>
 </head>
 <body>
@@ -618,6 +663,72 @@
 
                 <button class="btn-main" onclick="loginUser()">ACESSAR MEU PAINEL</button>
                 <button class="btn-sub" onclick="showAdminLogin()">Área Administrativa (Gerentes/Supervisores)</button>
+                <button class="btn-sub" style="border-color: #22c55e; color: #4ade80;" onclick="showRaceScreen()">🏁 Ver Corrida dos Turnos</button>
+            </div>
+
+            <!-- TELA DA CORRIDA DOS TURNOS (TEMA ESPECIAL) -->
+            <div id="raceScreen">
+                <div class="race-banner">
+                    <h2>🏁 Corrida dos Turnos 🏁</h2>
+                    <p>Disputa de alta velocidade pela liderança de produtividade no Mercado RP!</p>
+                </div>
+
+                <div class="race-rules">
+                    <div style="color: #4ade80; font-weight: bold; margin-bottom: 4px; text-transform: uppercase;">📋 Regulamento da Corrida:</div>
+                    <ul>
+                        <li>Ser funcionário <strong>ativo</strong> no mercado.</li>
+                        <li>Não possuir nenhuma <strong>advertência</strong> ativa na semana.</li>
+                        <li>Ter feito pelo menos <strong>40 turnos</strong> na semana.</li>
+                    </ul>
+                </div>
+
+                <!-- TABELA DE PRÊMIOS DA CORRIDA -->
+                <div class="warning-panel" style="border-color: #22c55e;">
+                    <div class="section-title" style="color: #4ade80;">🏆 PRÊMIOS DA CORRIDA</div>
+                    <div style="overflow-x: auto; margin-bottom: 8px;">
+                        <table class="habbo-table" style="font-size: 0.75rem;">
+                            <thead>
+                                <tr>
+                                    <th>Posição / Lugar</th>
+                                    <th>Prêmio</th>
+                                    <th style="width: 50px;">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="racePrizesTableBody"></tbody>
+                        </table>
+                    </div>
+                    <button class="btn-sm btn-success" style="width: 100%; padding: 6px; background-color: #16a34a;" onclick="addRacePrizeRow()">+ Adicionar Nova Linha de Prêmio</button>
+                </div>
+
+                <!-- RANKING DOS PARTICIPANTES DA CORRIDA -->
+                <div class="warning-panel" style="border-color: #3b82f6;">
+                    <div class="section-title" style="color: #60a5fa;">🏎️ RANKING DOS PARTICIPANTES</div>
+                    <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
+                        Adicione os participantes oficiais. A tabela organiza-se automaticamente por ranking de turnos feitos!
+                    </p>
+                    <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+                        <input type="text" id="newRaceParticipant" class="input-field" placeholder="Nick do Participante..." style="font-size: 0.75rem; flex: 1; margin:0;">
+                        <button class="btn-sm btn-success" onclick="addRaceParticipant()">+ Inscrever</button>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="habbo-table" style="font-size: 0.75rem;">
+                            <thead>
+                                <tr>
+                                    <th>Posição</th>
+                                    <th>Participante</th>
+                                    <th>Cargo</th>
+                                    <th>Turnos Feitos</th>
+                                    <th>Elegível?</th>
+                                    <th style="width: 50px;">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="raceParticipantsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <button class="btn-sub" onclick="backToLogin()">← Voltar à Tela Inicial</button>
             </div>
 
             <!-- TELA DO FUNCIONÁRIO -->
@@ -974,6 +1085,8 @@
 
         let employees = [];
         let absentRecords = [];
+        let raceParticipants = [];
+        let racePrizes = [];
         let currentWeekText = "02/11/2026 à 08/11/2026";
         let activeUser = null;
         let currentInput = "0";
@@ -1012,10 +1125,14 @@
                     employees = defaultEmployees;
                 }
                 absentRecords = data.absentRecords || [];
+                raceParticipants = data.raceParticipants || [];
+                racePrizes = data.racePrizes || [{ place: "1º Lugar", prize: "500 c$" }, { place: "2º Lugar", prize: "300 c$" }];
                 currentWeekText = data.currentWeekText || "02/11/2026 à 08/11/2026";
             } else {
                 employees = defaultEmployees;
                 absentRecords = [];
+                raceParticipants = [];
+                racePrizes = [{ place: "1º Lugar", prize: "500 c$" }, { place: "2º Lugar", prize: "300 c$" }];
                 currentWeekText = "02/11/2026 à 08/11/2026";
                 saveData();
             }
@@ -1026,6 +1143,7 @@
             renderSchedule();
             renderAbsentTable();
             renderAdminTable();
+            renderRaceScreen();
 
             if (activeUser) {
                 let updated = employees.find(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
@@ -1073,10 +1191,126 @@
             db.collection("mercadoData").doc("mainDoc").set({
                 employees: employees,
                 absentRecords: absentRecords,
+                raceParticipants: raceParticipants,
+                racePrizes: racePrizes,
                 currentWeekText: currentWeekText
             }).catch((error) => {
                 console.error("Erro ao salvar no Firestore: ", error);
             });
+        }
+
+        // NAVEGAÇÃO DA TELA DA CORRIDA
+        function showRaceScreen() {
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("raceScreen").style.display = "block";
+            document.getElementById("mainWrapper").classList.add("wide");
+            renderRaceScreen();
+        }
+
+        function backToLogin() {
+            document.getElementById("raceScreen").style.display = "none";
+            document.getElementById("loginScreen").style.display = "block";
+            document.getElementById("mainWrapper").classList.remove("wide");
+        }
+
+        // FUNÇÕES DA CORRIDA DOS TURNOS
+        function addRacePrizeRow() {
+            racePrizes.push({ place: `${racePrizes.length + 1}º Lugar`, prize: "Prêmio a definir" });
+            saveData();
+            renderRaceScreen();
+        }
+
+        function updateRacePrize(index, field, value) {
+            racePrizes[index][field] = value;
+            saveData();
+        }
+
+        function removeRacePrize(index) {
+            racePrizes.splice(index, 1);
+            saveData();
+            renderRaceScreen();
+        }
+
+        function addRaceParticipant() {
+            const input = document.getElementById("newRaceParticipant");
+            const nick = input.value.trim();
+            if (!nick) {
+                alert("Digite o nick do participante!");
+                return;
+            }
+
+            if (raceParticipants.some(p => p.toLowerCase() === nick.toLowerCase())) {
+                alert("Este participante já está inscrito na corrida!");
+                return;
+            }
+
+            raceParticipants.push(nick);
+            input.value = "";
+            saveData();
+            renderRaceScreen();
+        }
+
+        function removeRaceParticipant(index) {
+            raceParticipants.splice(index, 1);
+            saveData();
+            renderRaceScreen();
+        }
+
+        function renderRaceScreen() {
+            // Renderizar Prêmios
+            const prizesTbody = document.getElementById("racePrizesTableBody");
+            if (prizesTbody) {
+                prizesTbody.innerHTML = "";
+                racePrizes.forEach((p, idx) => {
+                    let tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td><input type="text" class="editable-input" value="${p.place}" onchange="updateRacePrize(${idx}, 'place', this.value)" style="width:100%;"></td>
+                        <td><input type="text" class="editable-input" value="${p.prize}" onchange="updateRacePrize(${idx}, 'prize', this.value)" style="width:100%;"></td>
+                        <td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRacePrize(${idx})">❌</button></td>
+                    `;
+                    prizesTbody.appendChild(tr);
+                });
+            }
+
+            // Renderizar Participantes Organizados por Ranking (Turnos Feitos)
+            const partsTbody = document.getElementById("raceParticipantsTableBody");
+            if (partsTbody) {
+                partsTbody.innerHTML = "";
+
+                // Mapeia e calcula os dados de cada participante inscrito
+                let list = raceParticipants.map(nick => {
+                    let emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
+                    let feitos = emp ? (emp.current - emp.initial) : 0;
+                    if (feitos < 0) feitos = 0;
+                    let hasWarn = emp && emp.warnings && emp.warnings.length > 0;
+                    let isAbsent = absentRecords.some(r => r.nick.trim().toLowerCase() === nick.toLowerCase());
+                    
+                    // Regras: ativo, sem advertência e >= 40 turnos
+                    let eligible = emp && !hasWarn && !isAbsent && feitos >= 40;
+
+                    return { nick, role: emp ? emp.role : "Desconhecido", feitos, eligible };
+                });
+
+                // Ordena por maior número de turnos feitos (Ranking)
+                list.sort((a, b) => b.feitos - a.feitos);
+
+                list.forEach((item, idx) => {
+                    let tr = document.createElement("tr");
+                    let badge = item.eligible ? 
+                        `<span class="badge-status badge-success">Elegível ✅</span>` : 
+                        `<span class="badge-status badge-danger">Não atende regras ❌</span>`;
+
+                    tr.innerHTML = `
+                        <td><strong>#${idx + 1}</strong></td>
+                        <td><strong>${item.nick}</strong></td>
+                        <td>${item.role}</td>
+                        <td><strong>${item.feitos} turnos</strong></td>
+                        <td>${badge}</td>
+                        <td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRaceParticipant('${item.nick}')">❌</button></td>
+                    `;
+                    partsTbody.appendChild(tr);
+                });
+            }
         }
 
         function loginUser() {
@@ -1160,7 +1394,6 @@
                 document.getElementById("mainWrapper").classList.add("wide");
                 document.getElementById("printWeekSpan").innerText = currentWeekText;
                 
-                // Garante que a tabela de novos funcionários tenha 1 linha inicial
                 const newTbody = document.getElementById("newEmpTableBody");
                 if (newTbody && newTbody.children.length === 0) {
                     addNewEmpTableRow();
@@ -1357,7 +1590,6 @@
             }
         }
 
-        // FUNÇÕES DA TABELA INTERATIVA DE NOVATOS
         function addNewEmpTableRow() {
             const tbody = document.getElementById("newEmpTableBody");
             if (!tbody) return;
