@@ -432,7 +432,7 @@
             background: rgba(96, 165, 250, 0.15);
         }
 
-        .warning-panel, .absent-panel {
+        .warning-panel, .absent-panel, .bulk-add-panel {
             background: #060b14;
             border: 1px solid #12223c;
             border-radius: 6px;
@@ -717,6 +717,19 @@
                     <div class="schedule-list" id="scheduleList"></div>
                 </div>
 
+                <!-- PAINEL DE CADASTRO EM MASSA DE NOVATOS (ABERTO NA TELA) -->
+                <div class="bulk-add-panel" style="border-color: #3b82f6;">
+                    <div class="section-title">➕ CADASTRAR NOVATOS EM MASSA</div>
+                    <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
+                        Cole ou digite abaixo os dados dos novatos na sequência (uma linha por funcionário).<br>
+                        <strong>Formato recomendado por linha:</strong> <code>Nome | ID | Cargo | TurnoInicial | TurnoFinal</code> (ou separado por tabulação/espaço).
+                    </p>
+                    <textarea id="bulkNewEmployeesText" class="input-field" rows="4" placeholder="Ex:&#10;NovoRecruta1  12345  Operador de Loja  0  18&#10;NovoRecruta2  67890  Caixa  5  28" style="width:100%; font-family:monospace; font-size:0.8rem; margin-bottom:8px;"></textarea>
+                    <button class="btn-sm btn-success" style="width:100%; padding: 8px;" onclick="processBulkNewEmployees()">
+                        💾 Salvar Todos os Novos Funcionários na Nuvem
+                    </button>
+                </div>
+
                 <!-- PAINEL DE AUSENTES / LICENÇAS -->
                 <div class="absent-panel">
                     <div class="section-title">🏖️ REGISTRO DE AUSENTES / LICENÇAS (AVAL)</div>
@@ -842,7 +855,6 @@
                         </select>
                         <button class="btn-sm btn-info" onclick="generateTableImage()">📷 Baixar Imagem (PNG)</button>
                         <button class="btn-sm btn-warning" onclick="advanceWeek()">🔄 Virar Semana</button>
-                        <button class="btn-sm btn-success" onclick="addNewEmployeePrompt()">+ Add Funcionário</button>
                     </div>
                 </div>
 
@@ -965,7 +977,7 @@
             bgContainer.appendChild(icon);
         }
 
-        // CARREGAR DADOS DO FIRESTORE EM TEMPO REAL COM SEGURANÇA TOTAL DE DADOS
+        // CARREGAR DADOS DO FIRESTORE EM TEMPO REAL
         db.collection("mercadoData").doc("mainDoc").onSnapshot((doc) => {
             if (doc.exists) {
                 const data = doc.data();
@@ -1324,43 +1336,73 @@
             }
         }
 
-        function addNewEmployeePrompt() {
-            const name = prompt("Nome do Funcionário:");
-            if (!name || !name.trim()) return;
+        // FUNÇÃO DE CADASTRAR NOVATOS EM MASSA PELA CAIXA DE TEXTO FIXA
+        function processBulkNewEmployees() {
+            const rawText = document.getElementById("bulkNewEmployeesText").value.trim();
+            if (!rawText) {
+                alert("Cole ou digite os dados dos novos funcionários na caixa de texto!");
+                return;
+            }
 
-            const empId = prompt("ID do funcionário no jogo (opcional):", "") || "";
-            
-            const rolesList = Object.keys(roleMetas);
-            let rolePromptMsg = "Escolha o número correspondente ao cargo:\n";
-            rolesList.forEach((r, idx) => {
-                rolePromptMsg += `${idx + 1} - ${r}\n`;
+            const lines = rawText.split("\n");
+            let addedCount = 0;
+
+            lines.forEach(line => {
+                const cleanLine = line.trim();
+                if (!cleanLine) return;
+
+                // Suporta separação por vírgula, barra vertical (|) ou tabulação/espaços múltiplos
+                const parts = cleanLine.split(/[|,\t]+/).map(p => p.trim()).filter(p => p !== "");
+                
+                if (parts.length >= 1) {
+                    const name = parts[0];
+                    const id = parts[1] && !isNaN(parts[1]) ? parts[1] : (parts[1] || "");
+                    
+                    // Se o segundo campo for texto (ex: cargo), ajusta os índices
+                    let role = "Operador de Loja";
+                    let initial = 0;
+                    let current = 0;
+
+                    let roleIndex = parts.findIndex(p => roleMetas[p] !== undefined);
+                    if (roleIndex !== -1) {
+                        role = parts[roleIndex];
+                    }
+
+                    // Procura por números nas partes finais para initial e current
+                    let numbers = parts.filter(p => !isNaN(p) && p !== id);
+                    if (numbers.length >= 2) {
+                        initial = parseInt(numbers[0]) || 0;
+                        current = parseInt(numbers[1]) || 0;
+                    } else if (numbers.length === 1) {
+                        current = parseInt(numbers[0]) || 0;
+                        initial = current;
+                    }
+
+                    // Verifica se já existe para atualizar ou adicionar
+                    let existing = employees.find(e => e.name.toLowerCase() === name.toLowerCase());
+                    if (!existing) {
+                        employees.push({
+                            name: name,
+                            id: id !== role ? id : "",
+                            role: role,
+                            initial: initial,
+                            current: current,
+                            customAvatar: "",
+                            warnings: []
+                        });
+                        addedCount++;
+                    }
+                }
             });
 
-            const roleChoice = prompt(rolePromptMsg, "1");
-            if (!roleChoice) return;
-            
-            let roleIndex = parseInt(roleChoice) - 1;
-            let selectedRole = rolesList[roleIndex] || "Operador de Loja";
-
-            const initial = parseInt(prompt("Turno Inicial:", "0"));
-            if (isNaN(initial)) return;
-
-            const current = parseInt(prompt("Turno Final atual:", initial.toString()));
-            if (isNaN(current)) return;
-
-            employees.push({
-                name: name.trim(),
-                id: empId.trim(),
-                role: selectedRole,
-                initial: initial,
-                current: current,
-                customAvatar: "",
-                warnings: []
-            });
-
-            saveData();
-            renderAdminTable();
-            alert(`Funcionário ${name.trim()} (${selectedRole}) cadastrado com sucesso!`);
+            if (addedCount > 0) {
+                saveData();
+                renderAdminTable();
+                document.getElementById("bulkNewEmployeesText").value = "";
+                alert(`Sucesso! ${addedCount} novos funcionários cadastrados e salvos permanentemente na nuvem.`);
+            } else {
+                alert("Não foi possível ler os dados. Verifique se o formato está correto (ex: Nome | ID | Cargo | Inicial | Final).");
+            }
         }
 
         function addAbsentRecord() {
@@ -1470,7 +1512,7 @@
             if (emp) {
                 if (!emp.warnings) emp.warnings = [];
                 emp.warnings.push({ num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') });
-                saveData(); // SALVA DIRETAMENTE NA NUVEM NO PERFIL DO FUNCIONÁRIO
+                saveData();
             }
 
             const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
