@@ -627,6 +627,19 @@
         .race-rules li {
             margin-bottom: 4px;
         }
+
+        .prize-slot-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .prize-slot-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
@@ -693,17 +706,16 @@
 
                 <!-- TABELA DE PRÊMIOS DA CORRIDA -->
                 <div class="warning-panel" style="border-color: #22c55e;">
-                    <div class="section-title" style="color: #4ade80;">🏆 PRÊMIOS DA CORRIDA (MEDALHAS & ITENS)</div>
+                    <div class="section-title" style="color: #4ade80;">🏆 PRÊMIOS DA CORRIDA (5 SLOTS COM EMOJIS)</div>
                     <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
-                        Escolha o símbolo/emoji, defina a posição (ex: 🥇 1º Lugar - 5 prêmios) e digite o prêmio:
+                        Escolha o emoji e preencha os 5 prêmios correspondentes de cada posição:
                     </p>
                     <div style="overflow-x: auto; margin-bottom: 8px;">
                         <table class="habbo-table" style="font-size: 0.75rem;">
                             <thead>
                                 <tr>
-                                    <th style="width: 50px;">Símbolo</th>
                                     <th>Posição / Lugar</th>
-                                    <th>Prêmio (Dinheiro, Skins, Poções, etc.)</th>
+                                    <th>Prêmios (Emoji + Descrição)</th>
                                     <th style="width: 50px;" class="race-admin-col">Ação</th>
                                 </tr>
                             </thead>
@@ -877,7 +889,7 @@
                             <input type="text" id="absentNick" class="input-field" placeholder="Ex: Solyta">
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>AUSÊNCIA (PERíODO)</label>
+                            <label>AUSÊNCIA (PERÍODO)</label>
                             <input type="text" id="absentPeriod" class="input-field" placeholder="Ex: 02/11 à 08/11">
                         </div>
                         <div class="input-group" style="margin:0;">
@@ -1141,9 +1153,9 @@
                 absentRecords = data.absentRecords || [];
                 raceParticipants = data.raceParticipants || [];
                 racePrizes = data.racePrizes || [
-                    { symbol: "🥇", place: "1º Lugar", prize: "💰 500 c$ / 🔫 Skin de Arma" },
-                    { symbol: "🥈", place: "2º Lugar", prize: "💰 300 c$ / 🔋 Energético" },
-                    { symbol: "🥉", place: "3º Lugar", prize: "💰 150 c$ / 🧪 Poção" }
+                    { place: "🥇 1º Lugar", slots: [{symbol: "💰", text: "500 c$"}, {symbol: "🔫", text: "Skin AK-47"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "🧨", text: "Dinamite"}] },
+                    { place: "🥈 2º Lugar", slots: [{symbol: "💰", text: "300 c$"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "📄", text: "Documento"}, {symbol: "", text: ""}] },
+                    { place: "🥉 3º Lugar", slots: [{symbol: "💰", text: "150 c$"}, {symbol: "🧪", text: "Poção"}, {symbol: "🎣", text: "Item de Pesca"}, {symbol: "", text: ""}, {symbol: "", text: ""}] }
                 ];
                 currentWeekText = data.currentWeekText || "02/11/2026 à 08/11/2026";
             } else {
@@ -1151,9 +1163,9 @@
                 absentRecords = [];
                 raceParticipants = [];
                 racePrizes = [
-                    { symbol: "🥇", place: "1º Lugar", prize: "💰 500 c$ / 🔫 Skin de Arma" },
-                    { symbol: "🥈", place: "2º Lugar", prize: "💰 300 c$ / 🔋 Energético" },
-                    { symbol: "🥉", place: "3º Lugar", prize: "💰 150 c$ / 🧪 Poção" }
+                    { place: "🥇 1º Lugar", slots: [{symbol: "💰", text: "500 c$"}, {symbol: "🔫", text: "Skin AK-47"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "🧨", text: "Dinamite"}] },
+                    { place: "🥈 2º Lugar", slots: [{symbol: "💰", text: "300 c$"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "📄", text: "Documento"}, {symbol: "", text: ""}] },
+                    { place: "🥉 3º Lugar", slots: [{symbol: "💰", text: "150 c$"}, {symbol: "🧪", text: "Poção"}, {symbol: "🎣", text: "Item de Pesca"}, {symbol: "", text: ""}, {symbol: "", text: ""}] }
                 ];
                 currentWeekText = "02/11/2026 à 08/11/2026";
                 saveData();
@@ -1221,7 +1233,6 @@
             });
         }
 
-        // NAVEGAÇÃO DA TELA DA CORRIDA (Livre para ver)
         function showRaceScreen() {
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("raceScreen").style.display = "block";
@@ -1254,13 +1265,32 @@
                 alert("Apenas administradores podem adicionar prêmios!");
                 return;
             }
-            racePrizes.push({ symbol: "🎁", place: `${racePrizes.length + 1}º Lugar`, prize: "Novo Prêmio" });
+            racePrizes.push({
+                place: `${racePrizes.length + 1}º Lugar`,
+                slots: [
+                    {symbol: "💰", text: ""},
+                    {symbol: "", text: ""},
+                    {symbol: "", text: ""},
+                    {symbol: "", text: ""},
+                    {symbol: "", text: ""}
+                ]
+            });
             saveData();
             renderRaceScreen();
         }
 
-        function updateRacePrize(index, field, value) {
-            racePrizes[index][field] = value;
+        function updatePrizePlace(index, value) {
+            racePrizes[index].place = value;
+            saveData();
+        }
+
+        function updatePrizeSlotSymbol(prizeIdx, slotIdx, value) {
+            racePrizes[prizeIdx].slots[slotIdx].symbol = value;
+            saveData();
+        }
+
+        function updatePrizeSlotText(prizeIdx, slotIdx, value) {
+            racePrizes[prizeIdx].slots[slotIdx].text = value;
             saveData();
         }
 
@@ -1308,7 +1338,6 @@
         }
 
         function renderRaceScreen() {
-            // Controla visibilidade de colunas de ação com base na senha
             const actionCols = document.querySelectorAll(".race-admin-col");
             const actionBtns = document.querySelectorAll(".race-admin-action");
             const addContainer = document.getElementById("raceAddContainer");
@@ -1317,29 +1346,43 @@
             actionBtns.forEach(btn => btn.style.display = isRaceAdminUnlocked ? "block" : "none");
             if (addContainer) addContainer.style.display = isRaceAdminUnlocked ? "flex" : "none";
 
-            // Renderizar Prêmios com seletor de emojis temáticos
+            // Renderizar Prêmios (5 slots por linha com emojis na frente)
             const prizesTbody = document.getElementById("racePrizesTableBody");
             if (prizesTbody) {
                 prizesTbody.innerHTML = "";
-                racePrizes.forEach((p, idx) => {
-                    let tr = document.createElement("tr");
-                    let symbolOptions = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💰', '🔫', '🔋', '🧪', '🧨', '📄', '🎣', '⛏️', '🌱', '🎁'].map(sym => 
-                        `<option value="${sym}" ${sym === p.symbol ? 'selected' : ''}>${sym}</option>`
-                    ).join("");
+                const emojiChoices = ['', '💰', '🔫', '🔋', '🧪', '🧨', '📄', '🎣', '⛏️', '🌱', '🥇', '🥈', '🥉', '🎁', '⭐', '💎'];
 
-                    let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRacePrize(${idx})">❌</button></td>` : '';
+                racePrizes.forEach((p, prizeIdx) => {
+                    let tr = document.createElement("tr");
+
+                    let slotsHtml = `<div class="prize-slot-group">`;
+                    for (let sIdx = 0; sIdx < 5; sIdx++) {
+                        let slot = p.slots[sIdx] || {symbol: "", text: ""};
+                        let symbolOptions = emojiChoices.map(sym => 
+                            `<option value="${sym}" ${sym === slot.symbol ? 'selected' : ''}>${sym || '--'}</option>`
+                        ).join("");
+
+                        slotsHtml += `
+                            <div class="prize-slot-item">
+                                <select class="editable-select" ${!isRaceAdminUnlocked ? 'disabled' : ''} onchange="updatePrizeSlotSymbol(${prizeIdx}, ${sIdx}, this.value)" style="width: 60px; text-align: center;">${symbolOptions}</select>
+                                <input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} placeholder="Prêmio ${sIdx + 1}" value="${slot.text}" onchange="updatePrizeSlotText(${prizeIdx}, ${sIdx}, this.value)" style="width: 240px; text-align: left; padding: 4px 8px;">
+                            </div>
+                        `;
+                    }
+                    slotsHtml += `</div>`;
+
+                    let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRacePrize(${prizeIdx})">❌</button></td>` : '';
 
                     tr.innerHTML = `
-                        <td><select class="editable-select" ${!isRaceAdminUnlocked ? 'disabled' : ''} onchange="updateRacePrize(${idx}, 'symbol', this.value)" style="width:100%; text-align:center;">${symbolOptions}</select></td>
-                        <td><input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.place}" onchange="updateRacePrize(${idx}, 'place', this.value)" style="width:100%;"></td>
-                        <td><input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.prize}" onchange="updateRacePrize(${idx}, 'prize', this.value)" style="width:100%;"></td>
+                        <td><input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.place}" onchange="updatePrizePlace(${prizeIdx}, this.value)" style="width:110px; font-weight:bold;"></td>
+                        <td>${slotsHtml}</td>
                         ${actionTd}
                     `;
                     prizesTbody.appendChild(tr);
                 });
             }
 
-            // Renderizar Participantes Organizados por Ranking (Turnos Feitos)
+            // Renderizar Participantes Organizados por Ranking
             const partsTbody = document.getElementById("raceParticipantsTableBody");
             if (partsTbody) {
                 partsTbody.innerHTML = "";
@@ -1365,7 +1408,6 @@
                         `<span class="badge-status badge-danger">Não atende regras ❌</span>`;
 
                     let medalha = idx === 0 ? "🥇 " : idx === 1 ? "🥈 " : idx === 2 ? "🥉 " : `#${idx + 1} `;
-
                     let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRaceParticipant('${item.nick}')">❌</button></td>` : '';
 
                     tr.innerHTML = `
