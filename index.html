@@ -432,7 +432,7 @@
             background: rgba(96, 165, 250, 0.15);
         }
 
-        .warning-panel, .absent-panel, .dynamic-add-panel {
+        .warning-panel, .absent-panel, .bulk-add-panel {
             background: #060b14;
             border: 1px solid #12223c;
             border-radius: 6px;
@@ -717,35 +717,17 @@
                     <div class="schedule-list" id="scheduleList"></div>
                 </div>
 
-                <!-- PAINEL DE CADASTRO EM TABELA DINÂMICA DE NOVATOS -->
-                <div class="dynamic-add-panel" style="border-color: #3b82f6;">
-                    <div class="section-title">➕ CADASTRAR NOVATOS (TABELA INTERATIVA)</div>
+                <!-- PAINEL DE CADASTRO EM MASSA DE NOVATOS (ABERTO NA TELA) -->
+                <div class="bulk-add-panel" style="border-color: #3b82f6;">
+                    <div class="section-title">➕ CADASTRAR NOVATOS EM MASSA</div>
                     <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
-                        Adicione as linhas necessárias, preencha os dados de cada novato em colunas separadas e salve tudo de uma vez:
+                        Cole ou digite abaixo os dados dos novatos na sequência (uma linha por funcionário).<br>
+                        <strong>Formato recomendado por linha:</strong> <code>Nome | ID | Cargo | TurnoInicial | TurnoFinal</code> (ou separado por tabulação/espaço).
                     </p>
-                    
-                    <div style="overflow-x:auto; margin-bottom: 10px;">
-                        <table class="habbo-table" style="font-size: 0.75rem; min-width: 600px;">
-                            <thead>
-                                <tr>
-                                    <th>Nickname</th>
-                                    <th>ID no Jogo</th>
-                                    <th>Cargo</th>
-                                    <th>Turno Inicial</th>
-                                    <th>Turno Final</th>
-                                    <th style="width: 50px;">Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dynamicAddTableBody">
-                                <!-- Linha gerada via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-sm btn-sub" style="width: auto; margin:0;" onclick="addNewRowToDynamicTable()">+ Adicionar Linha</button>
-                        <button class="btn-sm btn-success" style="flex: 1; padding: 8px;" onclick="saveDynamicNewEmployees()">💾 Salvar Todos na Nuvem</button>
-                    </div>
+                    <textarea id="bulkNewEmployeesText" class="input-field" rows="4" placeholder="Ex:&#10;NovoRecruta1  12345  Operador de Loja  0  18&#10;NovoRecruta2  67890  Caixa  5  28" style="width:100%; font-family:monospace; font-size:0.8rem; margin-bottom:8px;"></textarea>
+                    <button class="btn-sm btn-success" style="width:100%; padding: 8px;" onclick="processBulkNewEmployees()">
+                        💾 Salvar Todos os Novos Funcionários na Nuvem
+                    </button>
                 </div>
 
                 <!-- PAINEL DE AUSENTES / LICENÇAS -->
@@ -1045,75 +1027,6 @@
             populateWeekSelector();
             renderAdminTable();
         });
-
-        // INICIALIZAR A TABELA DINÂMICA DE CADASTRO COM 1 LINHA VAZIA AO CARREGAR
-        window.addEventListener("DOMContentLoaded", () => {
-            addNewRowToDynamicTable();
-        });
-
-        function addNewRowToDynamicTable() {
-            const tbody = document.getElementById("dynamicAddTableBody");
-            if (!tbody) return;
-
-            let roleOptions = Object.keys(roleMetas).map(r => `<option value="${r}">${r}</option>`).join("");
-
-            let tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><input type="text" class="editable-input dyn-name" placeholder="Nick" style="width:100%;"></td>
-                <td><input type="text" class="editable-input dyn-id" placeholder="ID" style="width:100%;"></td>
-                <td><select class="editable-select dyn-role" style="width:100%;">${roleOptions}</select></td>
-                <td><input type="number" class="editable-input dyn-initial" value="0" style="width:100%;"></td>
-                <td><input type="number" class="editable-input dyn-current" value="0" style="width:100%;"></td>
-                <td><button class="btn-sm btn-sub" style="margin:0; padding:4px 8px;" onclick="this.closest('tr').remove()">❌</button></td>
-            `;
-            tbody.appendChild(tr);
-        }
-
-        function saveDynamicNewEmployees() {
-            const rows = document.querySelectorAll("#dynamicAddTableBody tr");
-            let addedCount = 0;
-
-            rows.forEach(tr => {
-                const name = tr.querySelector(".dyn-name").value.trim();
-                const id = tr.querySelector(".dyn-id").value.trim();
-                const role = tr.querySelector(".dyn-role").value;
-                const initial = parseInt(tr.querySelector(".dyn-initial").value) || 0;
-                const current = parseInt(tr.querySelector(".dyn-current").value) || 0;
-
-                if (name) {
-                    let existing = employees.find(e => e.name.toLowerCase() === name.toLowerCase());
-                    if (!existing) {
-                        employees.push({
-                            name: name,
-                            id: id,
-                            role: role,
-                            initial: initial,
-                            current: current,
-                            customAvatar: "",
-                            warnings: []
-                        });
-                        addedCount++;
-                    } else {
-                        existing.id = id || existing.id;
-                        existing.role = role;
-                        existing.initial = initial;
-                        existing.current = current;
-                        addedCount++;
-                    }
-                }
-            });
-
-            if (addedCount > 0) {
-                saveData();
-                renderAdminTable();
-                // Limpa e recria uma linha vazia
-                document.getElementById("dynamicAddTableBody").innerHTML = "";
-                addNewRowToDynamicTable();
-                alert(`Sucesso! ${addedCount} funcionário(s) salvos permanentemente na nuvem.`);
-            } else {
-                alert("Preencha ao menos o Nickname de um funcionário na tabela.");
-            }
-        }
 
         function initApp() {
             const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
@@ -1420,6 +1333,75 @@
                 employees.splice(index, 1);
                 saveData();
                 renderAdminTable();
+            }
+        }
+
+        // FUNÇÃO DE CADASTRAR NOVATOS EM MASSA PELA CAIXA DE TEXTO FIXA
+        function processBulkNewEmployees() {
+            const rawText = document.getElementById("bulkNewEmployeesText").value.trim();
+            if (!rawText) {
+                alert("Cole ou digite os dados dos novos funcionários na caixa de texto!");
+                return;
+            }
+
+            const lines = rawText.split("\n");
+            let addedCount = 0;
+
+            lines.forEach(line => {
+                const cleanLine = line.trim();
+                if (!cleanLine) return;
+
+                // Suporta separação por vírgula, barra vertical (|) ou tabulação/espaços múltiplos
+                const parts = cleanLine.split(/[|,\t]+/).map(p => p.trim()).filter(p => p !== "");
+                
+                if (parts.length >= 1) {
+                    const name = parts[0];
+                    const id = parts[1] && !isNaN(parts[1]) ? parts[1] : (parts[1] || "");
+                    
+                    // Se o segundo campo for texto (ex: cargo), ajusta os índices
+                    let role = "Operador de Loja";
+                    let initial = 0;
+                    let current = 0;
+
+                    let roleIndex = parts.findIndex(p => roleMetas[p] !== undefined);
+                    if (roleIndex !== -1) {
+                        role = parts[roleIndex];
+                    }
+
+                    // Procura por números nas partes finais para initial e current
+                    let numbers = parts.filter(p => !isNaN(p) && p !== id);
+                    if (numbers.length >= 2) {
+                        initial = parseInt(numbers[0]) || 0;
+                        current = parseInt(numbers[1]) || 0;
+                    } else if (numbers.length === 1) {
+                        current = parseInt(numbers[0]) || 0;
+                        initial = current;
+                    }
+
+                    // Verifica se já existe para atualizar ou adicionar
+                    let existing = employees.find(e => e.name.toLowerCase() === name.toLowerCase());
+                    if (!existing) {
+                        employees.push({
+                            name: name,
+                            id: id !== role ? id : "",
+                            role: role,
+                            initial: initial,
+                            current: current,
+                            customAvatar: "",
+                            warnings: []
+                        });
+                        addedCount++;
+                    }
+                }
+            });
+
+            if (addedCount > 0) {
+                saveData();
+                renderAdminTable();
+                document.getElementById("bulkNewEmployeesText").value = "";
+                alert(`Sucesso! ${addedCount} novos funcionários cadastrados e salvos permanentemente na nuvem.`);
+            } else {
+                alert("Não foi possível ler os dados. Verifique se o formato está correto (ex: Nome | ID | Cargo | Inicial | Final).");
             }
         }
 
