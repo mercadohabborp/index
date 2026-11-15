@@ -716,7 +716,7 @@
                                 <tr>
                                     <th>Posição / Lugar</th>
                                     <th>Prêmios (Emoji + Descrição)</th>
-                                    <th style="width: 50px;" class="race-admin-col" style="display:none;">Ação</th>
+                                    <th style="width: 50px; display:none;" class="race-admin-col">Ação</th>
                                 </tr>
                             </thead>
                             <tbody id="racePrizesTableBody"></tbody>
@@ -732,7 +732,7 @@
                         Insira os participantes. O ranking organiza-se automaticamente por quem tem mais turnos feitos!
                     </p>
                     <div id="raceAddContainer" style="display: none; gap: 6px; margin-bottom: 10px;">
-                        <input type="text" id="newRaceParticipant" class="input-field" placeholder="Nick do Participante..." style="font-size: 0.75rem; flex: 1; margin:0;">
+                        <input type="text" id="newRaceParticipant" class="input-field" placeholder="Nick do Participante..." style="font-size: 0.75rem; flex: 1; margin:0;" onkeypress="if(event.key==='Enter') addRaceParticipant()">
                         <button class="btn-sm btn-success" onclick="addRaceParticipant()">+ Inscrever</button>
                     </div>
 
@@ -745,7 +745,7 @@
                                     <th>Cargo</th>
                                     <th>Turnos Feitos</th>
                                     <th>Elegível?</th>
-                                    <th style="width: 50px;" class="race-admin-col" style="display:none;">Ação</th>
+                                    <th style="width: 50px; display:none;" class="race-admin-col">Ação</th>
                                 </tr>
                             </thead>
                             <tbody id="raceParticipantsTableBody"></tbody>
@@ -1111,7 +1111,11 @@
         let employees = [];
         let absentRecords = [];
         let raceParticipants = [];
-        let racePrizes = [];
+        let racePrizes = [
+            { place: "🥇 1º Lugar", slots: [{symbol: "💰", text: "500 c$"}, {symbol: "🔫", text: "Skin AK-47"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "🧨", text: "Dinamite"}] },
+            { place: "🥈 2º Lugar", slots: [{symbol: "💰", text: "300 c$"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "📄", text: "Documento"}, {symbol: "", text: ""}] },
+            { place: "🥉 3º Lugar", slots: [{symbol: "💰", text: "150 c$"}, {symbol: "🧪", text: "Poção"}, {symbol: "🎣", text: "Item de Pesca"}, {symbol: "", text: ""}, {symbol: "", text: ""}] }
+        ];
         let currentWeekText = "02/11/2026 à 08/11/2026";
         let activeUser = null;
         let currentInput = "0";
@@ -1152,22 +1156,14 @@
                 }
                 absentRecords = data.absentRecords || [];
                 raceParticipants = data.raceParticipants || [];
-                racePrizes = data.racePrizes || [
-                    { place: "🥇 1º Lugar", slots: [{symbol: "💰", text: "500 c$"}, {symbol: "🔫", text: "Skin AK-47"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "🧨", text: "Dinamite"}] },
-                    { place: "🥈 2º Lugar", slots: [{symbol: "💰", text: "300 c$"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "📄", text: "Documento"}, {symbol: "", text: ""}] },
-                    { place: "🥉 3º Lugar", slots: [{symbol: "💰", text: "150 c$"}, {symbol: "🧪", text: "Poção"}, {symbol: "🎣", text: "Item de Pesca"}, {symbol: "", text: ""}, {symbol: "", text: ""}] }
-                ];
+                if (data.racePrizes && data.racePrizes.length > 0) {
+                    racePrizes = data.racePrizes;
+                }
                 currentWeekText = data.currentWeekText || "02/11/2026 à 08/11/2026";
             } else {
                 employees = defaultEmployees;
                 absentRecords = [];
                 raceParticipants = [];
-                racePrizes = [
-                    { place: "🥇 1º Lugar", slots: [{symbol: "💰", text: "500 c$"}, {symbol: "🔫", text: "Skin AK-47"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "🧨", text: "Dinamite"}] },
-                    { place: "🥈 2º Lugar", slots: [{symbol: "💰", text: "300 c$"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "📄", text: "Documento"}, {symbol: "", text: ""}] },
-                    { place: "🥉 3º Lugar", slots: [{symbol: "💰", text: "150 c$"}, {symbol: "🧪", text: "Poção"}, {symbol: "🎣", text: "Item de Pesca"}, {symbol: "", text: ""}, {symbol: "", text: ""}] }
-                ];
-                currentWeekText = "02/11/2026 à 08/11/2026";
                 saveData();
             }
 
@@ -1346,80 +1342,89 @@
             actionBtns.forEach(btn => btn.style.display = isRaceAdminUnlocked ? "block" : "none");
             if (addContainer) addContainer.style.display = isRaceAdminUnlocked ? "flex" : "none";
 
-            // Renderizar Prêmios (5 slots por linha com emojis na frente)
+            // Renderizar Prêmios
             const prizesTbody = document.getElementById("racePrizesTableBody");
             if (prizesTbody) {
                 prizesTbody.innerHTML = "";
                 const emojiChoices = ['', '💰', '🔫', '🔋', '🧪', '🧨', '📄', '🎣', '⛏️', '🌱', '🥇', '🥈', '🥉', '🎁', '⭐', '💎'];
 
-                racePrizes.forEach((p, prizeIdx) => {
-                    let tr = document.createElement("tr");
+                if (racePrizes.length === 0) {
+                    prizesTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#7b93b8; padding:12px;">Nenhum prêmio cadastrado. Clique no botão abaixo para adicionar.</td></tr>`;
+                } else {
+                    racePrizes.forEach((p, prizeIdx) => {
+                        let tr = document.createElement("tr");
 
-                    let slotsHtml = `<div class="prize-slot-group">`;
-                    for (let sIdx = 0; sIdx < 5; sIdx++) {
-                        let slot = p.slots[sIdx] || {symbol: "", text: ""};
-                        let symbolOptions = emojiChoices.map(sym => 
-                            `<option value="${sym}" ${sym === slot.symbol ? 'selected' : ''}>${sym || '--'}</option>`
-                        ).join("");
+                        let slotsHtml = `<div class="prize-slot-group">`;
+                        for (let sIdx = 0; sIdx < 5; sIdx++) {
+                            let slot = (p.slots && p.slots[sIdx]) ? p.slots[sIdx] : {symbol: "", text: ""};
+                            let symbolOptions = emojiChoices.map(sym => 
+                                `<option value="${sym}" ${sym === slot.symbol ? 'selected' : ''}>${sym || '--'}</option>`
+                            ).join("");
 
-                        slotsHtml += `
-                            <div class="prize-slot-item">
-                                <select class="editable-select" ${!isRaceAdminUnlocked ? 'disabled' : ''} onchange="updatePrizeSlotSymbol(${prizeIdx}, ${sIdx}, this.value)" style="width: 60px; text-align: center;">${symbolOptions}</select>
-                                <input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} placeholder="Prêmio ${sIdx + 1}" value="${slot.text}" onchange="updatePrizeSlotText(${prizeIdx}, ${sIdx}, this.value)" style="width: 240px; text-align: left; padding: 4px 8px;">
-                            </div>
+                            slotsHtml += `
+                                <div class="prize-slot-item">
+                                    <select class="editable-select" ${!isRaceAdminUnlocked ? 'disabled' : ''} onchange="updatePrizeSlotSymbol(${prizeIdx}, ${sIdx}, this.value)" style="width: 60px; text-align: center;">${symbolOptions}</select>
+                                    <input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} placeholder="Prêmio ${sIdx + 1}" value="${slot.text || ''}" onchange="updatePrizeSlotText(${prizeIdx}, ${sIdx}, this.value)" style="width: 240px; text-align: left; padding: 4px 8px;">
+                                </div>
+                            `;
+                        }
+                        slotsHtml += `</div>`;
+
+                        let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRacePrize(${prizeIdx})">❌</button></td>` : '';
+
+                        tr.innerHTML = `
+                            <td><input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.place || ''}" onchange="updatePrizePlace(${prizeIdx}, this.value)" style="width:110px; font-weight:bold;"></td>
+                            <td>${slotsHtml}</td>
+                            ${actionTd}
                         `;
-                    }
-                    slotsHtml += `</div>`;
-
-                    let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRacePrize(${prizeIdx})">❌</button></td>` : '';
-
-                    tr.innerHTML = `
-                        <td><input type="text" class="editable-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.place}" onchange="updatePrizePlace(${prizeIdx}, this.value)" style="width:110px; font-weight:bold;"></td>
-                        <td>${slotsHtml}</td>
-                        ${actionTd}
-                    `;
-                    prizesTbody.appendChild(tr);
-                });
+                        prizesTbody.appendChild(tr);
+                    });
+                }
             }
 
-            // Renderizar Participantes Organizados por Ranking
+            // Renderizar Participantes
             const partsTbody = document.getElementById("raceParticipantsTableBody");
             if (partsTbody) {
                 partsTbody.innerHTML = "";
 
-                let list = raceParticipants.map(nick => {
-                    let emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
-                    let feitos = emp ? (emp.current - emp.initial) : 0;
-                    if (feitos < 0) feitos = 0;
-                    let hasWarn = emp && emp.warnings && emp.warnings.length > 0;
-                    let isAbsent = absentRecords.some(r => r.nick.trim().toLowerCase() === nick.toLowerCase());
-                    
-                    let eligible = emp && !hasWarn && !isAbsent && feitos >= 40;
+                if (raceParticipants.length === 0) {
+                    let colSpanVal = isRaceAdminUnlocked ? 6 : 5;
+                    partsTbody.innerHTML = `<tr><td colspan="${colSpanVal}" style="text-align:center; color:#7b93b8; padding:14px;">Nenhum participante inscrito na corrida ainda. ${isRaceAdminUnlocked ? 'Insira acima!' : 'Desbloqueie com a senha para inscrever.'}</td></tr>`;
+                } else {
+                    let list = raceParticipants.map(nick => {
+                        let emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
+                        let feitos = emp ? (emp.current - emp.initial) : 0;
+                        if (feitos < 0) feitos = 0;
+                        let hasWarn = emp && emp.warnings && emp.warnings.length > 0;
+                        let isAbsent = absentRecords.some(r => r.nick.trim().toLowerCase() === nick.toLowerCase());
+                        
+                        let eligible = emp && !hasWarn && !isAbsent && feitos >= 40;
 
-                    return { nick, role: emp ? emp.role : "Desconhecido", feitos, eligible };
-                });
+                        return { nick, role: emp ? emp.role : "Desconhecido", feitos, eligible };
+                    });
 
-                list.sort((a, b) => b.feitos - a.feitos);
+                    list.sort((a, b) => b.feitos - a.feitos);
 
-                list.forEach((item, idx) => {
-                    let tr = document.createElement("tr");
-                    let badge = item.eligible ? 
-                        `<span class="badge-status badge-success">Elegível ✅</span>` : 
-                        `<span class="badge-status badge-danger">Não atende regras ❌</span>`;
+                    list.forEach((item, idx) => {
+                        let tr = document.createElement("tr");
+                        let badge = item.eligible ? 
+                            `<span class="badge-status badge-success">Elegível ✅</span>` : 
+                            `<span class="badge-status badge-danger">Não atende regras ❌</span>`;
 
-                    let medalha = idx === 0 ? "🥇 " : idx === 1 ? "🥈 " : idx === 2 ? "🥉 " : `#${idx + 1} `;
-                    let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRaceParticipant('${item.nick}')">❌</button></td>` : '';
+                        let medalha = idx === 0 ? "🥇 " : idx === 1 ? "🥈 " : idx === 2 ? "🥉 " : `#${idx + 1} `;
+                        let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRaceParticipant('${item.nick}')">❌</button></td>` : '';
 
-                    tr.innerHTML = `
-                        <td><strong>${medalha}</strong></td>
-                        <td><strong>${item.nick}</strong></td>
-                        <td>${item.role}</td>
-                        <td><strong>${item.feitos} turnos</strong></td>
-                        <td>${badge}</td>
-                        ${actionTd}
-                    `;
-                    partsTbody.appendChild(tr);
-                });
+                        tr.innerHTML = `
+                            <td><strong>${medalha}</strong></td>
+                            <td><strong>${item.nick}</strong></td>
+                            <td>${item.role}</td>
+                            <td><strong>${item.feitos} turnos</strong></td>
+                            <td>${badge}</td>
+                            ${actionTd}
+                        `;
+                        partsTbody.appendChild(tr);
+                    });
+                }
             }
         }
 
