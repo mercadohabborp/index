@@ -1189,4 +1189,506 @@
             document.getElementById("uName").innerText = activeUser.name;
             document.getElementById("uRole").innerText = activeUser.role;
             document.getElementById("uInitial").innerText = activeUser.initial;
-            document.getElementById("uMeta").innerText = meta
+            document.getElementById("uMeta").innerText = meta + " turnos";
+            document.getElementById("refDateLabel").innerText = `TURNOS INICIAIS (${match.refDate || 'Iniciais'})`;
+
+            const avatarBg = activeUser.customAvatar ? activeUser.customAvatar : `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${activeUser.name}&action=std&direction=2&head_direction=2&gesture=sml&size=m`;
+            document.getElementById("avatarFrame").style.backgroundImage = `url('${avatarBg}')`;
+            document.getElementById("customAvatarInput").value = activeUser.customAvatar || "";
+
+            const warnContainer = document.getElementById("userWarningsContainer");
+            warnContainer.innerHTML = "";
+            if (activeUser.warnings && activeUser.warnings.length > 0) {
+                activeUser.warnings.forEach((w, idx) => {
+                    let div = document.createElement("div");
+                    div.style.cssText = "background:#0f1c30; padding:8px; border-radius:4px; margin-bottom:6px; border-left:3px solid #f87171;";
+                    div.innerHTML = `<strong>${w.num}</strong> - Motivo: ${w.motivo}<br><span style="font-size:0.7rem; color:#7b93b8;">Print: ${w.imgur && w.imgur !== '-x-' ? `<a href="${w.imgur}" target="_blank" style="color:#60a5fa;">Ver Print</a>` : '-x-'}</span>`;
+                    warnContainer.appendChild(div);
+                });
+            } else {
+                warnContainer.innerHTML = `<span style="color:#7b93b8;">Nenhuma advertência registrada. Parabéns!</span>`;
+            }
+        }
+
+        function saveCustomAvatar() {
+            const link = document.getElementById("customAvatarInput").value.trim();
+            if (!activeUser) return;
+
+            activeUser.customAvatar = link;
+            let idx = employees.findIndex(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
+            if (idx !== -1) {
+                employees[idx].customAvatar = link;
+                saveData();
+            }
+
+            renderUserProfile();
+            alert("Foto de perfil atualizada com sucesso!");
+        }
+
+        function showAdminLogin() {
+            const pass = prompt("Digite a senha de administrador:");
+            if (pass === "tudomercado363") {
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("adminScreen").style.display = "block";
+                document.getElementById("mainWrapper").classList.add("wide");
+                document.getElementById("printWeekSpan").innerText = currentWeekText;
+                populateWeekSelector();
+                renderSchedule();
+                renderAdminTable();
+            } else if (pass) {
+                alert("Senha incorreta!");
+            }
+        }
+
+        function logout() {
+            activeUser = null;
+            document.getElementById("userScreen").style.display = "none";
+            document.getElementById("adminScreen").style.display = "none";
+            document.getElementById("loginScreen").style.display = "block";
+            document.getElementById("mainWrapper").classList.remove("wide");
+            document.getElementById("usernameInput").value = "";
+        }
+
+        const display = document.getElementById("display");
+
+        function updateDisplay() { display.innerText = currentInput; }
+
+        function appendNum(num) {
+            if (currentInput === "0") currentInput = num;
+            else currentInput += num;
+            updateDisplay();
+        }
+
+        function clearNum() { currentInput = "0"; updateDisplay(); }
+
+        function deleteNum() {
+            if (currentInput.length > 1) currentInput = currentInput.slice(0, -1);
+            else currentInput = "0";
+            updateDisplay();
+        }
+
+        function calculateShift() {
+            let currVal = parseInt(currentInput);
+            if (isNaN(currVal)) currVal = 0;
+
+            let meta = roleMetas[activeUser.role] || 15;
+            let feitos = (currVal >= activeUser.initial) ? (currVal - activeUser.initial) : currVal;
+
+            let faltando = meta - feitos;
+            const resCard = document.getElementById("resultCard");
+            const resText = document.getElementById("resultText");
+
+            if (faltando > 0) {
+                resCard.className = "result-card danger";
+                resText.innerHTML = `Feitos nesta semana: <span style="color:#ffffff;">${feitos}</span><br><span style="color:#f87171;">Faltam ${faltando} turnos para a meta</span>`;
+            } else {
+                resCard.className = "result-card";
+                resText.innerHTML = `Feitos nesta semana: <span style="color:#ffffff;">${feitos}</span><br><span style="color:#60a5fa;">🎉 Meta Alcançada!</span>`;
+            }
+        }
+
+        function renderSchedule() {
+            const container = document.getElementById("scheduleList");
+            container.innerHTML = "";
+
+            rotationSchedule.forEach(s => {
+                const isActive = s.week === currentWeekText;
+                const div = document.createElement("div");
+                div.className = `schedule-item ${isActive ? 'active' : ''}`;
+                div.innerHTML = `
+                    <span>${s.week}</span>
+                    <strong>${s.resp} ${isActive ? '(Atual)' : ''}</strong>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+
+            let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
+            let imageFilterMode = document.getElementById("imageFilterToggle") ? document.getElementById("imageFilterToggle").value : "all";
+            
+            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx }));
+
+            if (imageFilterMode === "gt15") {
+                visibleEmployees = visibleEmployees.filter(emp => {
+                    let feitos = emp.current - emp.initial;
+                    if (feitos < 0) feitos = 0;
+                    let isAbsent = hasActiveAbsent(emp.name);
+                    return feitos > 15 || isAbsent;
+                });
+            }
+
+            if (filterMode === "alpha") {
+                visibleEmployees.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (filterMode === "turns-desc") {
+                visibleEmployees.sort((a, b) => (b.current - b.initial) - (a.current - a.initial));
+            } else if (filterMode === "turns-asc") {
+                visibleEmployees.sort((a, b) => (a.current - a.initial) - (b.current - b.initial));
+            } else if (filterMode === "role") {
+                visibleEmployees.sort((a, b) => (roleHierarchy[a.role] || 99) - (roleHierarchy[b.role] || 99));
+            }
+
+            visibleEmployees.forEach((emp) => {
+                let index = emp.originalIndex;
+                let meta = roleMetas[emp.role] || 15;
+                let feitos = emp.current - emp.initial;
+                if (feitos < 0) feitos = 0;
+                let alcançou = feitos >= meta;
+
+                let isAbsent = hasActiveAbsent(emp.name);
+
+                let roleOptions = Object.keys(roleMetas).map(r => 
+                    `<option value="${r}" ${r === emp.role ? 'selected' : ''}>${r}</option>`
+                ).join("");
+
+                let tr = document.createElement("tr");
+                
+                let statusBadge = "";
+                if (isAbsent) {
+                    statusBadge = `<span class="badge-status badge-aval">⭐ COM AVAL</span>`;
+                } else {
+                    statusBadge = `<span class="badge-status ${alcançou ? 'badge-success' : 'badge-danger'}">
+                        ${alcançou ? 'Alcançada' : 'Não alcançada'}
+                    </span>`;
+                }
+
+                tr.innerHTML = `
+                    <td>
+                        <strong>${emp.name}</strong> ${emp.id ? `<span style="color:#7b93b8; font-size:0.75rem;">(ID: ${emp.id})</span>` : ''}
+                        <button class="btn-edit-pencil action-col" title="Editar Nick/ID" onclick="editEmpInfo(${index})">✏️</button>
+                    </td>
+                    <td class="role-cell" data-role="${emp.role}">
+                        <select class="editable-select" onchange="updateEmpRole(${index}, this.value)">
+                            ${roleOptions}
+                        </select>
+                    </td>
+                    <td>${emp.initial}</td>
+                    <td class="turn-cell" data-val="${emp.current}">
+                        <input type="number" class="editable-input" id="emp-curr-${index}" value="${emp.current}">
+                    </td>
+                    <td><strong>${feitos}</strong></td>
+                    <td>${statusBadge}</td>
+                    <td class="action-col">
+                        <button class="btn-sm btn-success" onclick="saveSingleTurn(${index})">💾 Salvar</button>
+                        <button class="btn-sm btn-sub" style="margin:0;" onclick="removeEmp(${index})">❌</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function hasActiveAbsent(name) {
+            return absentRecords.some(r => r.nick.trim().toLowerCase() === name.trim().toLowerCase());
+        }
+
+        function editEmpInfo(index) {
+            const emp = employees[index];
+            const newName = prompt("Editar Nickname do funcionário:", emp.name);
+            if (!newName || !newName.trim()) return;
+
+            const newId = prompt("Editar ID do funcionário no jogo:", emp.id || "");
+            
+            employees[index].name = newName.trim();
+            employees[index].id = newId ? newId.trim() : "";
+            saveData();
+            renderAdminTable();
+            alert("ID e Nick atualizados e salvos na nuvem com sucesso!");
+        }
+
+        function updateEmpRole(index, newRole) {
+            employees[index].role = newRole;
+            saveData();
+            renderAdminTable();
+        }
+
+        function saveSingleTurn(index) {
+            const valInput = document.getElementById(`emp-curr-${index}`).value;
+            const newTurn = parseInt(valInput);
+            if (!isNaN(newTurn)) {
+                employees[index].current = newTurn;
+                saveData();
+                renderAdminTable();
+                alert(`Turnos de ${employees[index].name} atualizados e salvos na nuvem!`);
+            }
+        }
+
+        function removeEmp(index) {
+            if (confirm(`Remover ${employees[index].name} da lista?`)) {
+                employees.splice(index, 1);
+                saveData();
+                renderAdminTable();
+            }
+        }
+
+        function addAbsentRecord() {
+            const nick = document.getElementById("absentNick").value.trim();
+            const period = document.getElementById("absentPeriod").value.trim();
+            const reason = document.getElementById("absentReason").value.trim();
+
+            if (!nick || !period) {
+                alert("Preencha ao menos o Nick e o Período da ausência!");
+                return;
+            }
+
+            absentRecords.push({ nick, period, reason: reason || "N/A" });
+            saveData();
+            renderAbsentTable();
+            renderAdminTable();
+
+            document.getElementById("absentNick").value = "";
+            document.getElementById("absentPeriod").value = "";
+            document.getElementById("absentReason").value = "";
+            alert("Aval / Ausência registrado e salvo na nuvem!");
+        }
+
+        function renderAbsentTable() {
+            const tbody = document.getElementById("absentTableBody");
+            tbody.innerHTML = "";
+
+            absentRecords.forEach((rec, idx) => {
+                let tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${rec.nick}</strong></td>
+                    <td>${rec.period}</td>
+                    <td>${rec.reason}</td>
+                    <td><button class="btn-sm btn-warning" style="margin:0; padding:3px 6px;" onclick="removeAbsentRecord(${idx})">Encerrar</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function removeAbsentRecord(idx) {
+            if (confirm("Deseja encerrar e remover o aval/ausência deste funcionário?")) {
+                absentRecords.splice(idx, 1);
+                saveData();
+                renderAbsentTable();
+                renderAdminTable();
+                alert("Aval encerrado com sucesso!");
+            }
+        }
+
+        function advanceWeek() {
+            const pass = prompt("Digite a senha de administrador para virar a semana:");
+            if (pass !== "tudomercado363") {
+                alert("Senha incorreta!");
+                return;
+            }
+
+            if (confirm("Deseja virar a semana? Os Turnos Finais atuais passarão a ser os Turnos Iniciais para todos, garantindo o avanço correto!")) {
+                employees.forEach(emp => {
+                    emp.initial = emp.current;
+                });
+
+                const currentIndex = rotationSchedule.findIndex(s => s.week === currentWeekText);
+                if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
+                    currentWeekText = rotationSchedule[currentIndex + 1].week;
+                } else {
+                    const newWeek = prompt("Digite o período da nova semana:", "09/11/2026 à 15/11/2026");
+                    if (newWeek && newWeek.trim() !== "") {
+                        currentWeekText = newWeek.trim();
+                    }
+                }
+
+                saveData();
+                populateWeekSelector();
+                document.getElementById("printWeekSpan").innerText = currentWeekText;
+                initApp();
+                renderSchedule();
+                renderAdminTable();
+                alert("Semana virada com sucesso! Turnos iniciais atualizados com os finais e salvos na nuvem.");
+            }
+        }
+
+        function generateWarningText() {
+            const nick = document.getElementById("advNick").value.trim();
+            const numAdv = document.getElementById("advNum").value;
+            const motivo = document.getElementById("advMotivo").value.trim();
+            let imgur = document.getElementById("advImgur").value.trim();
+            if (!imgur) imgur = "-x-";
+
+            if (!nick || !motivo) {
+                alert("Preencha ao menos o Nick e o Motivo da advertência!");
+                return;
+            }
+
+            const pass = prompt("Digite a senha de administrador para salvar e registrar a advertência:");
+            if (pass !== "tudomercado363") {
+                alert("Senha incorreta! Advertência não aplicada.");
+                return;
+            }
+
+            const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
+            
+            let formattedNickAndId = nick;
+            if (emp && emp.id) {
+                formattedNickAndId = `${emp.name} (${emp.id})`;
+            }
+
+            if (emp) {
+                if (!emp.warnings) emp.warnings = [];
+                emp.warnings.push({ num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') });
+                saveData();
+            }
+
+            const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
+                `👤 **Funcionário(a):** ${formattedNickAndId}\n` +
+                `💼 **Cargo:** ${emp ? emp.role : 'Funcionário'}\n` +
+                `⚠️ **Punição:** ${numAdv}\n` +
+                `📝 **Motivo:** ${motivo}\n` +
+                `🖼️ **Comprovação (Print):** ${imgur}\n` +
+                `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
+                `*Esta advertência foi registrada na Administração do Mercado RP.*`;
+
+            document.getElementById("discordTextOutput").innerText = discordFormatted;
+            document.getElementById("discordOutputContainer").style.display = "block";
+            alert("Senha correta! Advertência registrada e salva na nuvem com sucesso.");
+        }
+
+        function generateUnreachedList() {
+            let unreached = employees.filter(emp => {
+                let meta = roleMetas[emp.role] || 15;
+                let feitos = emp.current - emp.initial;
+                if (feitos < 0) feitos = 0;
+                if (hasActiveAbsent(emp.name)) return false;
+                return feitos < meta;
+            });
+
+            if (unreached.length === 0) {
+                document.getElementById("unreachedTextOutput").innerText = "Todos os funcionários atingiram a meta nesta semana (ou estão de licença/com aval)!";
+                document.getElementById("unreachedOutputContainer").style.display = "block";
+                return;
+            }
+
+            let blocks = [];
+            unreached.forEach(emp => {
+                let displayName = emp.id ? `${emp.name} (${emp.id})` : emp.name;
+                blocks.push(`**Nick:** ${displayName}\n**motivo:** cota de turnos não atingida\n**Nº DE Advertência:** \n**Print:** -x-`);
+            });
+
+            let finalOutput = blocks.join("\n-\n");
+
+            document.getElementById("unreachedTextOutput").innerText = finalOutput;
+            document.getElementById("unreachedOutputContainer").style.display = "block";
+        }
+
+        function copyDiscordText() {
+            const text = document.getElementById("discordTextOutput").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Texto copiado para a área de transferência!");
+            });
+        }
+
+        function copyUnreachedText() {
+            const text = document.getElementById("unreachedTextOutput").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Relatório copiado para a área de transferência!");
+            });
+        }
+
+        function generateTableImage() {
+            const area = document.getElementById("printableTableArea");
+            const responsiveBox = document.getElementById("tableResponsiveBox");
+            const actionCols = document.querySelectorAll(".action-col");
+
+            actionCols.forEach(c => c.style.display = "none");
+
+            const turnCells = document.querySelectorAll(".turn-cell");
+            const roleCells = document.querySelectorAll(".role-cell");
+
+            turnCells.forEach(cell => {
+                const val = cell.getAttribute("data-val");
+                cell.innerHTML = `<strong>${val}</strong>`;
+            });
+
+            roleCells.forEach(cell => {
+                const role = cell.getAttribute("data-role");
+                cell.innerHTML = role;
+            });
+
+            responsiveBox.classList.add("force-full-print");
+
+            html2canvas(area, {
+                backgroundColor: "#060b14",
+                scale: 2,
+                useCORS: true,
+                windowWidth: 1200
+            }).then(canvas => {
+                responsiveBox.classList.remove("force-full-print");
+                actionCols.forEach(c => c.style.display = "");
+                renderAdminTable();
+
+                const link = document.createElement('a');
+                link.download = `Mercado_Habbo_${currentWeekText.replace(/[/]/g, '-')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function processBulkImport() {
+            const rawText = document.getElementById("bulkImportText").value.trim();
+            if (!rawText) {
+                alert("Cole os dados na caixa de texto primeiro!");
+                return;
+            }
+
+            const lines = rawText.split("\n");
+            let updatedCount = 0;
+            let addedCount = 0;
+
+            lines.forEach(line => {
+                const cleanLine = line.trim();
+                if (!cleanLine) return;
+
+                const match = cleanLine.match(/^(.*?)\s+(\d+)$/);
+                if (match) {
+                    const inputName = match[1].trim();
+                    const newTurnVal = parseInt(match[2]);
+                    const cleanInput = inputName.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+                    let emp = employees.find(e => {
+                        if (!e || !e.name) return false;
+                        const dbName = e.name.trim().toLowerCase();
+                        const cleanDb = dbName.replace(/[^a-z0-9]/g, '');
+                        return cleanDb === cleanInput || dbName === inputName.toLowerCase();
+                    });
+
+                    if (emp) {
+                        emp.current = newTurnVal;
+                        if (!emp.initial || emp.initial < 15) {
+                            emp.initial = newTurnVal >= 15 ? newTurnVal : 15;
+                        }
+                        updatedCount++;
+                    } else {
+                        employees.push({
+                            name: inputName,
+                            id: "",
+                            role: "Operador de Loja",
+                            initial: newTurnVal >= 15 ? newTurnVal : 15,
+                            current: newTurnVal,
+                            customAvatar: "",
+                            warnings: []
+                        });
+                        addedCount++;
+                    }
+                }
+            });
+
+            if (updatedCount > 0 || addedCount > 0) {
+                saveData();
+                renderAdminTable();
+                document.getElementById("bulkImportText").value = "";
+                alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
+            } else {
+                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
+            }
+        }
+
+        document.getElementById("usernameInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") loginUser();
+        });
+    </script>
+</body>
+</html>
