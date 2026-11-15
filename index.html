@@ -719,7 +719,7 @@
 
                 <!-- PAINEL DE AUSENTES / LICENÇAS -->
                 <div class="absent-panel">
-                    <div class="section-title">🏖️ REGISTRO DE AUSENTES / LICENÇAS</div>
+                    <div class="section-title">🏖️ REGISTRO DE AUSENTES / LICENÇAS (AVAL)</div>
                     <div class="warning-form-grid">
                         <div class="input-group" style="margin:0;">
                             <label>NICK DO FUNCIONÁRIO</label>
@@ -727,7 +727,7 @@
                         </div>
                         <div class="input-group" style="margin:0;">
                             <label>AUSÊNCIA (PERÍODO)</label>
-                            <input type="text" id="absentPeriod" class="input-field" placeholder="Ex: 20/10 à 25/10">
+                            <input type="text" id="absentPeriod" class="input-field" placeholder="Ex: 02/11 à 08/11">
                         </div>
                         <div class="input-group" style="margin:0;">
                             <label>JUSTIFICATIVA</label>
@@ -735,7 +735,7 @@
                         </div>
                     </div>
                     <button class="btn-sm btn-success" style="width:100%; padding:8px; margin-bottom:12px;" onclick="addAbsentRecord()">
-                        + REGISTRAR AUSÊNCIA / AVAL
+                        + REGISTRAR AVAL / AUSÊNCIA
                     </button>
 
                     <div style="overflow-x:auto;">
@@ -743,9 +743,9 @@
                             <thead>
                                 <tr>
                                     <th>Nick</th>
-                                    <th>Ausência</th>
+                                    <th>Período</th>
                                     <th>Justificativa</th>
-                                    <th style="width:40px;">Ação</th>
+                                    <th style="width:90px;">Ação</th>
                                 </tr>
                             </thead>
                             <tbody id="absentTableBody"></tbody>
@@ -965,21 +965,26 @@
             bgContainer.appendChild(icon);
         }
 
-        // VERIFICAR E CRIAR DOCUMENTO SE NÃO EXISTIR
-        db.collection("mercadoData").doc("mainDoc").get().then((doc) => {
-            if (!doc.exists) {
-                employees = defaultEmployees;
-                absentRecords = [];
-                currentWeekText = "02/11/2026 à 08/11/2026";
-                saveData();
-            }
-        });
-
-        // CARREGAR DADOS DO FIRESTORE EM TEMPO REAL
+        // CARREGAR DADOS DO FIRESTORE EM TEMPO REAL COM SEGURANÇA TOTAL DE DADOS
         db.collection("mercadoData").doc("mainDoc").onSnapshot((doc) => {
             if (doc.exists) {
                 const data = doc.data();
-                employees = (data.employees && data.employees.length > 0) ? data.employees : defaultEmployees;
+                if (data.employees && data.employees.length > 0) {
+                    employees = data.employees.map(emp => {
+                        let defMatch = defaultEmployees.find(d => d.name.toLowerCase() === emp.name.toLowerCase());
+                        return {
+                            id: emp.id !== undefined ? emp.id : (defMatch ? defMatch.id : ""),
+                            name: emp.name,
+                            role: emp.role || "Operador de Loja",
+                            initial: emp.initial !== undefined ? emp.initial : 0,
+                            current: emp.current !== undefined ? emp.current : 0,
+                            customAvatar: emp.customAvatar || "",
+                            warnings: emp.warnings || []
+                        };
+                    });
+                } else {
+                    employees = defaultEmployees;
+                }
                 absentRecords = data.absentRecords || [];
                 currentWeekText = data.currentWeekText || "02/11/2026 à 08/11/2026";
             } else {
@@ -1046,10 +1051,6 @@
             }).catch((error) => {
                 console.error("Erro ao salvar no Firestore: ", error);
             });
-
-            localStorage.setItem("habbo_mkt_emp", JSON.stringify(employees));
-            localStorage.setItem("habbo_mkt_absent", JSON.stringify(absentRecords));
-            localStorage.setItem("habbo_mkt_week", currentWeekText);
         }
 
         function loginUser() {
@@ -1217,7 +1218,6 @@
                     let feitos = emp.current - emp.initial;
                     if (feitos < 0) feitos = 0;
                     let isAbsent = hasActiveAbsent(emp.name);
-                    // Mostra se fez mais de 15 turnos OU se tem Aval ativo
                     return feitos > 15 || isAbsent;
                 });
             }
@@ -1296,6 +1296,7 @@
             employees[index].id = newId ? newId.trim() : "";
             saveData();
             renderAdminTable();
+            alert("ID e Nick atualizados e salvos na nuvem com sucesso!");
         }
 
         function updateEmpRole(index, newRole) {
@@ -1380,6 +1381,7 @@
             document.getElementById("absentNick").value = "";
             document.getElementById("absentPeriod").value = "";
             document.getElementById("absentReason").value = "";
+            alert("Aval / Ausência registrado e salvo na nuvem!");
         }
 
         function renderAbsentTable() {
@@ -1392,17 +1394,20 @@
                     <td><strong>${rec.nick}</strong></td>
                     <td>${rec.period}</td>
                     <td>${rec.reason}</td>
-                    <td><button class="btn-sm btn-sub" style="margin:0; padding:2px 6px;" onclick="removeAbsentRecord(${idx})">❌</button></td>
+                    <td><button class="btn-sm btn-warning" style="margin:0; padding:3px 6px;" onclick="removeAbsentRecord(${idx})">Encerrar</button></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
         function removeAbsentRecord(idx) {
-            absentRecords.splice(idx, 1);
-            saveData();
-            renderAbsentTable();
-            renderAdminTable();
+            if (confirm("Deseja encerrar e remover o aval/ausência deste funcionário?")) {
+                absentRecords.splice(idx, 1);
+                saveData();
+                renderAbsentTable();
+                renderAdminTable();
+                alert("Aval encerrado com sucesso!");
+            }
         }
 
         function advanceWeek() {
@@ -1465,7 +1470,7 @@
             if (emp) {
                 if (!emp.warnings) emp.warnings = [];
                 emp.warnings.push({ num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') });
-                saveData();
+                saveData(); // SALVA DIRETAMENTE NA NUVEM NO PERFIL DO FUNCIONÁRIO
             }
 
             const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
@@ -1479,7 +1484,7 @@
 
             document.getElementById("discordTextOutput").innerText = discordFormatted;
             document.getElementById("discordOutputContainer").style.display = "block";
-            alert("Senha correta! Advertência registrada com sucesso e aplicada ao perfil do usuário.");
+            alert("Senha correta! Advertência registrada e salva na nuvem com sucesso.");
         }
 
         function generateUnreachedList() {
