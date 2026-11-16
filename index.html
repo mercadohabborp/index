@@ -805,7 +805,7 @@
                 <div class="profile-info" style="margin-bottom:14px; background:#060b14; padding:10px; border-radius:6px; border:1px solid #12223c;">
                     <div class="info-item">
                         <span class="lbl" id="refDateLabel">TURNOS INICIAIS</span>
-                        <span class="val" id="uInitial">1606</span>
+                        <span class="val" id="uInitial">1900</span>
                     </div>
                     <div class="info-item">
                         <span class="lbl">META DO CARGO</span>
@@ -893,7 +893,7 @@
                         </div>
                         <div class="input-group" style="margin:0;">
                             <label>AUSÊNCIA (PERÍODO)</label>
-                            <input type="text" id="absentPeriod" class="input-field" placeholder="Ex: 02/11 à 08/11">
+                            <input type="text" id="absentPeriod" class="input-field" placeholder="Ex: 09/11 à 15/11">
                         </div>
                         <div class="input-group" style="margin:0;">
                             <label>JUSTIFICATIVA</label>
@@ -980,7 +980,7 @@
                         <p style="font-size: 0.75rem; color: #7b93b8; margin-bottom: 8px;">
                             Cole abaixo os dados copiados (Nick e Turnos Finais separados por espaço ou tabulação):
                         </p>
-                        <textarea id="bulkImportText" class="input-field" rows="4" placeholder="Ex:&#10;Afrontoso    3433&#10;Solyta    1810" style="width:100%; font-family:monospace; font-size:0.8rem; margin-bottom:8px;"></textarea>
+                        <textarea id="bulkImportText" class="input-field" rows="4" placeholder="Ex:&#10;Afrontoso    3545&#10;Solyta    2002" style="width:100%; font-family:monospace; font-size:0.8rem; margin-bottom:8px;"></textarea>
                         <button class="btn-sm btn-success" style="width:100%; padding: 8px;" onclick="processBulkImport()">
                             ⚡ Processar e Atualizar Turnos Finais em Massa
                         </button>
@@ -1014,7 +1014,7 @@
                 <div id="printableTableArea">
                     <div style="padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid #12223c;">
                         <h2 style="font-size:1.1rem; color:#60a5fa; text-transform:uppercase;">MERCADO RP - Controle Semanal de Produtividade</h2>
-                        <span style="font-size:0.8rem; color:#7b93b8;" id="printWeekSpan">02/11/2026 à 08/11/2026</span>
+                        <span style="font-size:0.8rem; color:#7b93b8;" id="printWeekSpan">09/11/2026 à 15/11/2026</span>
                     </div>
                     <div class="table-responsive" id="tableResponsiveBox">
                         <table class="habbo-table">
@@ -1085,41 +1085,49 @@
             { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
+        // DADOS EXTRATÍSTICOS DO PRINT ATUAL (09/11 a 15/11)
         const defaultEmployees = [
-            { name: "Afrontoso", id: "", role: "Gerente", initial: 3433, current: 3496, customAvatar: "", warnings: [] },
-            { name: "Monica", id: "", role: "Supervisor", initial: 2263, current: 2312, customAvatar: "", warnings: [] },
-            { name: "Chantal", id: "", role: "Supervisor", initial: 2229, current: 2261, customAvatar: "", warnings: [] },
-            { name: "Solyta", id: "", role: "Supervisor", initial: 1810, current: 1900, customAvatar: "", warnings: [] },
-            { name: "SadLoveSong", id: "", role: "Encarregado de Loja", initial: 589, current: 665, customAvatar: "", warnings: [] },
-            { name: "JpCooDz", id: "", role: "Encarregado de Loja", initial: 440, current: 531, customAvatar: "", warnings: [] },
-            { name: "Angels", id: "", role: "Encarregado de Loja", initial: 244, current: 397, customAvatar: "", warnings: [] },
-            { name: "Victorgust1", id: "", role: "Encarregado de Loja", initial: 333, current: 333, customAvatar: "", warnings: [] },
-            { name: "mayy", id: "", role: "Encarregado de Loja", initial: 258, current: 278, customAvatar: "", warnings: [] },
-            { name: "ys", id: "", role: "Encarregado de Loja", initial: 200, current: 207, customAvatar: "", warnings: [] },
-            { name: "knife", id: "", role: "Encarregado de Loja", initial: 133, current: 133, customAvatar: "", warnings: [] },
-            { name: "Manu", id: "", role: "Caixa", initial: 0, current: 114, customAvatar: "", warnings: [] },
-            { name: "laryssa", id: "", role: "Caixa", initial: 82, current: 97, customAvatar: "", warnings: [] },
-            { name: "Mandys", id: "", role: "Caixa", initial: 0, current: 82, customAvatar: "", warnings: [] },
-            { name: "hurt", id: "", role: "Balconista", initial: 0, current: 56, customAvatar: "", warnings: [] },
-            { name: "avrilavigne", id: "", role: "Balconista", initial: 0, current: 56, customAvatar: "", warnings: [] },
-            { name: "mel", id: "", role: "Balconista", initial: 0, current: 42, customAvatar: "", warnings: [] },
-            { name: "deprera", id: "", role: "Operador de Loja", initial: 51, current: 56, customAvatar: "", warnings: [] },
-            { name: "Juhmmz", id: "", role: "Operador de Loja", initial: 38, current: 40, customAvatar: "", warnings: [] },
-            { name: "stilf", id: "", role: "Operador de Loja", initial: 0, current: 21, customAvatar: "", warnings: [] },
-            { name: "x1", id: "", role: "Operador de Loja", initial: 0, current: 18, customAvatar: "", warnings: [] },
-            { name: "dk", id: "", role: "Operador de Loja", initial: 0, current: 15, customAvatar: "", warnings: [] },
-            { name: "In", id: "", role: "Operador de Loja", initial: 0, current: 17, customAvatar: "", warnings: [] }
+            { name: "Afrontoso", id: "290", role: "Gerente", initial: 3496, current: 3545, customAvatar: "", warnings: [] },
+            { name: "Monica", id: "1025", role: "Supervisor", initial: 2312, current: 2344, customAvatar: "", warnings: [] },
+            { name: "Chantal", id: "269", role: "Supervisor", initial: 2261, current: 2295, customAvatar: "", warnings: [] },
+            { name: "Solyta", id: "2233", role: "Supervisor", initial: 1900, current: 2002, customAvatar: "", warnings: [] },
+            { name: "SadLoveSong", id: "4614", role: "Encarregado de Loja", initial: 665, current: 684, customAvatar: "", warnings: [] },
+            { name: "JpCooDz", id: "4496", role: "Encarregado de Loja", initial: 531, current: 531, customAvatar: "", warnings: [] },
+            { name: "Angels", id: "4428", role: "Encarregado de Loja", initial: 397, current: 419, customAvatar: "", warnings: [] },
+            { name: "victorgust1", id: "3417", role: "Encarregado de Loja", initial: 333, current: 333, customAvatar: "", warnings: [] },
+            { name: "ys", id: "886", role: "Encarregado de Loja", initial: 207, current: 207, customAvatar: "", warnings: [] },
+            { name: "Manu", id: "285", role: "Encarregado de Loja", initial: 114, current: 306, customAvatar: "", warnings: [] },
+            { name: "avrilavigne", id: "3916", role: "Encarregado de Loja", initial: 56, current: 130, customAvatar: "", warnings: [] },
+            { name: "mel", id: "374", role: "Encarregado de Loja", initial: 42, current: 148, customAvatar: "", warnings: [] },
+            { name: "laryssa", id: "3644", role: "Caixa", initial: 97, current: 100, customAvatar: "", warnings: [] },
+            { name: "Mandys", id: "743", role: "Caixa", initial: 82, current: 110, customAvatar: "", warnings: [] },
+            { name: "dk", id: "", role: "Caixa", initial: 15, current: 105, customAvatar: "", warnings: [] },
+            { name: "t", id: "", role: "Caixa", initial: 0, current: 92, customAvatar: "", warnings: [] },
+            { name: "hurt", id: "1222", role: "Balconista", initial: 56, current: 57, customAvatar: "", warnings: [] },
+            { name: "gabriel", id: "3397", role: "Balconista", initial: 0, current: 46, customAvatar: "", warnings: [] },
+            { name: "Kamlu", id: "4092", role: "Balconista", initial: 0, current: 60, customAvatar: "", warnings: [] },
+            { name: "LD", id: "2580", role: "Balconista", initial: 0, current: 43, customAvatar: "", warnings: [] },
+            { name: "lisa", id: "4759", role: "Balconista", initial: 0, current: 44, customAvatar: "", warnings: [] },
+            { name: "Lucas", id: "3579", role: "Balconista", initial: 0, current: 54, customAvatar: "", warnings: [] },
+            { name: "Xuxa", id: "2947", role: "Balconista", initial: 0, current: 40, customAvatar: "", warnings: [] },
+            { name: "Juhmmz", id: "4094", role: "Operador de Loja", initial: 40, current: 41, customAvatar: "", warnings: [] },
+            { name: "joaovitorf22", id: "1565", role: "Operador de Loja", initial: 0, current: 17, customAvatar: "", warnings: [] },
+            { name: "mxtheus", id: "1847", role: "Operador de Loja", initial: 0, current: 16, customAvatar: "", warnings: [] }
         ];
 
         let employees = [];
-        let absentRecords = [];
+        let absentRecords = [
+            { nick: "Angels", period: "09/11 à 15/11", reason: "Aval / Licença" },
+            { nick: "victorgust1", period: "09/11 à 15/11", reason: "Aval / Licença" },
+            { nick: "joaovitorf22", period: "09/11 à 15/11", reason: "Aval / Licença" }
+        ];
         let raceParticipants = [];
         let racePrizes = [
             { place: "🥇 1º Lugar", slots: [{symbol: "💰", text: "500 c$"}, {symbol: "🔫", text: "Skin AK-47"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "🧨", text: "Dinamite"}] },
             { place: "🥈 2º Lugar", slots: [{symbol: "💰", text: "300 c$"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "📄", text: "Documento"}, {symbol: "", text: ""}] },
             { place: "🥉 3º Lugar", slots: [{symbol: "💰", text: "150 c$"}, {symbol: "🧪", text: "Poção"}, {symbol: "🎣", text: "Item de Pesca"}, {symbol: "", text: ""}, {symbol: "", text: ""}] }
         ];
-        let currentWeekText = "02/11/2026 à 08/11/2026";
+        let currentWeekText = "09/11/2026 à 15/11/2026";
         let activeUser = null;
         let currentInput = "0";
         let isRaceAdminUnlocked = false;
@@ -1137,7 +1145,7 @@
             bgContainer.appendChild(icon);
         }
 
-        // CARREGAR DADOS DO FIRESTORE EM TEMPO REAL
+        // CARREGAR DADOS DO FIRESTORE COM BLINDAGEM CONTRA SOBRESCRITA VAZIA
         db.collection("mercadoData").doc("mainDoc").onSnapshot((doc) => {
             if (doc.exists) {
                 const data = doc.data();
@@ -1157,16 +1165,16 @@
                 } else {
                     employees = defaultEmployees;
                 }
-                absentRecords = data.absentRecords || [];
+                absentRecords = data.absentRecords || absentRecords;
                 raceParticipants = data.raceParticipants || [];
                 if (data.racePrizes && data.racePrizes.length > 0) {
                     racePrizes = data.racePrizes;
                 }
-                currentWeekText = data.currentWeekText || "02/11/2026 à 08/11/2026";
+                if (data.currentWeekText) {
+                    currentWeekText = data.currentWeekText;
+                }
             } else {
                 employees = defaultEmployees;
-                absentRecords = [];
-                raceParticipants = [];
                 saveData();
             }
 
@@ -1194,7 +1202,7 @@
         });
 
         function initApp() {
-            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
+            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[3];
             document.getElementById("currentSupervisorBanner").innerText = `${match.resp} (${match.week})`;
         }
 
@@ -1227,7 +1235,7 @@
                 raceParticipants: raceParticipants,
                 racePrizes: racePrizes,
                 currentWeekText: currentWeekText
-            }).catch((error) => {
+            }, { merge: true }).catch((error) => {
                 console.error("Erro ao salvar no Firestore: ", error);
             });
         }
@@ -1481,7 +1489,7 @@
         function renderUserProfile() {
             if (!activeUser) return;
             const meta = roleMetas[activeUser.role] || 15;
-            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[0];
+            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[3];
 
             document.getElementById("uName").innerText = activeUser.name;
             document.getElementById("uRole").innerText = activeUser.role;
@@ -1852,7 +1860,7 @@
                 if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
                     currentWeekText = rotationSchedule[currentIndex + 1].week;
                 } else {
-                    const newWeek = prompt("Digite o período da nova semana:", "09/11/2026 à 15/11/2026");
+                    const newWeek = prompt("Digite o período da nova semana:", "16/11/2026 à 22/11/2026");
                     if (newWeek && newWeek.trim() !== "") {
                         currentWeekText = newWeek.trim();
                     }
