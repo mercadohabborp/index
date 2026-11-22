@@ -873,7 +873,7 @@
         <div class="top-hero-banner">
             <div class="hero-pill">HABBO RP • MERCADO • CONTROLE DE TURNOS</div>
             <h1>PAINEL OPERACIONAL</h1>
-            <p>Acompanhe a produtividade da semana, o pódio dos turnos atuais e o controle geral.</p>
+            <p>Acompanhe a produtividade da semana, o pódio dos turnos semanais e o controle geral.</p>
             <div class="hero-status-bar">
                 <div class="badge-live">Turno Ativo</div>
             </div>
@@ -1074,14 +1074,14 @@
             <!-- TELA DE GERÊNCIA E SUPERVISÃO -->
             <div id="adminScreen">
                 <div class="section-title">
-                    <span>🏆 PÓDIO TOP 3 DA SEMANA (TURNOS ATUAIS)</span>
+                    <span>🏆 PÓDIO TOP 3 DA SEMANA (TURNOS SEMANAIS)</span>
                     <button class="btn-sub" style="width:auto; padding:6px 12px; margin:0;" onclick="logout()">Sair</button>
                 </div>
 
-                <!-- PÓDIO TOP 3 BASEADO SOMENTE NOS TURNOS ATUAIS -->
+                <!-- PÓDIO TOP 3 BASEADO NOS TURNOS SEMANAIS DA TABELA -->
                 <div class="podium-box">
                     <p style="font-size:0.74rem; color:var(--muted); font-weight:600; margin-bottom:6px;">
-                        Classificação dos 3 maiores valores de <strong>Turno Atual</strong> registrados na semana.
+                        Classificação dos 3 maiores <strong>Turnos Feitos na Semana</strong> (Turno Final − Turno Inicial) da tabela.
                     </p>
                     <div class="podium-grid" id="adminTop3Podium"></div>
                 </div>
@@ -1420,31 +1420,36 @@
             return `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(emp.name)}&action=std&direction=2&head_direction=2&gesture=sml&size=m`;
         }
 
+        function getWeeklyTurns(emp) {
+            const feitos = (Number(emp.current) || 0) - (Number(emp.initial) || 0);
+            return feitos > 0 ? feitos : 0;
+        }
+
         // =====================================================================
-        // PÓDIO TOP 3 DA SEMANA (USANDO SOMENTE OS TURNOS ATUAIS)
+        // PÓDIO TOP 3 DA SEMANA (CONSIDERANDO OS TURNOS SEMANAIS DA TABELA)
         // =====================================================================
         function renderAdminTop3Podium() {
             const container = document.getElementById("adminTop3Podium");
             if (!container) return;
 
-            const rankedByCurrent = [...employees]
+            const rankedByWeekly = [...employees]
                 .map(emp => ({
                     ...emp,
-                    currentTurns: Number(emp.current) || 0
+                    weeklyTurns: getWeeklyTurns(emp)
                 }))
-                .sort((a, b) => b.currentTurns - a.currentTurns || a.name.localeCompare(b.name))
+                .sort((a, b) => b.weeklyTurns - a.weeklyTurns || a.name.localeCompare(b.name))
                 .slice(0, 3);
 
-            if (rankedByCurrent.length === 0) {
+            if (rankedByWeekly.length === 0) {
                 container.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; color:var(--muted); font-size:0.8rem;">Nenhum funcionário encontrado.</p>`;
                 return;
             }
 
             // Ordem visual do pódio estilo print: 2º Lugar (esq), 1º Lugar (centro), 3º Lugar (dir)
             const visualSlots = [
-                { pos: 2, medal: "🥈", label: "2º Lugar", emp: rankedByCurrent[1] || null },
-                { pos: 1, medal: "🥇", label: "1º Lugar", emp: rankedByCurrent[0] || null },
-                { pos: 3, medal: "🥉", label: "3º Lugar", emp: rankedByCurrent[2] || null }
+                { pos: 2, medal: "🥈", label: "2º Lugar", emp: rankedByWeekly[1] || null },
+                { pos: 1, medal: "🥇", label: "1º Lugar", emp: rankedByWeekly[0] || null },
+                { pos: 3, medal: "🥉", label: "3º Lugar", emp: rankedByWeekly[2] || null }
             ];
 
             container.innerHTML = visualSlots.map(slot => {
@@ -1464,7 +1469,7 @@
                         <div class="podium-avatar" style="background-image: url('${getAvatarUrl(slot.emp)}');"></div>
                         <div class="podium-nick">${slot.emp.name}</div>
                         <div class="podium-role-badge">${slot.emp.role}</div>
-                        <div class="podium-pts">${slot.emp.currentTurns} <span>TURNOS</span></div>
+                        <div class="podium-pts">${slot.emp.weeklyTurns} <span>TURNOS</span></div>
                     </div>
                 `;
             }).join("");
@@ -1803,8 +1808,7 @@
                 } else {
                     let list = raceParticipants.map(nick => {
                         let emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
-                        let feitos = emp ? (emp.current - emp.initial) : 0;
-                        if (feitos < 0) feitos = 0;
+                        let feitos = emp ? getWeeklyTurns(emp) : 0;
                         let hasWarn = emp && emp.warnings && emp.warnings.length > 0;
                         let isAbsent = absentRecords.some(r => r.nick.trim().toLowerCase() === nick.toLowerCase());
                         
@@ -2010,8 +2014,7 @@
 
             if (imageFilterMode === "gt15") {
                 visibleEmployees = visibleEmployees.filter(emp => {
-                    let feitos = emp.current - emp.initial;
-                    if (feitos < 0) feitos = 0;
+                    let feitos = getWeeklyTurns(emp);
                     let isAbsent = hasActiveAbsent(emp.name);
                     return feitos > 15 || isAbsent;
                 });
@@ -2020,9 +2023,9 @@
             if (filterMode === "alpha") {
                 visibleEmployees.sort((a, b) => a.name.localeCompare(b.name));
             } else if (filterMode === "turns-desc") {
-                visibleEmployees.sort((a, b) => (b.current - b.initial) - (a.current - a.initial));
+                visibleEmployees.sort((a, b) => getWeeklyTurns(b) - getWeeklyTurns(a));
             } else if (filterMode === "turns-asc") {
-                visibleEmployees.sort((a, b) => (a.current - a.initial) - (b.current - b.initial));
+                visibleEmployees.sort((a, b) => getWeeklyTurns(a) - getWeeklyTurns(b));
             } else if (filterMode === "role") {
                 visibleEmployees.sort((a, b) => (roleHierarchy[a.role] || 99) - (roleHierarchy[b.role] || 99));
             }
@@ -2030,8 +2033,7 @@
             visibleEmployees.forEach((emp) => {
                 let index = emp.originalIndex;
                 let meta = roleMetas[emp.role] || 15;
-                let feitos = emp.current - emp.initial;
-                if (feitos < 0) feitos = 0;
+                let feitos = getWeeklyTurns(emp);
                 let alcançou = feitos >= meta;
 
                 let isAbsent = hasActiveAbsent(emp.name);
@@ -2325,8 +2327,7 @@
         function generateUnreachedList() {
             let unreached = employees.filter(emp => {
                 let meta = roleMetas[emp.role] || 15;
-                let feitos = emp.current - emp.initial;
-                if (feitos < 0) feitos = 0;
+                let feitos = getWeeklyTurns(emp);
                 if (hasActiveAbsent(emp.name)) return false;
                 return feitos < meta;
             });
