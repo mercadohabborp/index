@@ -873,7 +873,7 @@
         <div class="top-hero-banner">
             <div class="hero-pill">HABBO RP • MERCADO • CONTROLE DE TURNOS</div>
             <h1>PAINEL OPERACIONAL</h1>
-            <p>Acompanhe a produtividade da semana, o pódio dos turnos semanais e o controle geral.</p>
+            <p>Acompanhe a produtividade da semana, o pódio de turnos feitos na semana e o controle geral.</p>
             <div class="hero-status-bar">
                 <div class="badge-live">Turno Ativo</div>
             </div>
@@ -1074,14 +1074,14 @@
             <!-- TELA DE GERÊNCIA E SUPERVISÃO -->
             <div id="adminScreen">
                 <div class="section-title">
-                    <span>🏆 PÓDIO TOP 3 DA SEMANA (TURNOS SEMANAIS)</span>
+                    <span>🏆 TOP 3 DA SEMANA (TOTAIS DE TURNOS FEITOS NA SEMANA)</span>
                     <button class="btn-sub" style="width:auto; padding:6px 12px; margin:0;" onclick="logout()">Sair</button>
                 </div>
 
-                <!-- PÓDIO TOP 3 BASEADO NOS TURNOS SEMANAIS DA TABELA -->
+                <!-- PÓDIO TOP 3 USANDO SOMENTE TOTAIS DE TURNOS FEITOS NA SEMANA -->
                 <div class="podium-box">
                     <p style="font-size:0.74rem; color:var(--muted); font-weight:600; margin-bottom:6px;">
-                        Classificação dos 3 maiores <strong>Turnos Feitos na Semana</strong> (Turno Final − Turno Inicial) da tabela.
+                        Conta somente <strong>Totais de Turnos Feitos na Semana</strong> (Turno Final − Turno Inicial), sem considerar o total acumulado.
                     </p>
                     <div class="podium-grid" id="adminTop3Podium"></div>
                 </div>
@@ -1420,13 +1420,14 @@
             return `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(emp.name)}&action=std&direction=2&head_direction=2&gesture=sml&size=m`;
         }
 
+        // Retorna APENAS os "Totais de Turnos Feitos na Semana" (Turno Final - Turno Inicial)
         function getWeeklyTurns(emp) {
             const feitos = (Number(emp.current) || 0) - (Number(emp.initial) || 0);
             return feitos > 0 ? feitos : 0;
         }
 
         // =====================================================================
-        // PÓDIO TOP 3 DA SEMANA (CONSIDERANDO OS TURNOS SEMANAIS DA TABELA)
+        // PÓDIO TOP 3 DA SEMANA (SOMENTE "TOTAIS DE TURNOS FEITOS NA SEMANA")
         // =====================================================================
         function renderAdminTop3Podium() {
             const container = document.getElementById("adminTop3Podium");
@@ -1458,7 +1459,7 @@
                         <div class="podium-card pos-${slot.pos}">
                             <div class="podium-rank-pill">${slot.medal} ${slot.label}</div>
                             <div class="podium-nick" style="color:var(--muted);">—</div>
-                            <div class="podium-pts">0 <span>TURNOS</span></div>
+                            <div class="podium-pts">0 <span>NA SEMANA</span></div>
                         </div>
                     `;
                 }
@@ -1469,7 +1470,7 @@
                         <div class="podium-avatar" style="background-image: url('${getAvatarUrl(slot.emp)}');"></div>
                         <div class="podium-nick">${slot.emp.name}</div>
                         <div class="podium-role-badge">${slot.emp.role}</div>
-                        <div class="podium-pts">${slot.emp.weeklyTurns} <span>TURNOS</span></div>
+                        <div class="podium-pts">${slot.emp.weeklyTurns} <span>NA SEMANA</span></div>
                     </div>
                 `;
             }).join("");
