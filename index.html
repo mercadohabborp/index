@@ -11,27 +11,52 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+    <!-- Fonte Pixel estilo Ranking RP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --bg-dark: #0e1722;
+            --card-white: #ffffff;
+            --card-soft: #f8fafc;
+            --ink: #0f172a;
+            --muted: #64748b;
+            --border-dark: #0f172a;
+            --border-light: #e2e8f0;
+            --blue-1: #0b4a9c;
+            --blue-2: #1d76e8;
+            --blue-3: #2b8cff;
+            --gold-bg: #fef9e7;
+            --gold-border: #eab308;
+            --gold-badge: #facc15;
+            --silver-badge: #e2e8f0;
+            --bronze-bg: #fff7ed;
+            --bronze-badge: #fed7aa;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', monospace;
         }
 
         body {
-            background-color: #0b111e;
-            background-image: 
-                linear-gradient(rgba(30, 58, 138, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(30, 58, 138, 0.08) 1px, transparent 1px),
-                radial-gradient(circle at 50% 0%, #172a4f 0%, #0b111e 75%);
-            background-size: 24px 24px, 24px 24px, 100% 100%;
-            color: #e2e8f0;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+            background-size: 18px 18px;
+            color: var(--ink);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            padding: 20px 10px;
+            padding: 24px 12px 40px;
             overflow-x: hidden;
             position: relative;
         }
@@ -49,21 +74,21 @@
 
         .pixel-icon {
             position: absolute;
-            font-size: 22px;
-            opacity: 0.1;
+            font-size: 20px;
+            opacity: 0.08;
             animation: floatDown linear infinite;
         }
 
         @keyframes floatDown {
             0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.15; }
-            90% { opacity: 0.15; }
+            10% { opacity: 0.12; }
+            90% { opacity: 0.12; }
             100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
         }
 
         .main-wrapper {
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
             z-index: 10;
             transition: max-width 0.3s ease;
         }
@@ -72,194 +97,135 @@
             max-width: 1120px;
         }
 
-        /* Estilo Portal / Blog RP */
-        .rp-banner-header {
-            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
-            border: 2px solid #3b82f6;
-            border-bottom: 4px solid #172554;
-            border-radius: 10px 10px 0 0;
+        /* BANNER PRINCIPAL ESTILO RANKING RP */
+        .top-hero-banner {
+            background: linear-gradient(135deg, var(--blue-1) 0%, var(--blue-2) 55%, var(--blue-3) 100%);
+            border-radius: 12px;
             padding: 18px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .rp-banner-header .brand-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .rp-banner-header .brand-icon {
-            background: #0f172a;
-            border: 2px solid #60a5fa;
-            border-radius: 8px;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.4);
-        }
-
-        .rp-banner-header h1 {
-            font-size: 1.2rem;
+            text-align: center;
             color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .rp-banner-header p {
-            font-size: 0.72rem;
-            color: #bfdbfe;
-            margin-top: 2px;
-        }
-
-        .panel-card {
-            background-color: #0f172a;
-            border: 2px solid #1e293b;
-            border-top: none;
-            border-radius: 0 0 10px 10px;
-            padding: 20px;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+            box-shadow: 0 10px 25px rgba(11, 74, 156, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
             margin-bottom: 16px;
         }
 
-        .badge-live {
-            font-size: 0.68rem;
-            font-weight: bold;
-            color: #4ade80;
-            background: rgba(22, 101, 52, 0.45);
-            border: 1px solid #22c55e;
+        .hero-pill {
+            display: inline-block;
+            background: #facc15;
+            color: #0f172a;
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
             padding: 4px 10px;
-            border-radius: 20px;
+            border-radius: 999px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 0 rgba(15, 23, 42, 0.25);
+        }
+
+        .top-hero-banner h1 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #ffffff;
+            text-shadow: 0 3px 0 rgba(7, 28, 66, 0.75);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .top-hero-banner p {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 10px;
+        }
+
+        .hero-status-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-live {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #0f172a;
+            background: #ffffff;
+            padding: 3px 9px;
+            border-radius: 999px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-live::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background-color: #16a34a;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* CARD PRINCIPAL BRANCO ESTILO BLOGSPOT */
+        .panel-card {
+            background-color: var(--card-white);
+            border: 2px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45);
+            margin-bottom: 16px;
+            color: var(--ink);
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.72rem;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .section-sub-label {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .badge-live::before {
-            content: "";
-            width: 7px;
-            height: 7px;
-            background-color: #4ade80;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #4ade80;
-            display: inline-block;
-        }
-
-        .section-title {
-            font-size: 0.74rem;
-            color: #93c5fd;
-            background: #1e293b;
-            border-left: 4px solid #3b82f6;
-            padding: 6px 10px;
-            border-radius: 0 4px 4px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: 700;
-        }
-
-        /* Pódio Top 3 na área de Administração */
-        .top3-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .podium-card {
-            background: linear-gradient(180deg, #162238 0%, #0b1220 100%);
-            border: 1px solid #2a3f66;
-            border-bottom: 3px solid #3b82f6;
-            border-radius: 8px;
-            padding: 12px 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-        }
-
-        .podium-card.rank-1 {
-            border-color: #eab308;
-            background: linear-gradient(180deg, rgba(234, 179, 8, 0.16) 0%, #0b1220 100%);
-        }
-
-        .podium-card.rank-2 {
-            border-color: #94a3b8;
-            background: linear-gradient(180deg, rgba(148, 163, 184, 0.14) 0%, #0b1220 100%);
-        }
-
-        .podium-card.rank-3 {
-            border-color: #d97706;
-            background: linear-gradient(180deg, rgba(217, 119, 6, 0.14) 0%, #0b1220 100%);
-        }
-
-        .podium-medal {
-            font-size: 1.8rem;
-            flex-shrink: 0;
-        }
-
-        .podium-details {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .podium-pos {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            font-weight: bold;
-            color: #94a3b8;
-        }
-
-        .podium-name {
-            font-size: 1rem;
-            font-weight: bold;
-            color: #ffffff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .podium-turns {
-            font-size: 0.82rem;
-            font-weight: bold;
-            color: #60a5fa;
-            margin-top: 2px;
-        }
-
-        .rank-1 .podium-turns { color: #facc15; }
-        .rank-2 .podium-turns { color: #cbd5e1; }
-        .rank-3 .podium-turns { color: #fbbf24; }
-
         .profile-box {
-            background-color: #090e1a;
-            border: 1px solid #1e293b;
-            border-radius: 6px;
+            background-color: var(--card-soft);
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
             padding: 14px;
             display: flex;
             gap: 14px;
             align-items: center;
             margin-bottom: 16px;
+            box-shadow: 3px 3px 0 var(--border-dark);
         }
 
         .avatar-frame {
             width: 64px;
             height: 80px;
-            background: #0f1c30 center no-repeat;
+            background: #e2e8f0 center no-repeat;
             background-size: cover;
-            border: 2px solid #2563eb;
-            border-radius: 6px;
+            border: 2px solid var(--border-dark);
+            border-radius: 8px;
             flex-shrink: 0;
         }
 
@@ -276,24 +242,26 @@
         }
 
         .info-item .lbl {
-            font-size: 0.65rem;
-            color: #7b93b8;
+            font-size: 0.64rem;
+            color: var(--muted);
             text-transform: uppercase;
+            font-weight: 700;
         }
 
         .info-item .val {
             font-size: 0.9rem;
-            color: #ffffff;
-            font-weight: bold;
+            color: var(--ink);
+            font-weight: 800;
         }
 
         .role-tag {
-            background: #2563eb;
-            color: #ffffff;
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
             font-size: 0.65rem;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 3px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 999px;
             display: inline-block;
             margin-top: 2px;
             text-transform: uppercase;
@@ -301,79 +269,200 @@
         }
 
         .supervisor-card {
-            background: #090e1a;
-            border: 1px solid #1e293b;
-            border-bottom: 3px solid #2563eb;
-            border-radius: 6px;
+            background: var(--card-soft);
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
             padding: 12px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
+            box-shadow: 3px 3px 0 var(--border-dark);
         }
 
         .supervisor-card .resp-name {
-            font-size: 1rem;
-            font-weight: bold;
-            color: #60a5fa;
+            font-size: 0.98rem;
+            font-weight: 800;
+            color: var(--blue-1);
         }
 
         .supervisor-card .resp-sub {
+            font-size: 0.68rem;
+            color: var(--muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* PÓDIO TOP 3 ESTILO BLOGSPOT */
+        .podium-box {
+            background: var(--card-white);
+            border: 2px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 18px;
+            box-shadow: 4px 4px 0 var(--border-dark);
+        }
+
+        .podium-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            align-items: end;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 760px) {
+            .podium-grid {
+                grid-template-columns: 1fr;
+                align-items: stretch;
+            }
+            .podium-card.pos-1 {
+                order: -1;
+                transform: none !important;
+            }
+        }
+
+        .podium-card {
+            background: var(--card-white);
+            border: 2px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            box-shadow: 4px 4px 0 var(--border-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 225px;
+        }
+
+        .podium-card.pos-1 {
+            background: linear-gradient(180deg, var(--gold-bg) 0%, #ffffff 75%);
+            border-color: var(--border-dark);
+            transform: translateY(-6px);
+            min-height: 245px;
+        }
+
+        .podium-card.pos-3 {
+            background: linear-gradient(180deg, var(--bronze-bg) 0%, #ffffff 75%);
+        }
+
+        .podium-rank-pill {
             font-size: 0.7rem;
-            color: #7b93b8;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1.5px solid var(--border-dark);
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pos-1 .podium-rank-pill { background: var(--gold-badge); color: var(--ink); }
+        .pos-2 .podium-rank-pill { background: var(--silver-badge); color: var(--ink); }
+        .pos-3 .podium-rank-pill { background: var(--bronze-badge); color: var(--ink); }
+
+        .podium-avatar {
+            width: 58px;
+            height: 74px;
+            border: 2px solid var(--border-dark);
+            border-radius: 8px;
+            background: #f1f5f9 center no-repeat;
+            background-size: cover;
+            margin-bottom: 8px;
+        }
+
+        .podium-nick {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--ink);
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .podium-role-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #475569;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-bottom: 8px;
+        }
+
+        .podium-pts {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.85rem;
+            color: #15803d;
+            margin-top: 2px;
+        }
+
+        .podium-pts span {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--muted);
         }
 
         .display-box {
-            background-color: #090e1a;
-            border: 1px solid #1e293b;
-            border-radius: 6px;
+            background-color: var(--card-soft);
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
             padding: 12px;
             margin-bottom: 14px;
         }
 
         .display-lbl {
             font-size: 0.68rem;
-            color: #7b93b8;
+            color: var(--muted);
+            font-weight: 800;
             text-transform: uppercase;
             margin-bottom: 4px;
         }
 
         .display-val {
-            font-size: 1.8rem;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.45rem;
             text-align: right;
-            color: #60a5fa;
-            font-weight: bold;
-            min-height: 40px;
+            color: var(--blue-1);
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
 
         .result-card {
-            background-color: #090e1a;
-            border: 1px dashed #60a5fa;
-            border-radius: 6px;
+            background-color: #eff6ff;
+            border: 2px dashed var(--blue-2);
+            border-radius: 10px;
             padding: 12px;
             text-align: center;
             margin-bottom: 16px;
         }
 
         .result-card.danger {
-            border-color: #f87171;
+            background-color: #fef2f2;
+            border-color: #ef4444;
         }
 
         .result-card .res-title {
             font-size: 0.68rem;
-            color: #7b93b8;
+            color: var(--muted);
+            font-weight: 800;
             text-transform: uppercase;
         }
 
         .result-card .res-val {
-            font-size: 1.15rem;
-            font-weight: bold;
-            color: #60a5fa;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--blue-1);
             margin-top: 4px;
         }
 
         .result-card.danger .res-val {
-            color: #f87171;
+            color: #dc2626;
         }
 
         .keypad-grid {
@@ -383,44 +472,37 @@
         }
 
         .btn-key {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-bottom: 3px solid #0f172a;
-            border-radius: 6px;
-            color: #e1e1e6;
-            font-size: 1.1rem;
-            font-weight: bold;
+            background-color: var(--card-soft);
+            border: 2px solid var(--border-dark);
+            border-radius: 8px;
+            color: var(--ink);
+            font-size: 1.05rem;
+            font-weight: 800;
             padding: 12px 0;
             cursor: pointer;
+            box-shadow: 2px 2px 0 var(--border-dark);
             transition: all 0.1s;
         }
 
         .btn-key:hover {
-            background-color: #27354f;
+            background-color: #e2e8f0;
         }
 
         .btn-key:active {
-            transform: translateY(2px);
-            border-bottom-width: 1px;
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 var(--border-dark);
         }
 
         .btn-key.action-c {
-            background-color: rgba(248, 113, 113, 0.18);
-            border-color: rgba(248, 113, 113, 0.4);
-            color: #f87171;
+            background-color: #fee2e2;
+            color: #b91c1c;
         }
 
         .btn-key.action-ok {
             grid-column: span 3;
-            background-color: #2563eb;
-            border-color: #3b82f6;
-            border-bottom: 3px solid #1e3a8a;
+            background: linear-gradient(135deg, var(--blue-1), var(--blue-2));
             color: #ffffff;
             margin-top: 4px;
-        }
-
-        .btn-key.action-ok:hover {
-            background-color: #1d4ed8;
         }
 
         .input-group {
@@ -431,73 +513,75 @@
         }
 
         .input-group label {
-            font-size: 0.72rem;
-            color: #94a3b8;
-            font-weight: 600;
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-weight: 800;
             text-transform: uppercase;
         }
 
         .input-field {
-            background-color: #090e1a;
-            border: 1px solid #1e293b;
-            border-radius: 6px;
+            background-color: var(--card-white);
+            border: 2px solid var(--border-dark);
+            border-radius: 8px;
             padding: 10px 12px;
-            color: #ffffff;
+            color: var(--ink);
             font-size: 0.9rem;
+            font-weight: 600;
             outline: none;
         }
 
         .input-field:focus {
-            border-color: #3b82f6;
+            border-color: var(--blue-2);
+            box-shadow: 0 0 0 3px rgba(29, 118, 232, 0.18);
         }
 
         .btn-main {
-            background-color: #2563eb;
-            border: none;
-            border-bottom: 3px solid #1e3a8a;
-            border-radius: 6px;
+            background: linear-gradient(135deg, var(--blue-1), var(--blue-2));
+            border: 2px solid var(--border-dark);
+            border-radius: 8px;
             color: #ffffff;
-            font-size: 0.9rem;
-            font-weight: bold;
+            font-size: 0.88rem;
+            font-weight: 800;
             padding: 12px;
             width: 100%;
             cursor: pointer;
-            transition: background 0.2s;
+            box-shadow: 3px 3px 0 var(--border-dark);
+            transition: all 0.15s;
             margin-bottom: 8px;
         }
 
         .btn-main:hover {
-            background-color: #1d4ed8;
+            filter: brightness(1.06);
         }
 
         .btn-sub {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-bottom: 2px solid #0f172a;
-            color: #cbd5e1;
-            font-size: 0.8rem;
-            font-weight: 600;
+            background-color: var(--card-soft);
+            border: 2px solid var(--border-dark);
+            color: var(--ink);
+            font-size: 0.78rem;
+            font-weight: 700;
             padding: 10px;
-            border-radius: 6px;
+            border-radius: 8px;
             width: 100%;
             margin-top: 4px;
             cursor: pointer;
+            box-shadow: 2px 2px 0 var(--border-dark);
         }
 
         .btn-sub:hover {
-            color: #ffffff;
-            background-color: #26354d;
+            background-color: #e2e8f0;
         }
 
         .error-msg {
-            color: #f87171;
+            color: #b91c1c;
             font-size: 0.78rem;
+            font-weight: 700;
             text-align: center;
             display: none;
-            background: rgba(248, 113, 113, 0.12);
-            border: 1px solid rgba(248, 113, 113, 0.3);
+            background: #fee2e2;
+            border: 1.5px solid #ef4444;
             padding: 8px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 10px;
         }
 
@@ -511,50 +595,54 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
-            background: #090e1a;
+            background: var(--card-soft);
             padding: 10px 12px;
-            border-radius: 6px;
+            border-radius: 10px;
             margin-bottom: 14px;
-            border: 1px solid #1e293b;
+            border: 2px solid var(--border-dark);
         }
 
         .schedule-box {
-            background: #090e1a;
-            border: 1px solid #1e293b;
-            border-radius: 6px;
+            background: var(--card-soft);
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
             padding: 12px;
             margin-bottom: 14px;
         }
 
         .schedule-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 6px;
             max-height: 120px;
             overflow-y: auto;
         }
 
         .schedule-item {
-            background: #131d31;
+            background: var(--card-white);
+            border: 1.5px solid #cbd5e1;
             padding: 6px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.74rem;
             display: flex;
             justify-content: space-between;
-            border-left: 3px solid #3b82f6;
+            border-left: 4px solid var(--blue-2);
+            color: var(--ink);
         }
 
         .schedule-item.active {
-            border-left-color: #60a5fa;
-            background: rgba(59, 130, 246, 0.2);
+            border-left-color: #eab308;
+            background: #fefce8;
+            font-weight: 700;
         }
 
         .warning-panel, .absent-panel, .bulk-add-panel {
-            background: #090e1a;
-            border: 1px solid #1e293b;
-            border-radius: 6px;
+            background: var(--card-soft);
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
             padding: 14px;
             margin-bottom: 16px;
+            box-shadow: 3px 3px 0 var(--border-dark);
         }
 
         .warning-form-grid {
@@ -565,9 +653,9 @@
         }
 
         .discord-output-box {
-            background: #050811;
-            border: 1px dashed #2563eb;
-            border-radius: 6px;
+            background: #0f172a;
+            border: 2px dashed var(--blue-3);
+            border-radius: 8px;
             padding: 12px;
             margin-top: 10px;
         }
@@ -581,17 +669,20 @@
         }
 
         #printableTableArea {
-            background-color: #090e1a;
+            background-color: var(--card-white);
             padding: 16px;
-            border-radius: 6px;
-            border: 1px solid #1e293b;
+            border-radius: 10px;
+            border: 2px solid var(--border-dark);
             width: 100%;
+            box-shadow: 4px 4px 0 var(--border-dark);
         }
 
         .table-responsive {
             overflow-x: auto;
-            max-height: 480px;
+            max-height: 520px;
             width: 100%;
+            border: 1.5px solid var(--border-light);
+            border-radius: 8px;
         }
 
         table.habbo-table {
@@ -599,15 +690,19 @@
             border-collapse: collapse;
             font-size: 0.82rem;
             text-align: left;
+            background: var(--card-white);
+            color: var(--ink);
         }
 
         table.habbo-table th {
-            background-color: #050811;
-            color: #60a5fa;
+            background-color: #f8fafc;
+            color: var(--muted);
             padding: 10px 12px;
             text-transform: uppercase;
-            font-size: 0.72rem;
-            border-bottom: 2px solid #1e293b;
+            font-size: 0.68rem;
+            letter-spacing: 0.6px;
+            font-weight: 800;
+            border-bottom: 2px solid var(--border-light);
             position: sticky;
             top: 0;
             z-index: 2;
@@ -615,81 +710,85 @@
 
         table.habbo-table td {
             padding: 10px 12px;
-            border-bottom: 1px solid #131d31;
+            border-bottom: 1px solid #f1f5f9;
             white-space: nowrap;
+            color: var(--ink);
         }
 
         table.habbo-table tbody tr:hover {
-            background-color: rgba(30, 41, 59, 0.35);
+            background-color: #f8fafc;
         }
 
         .badge-status {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.72rem;
-            font-weight: bold;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 800;
             display: inline-block;
         }
-        .badge-success { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .badge-danger { background: rgba(248, 113, 113, 0.2); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
-        .badge-aval { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
+        .badge-success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .badge-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .badge-aval { background: #fef9c3; color: #a16207; border: 1px solid #fde047; }
 
         .editable-input {
-            background: #131d31;
-            border: 1px solid #283858;
-            color: #ffffff;
+            background: var(--card-white);
+            border: 1.5px solid #94a3b8;
+            color: var(--ink);
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
+            border-radius: 6px;
+            font-size: 0.84rem;
+            font-weight: 700;
             width: 90px;
             text-align: center;
         }
 
         .editable-select {
-            background: #131d31;
-            border: 1px solid #283858;
-            color: #ffffff;
-            padding: 4px 6px;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            background: var(--card-white);
+            border: 1.5px solid #94a3b8;
+            color: var(--ink);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
         }
 
         .btn-edit-pencil {
             background: none;
             border: none;
-            color: #60a5fa;
+            color: var(--blue-1);
             cursor: pointer;
             font-size: 0.85rem;
             margin-left: 6px;
             padding: 2px 4px;
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
         .btn-edit-pencil:hover {
-            background: rgba(96, 165, 250, 0.2);
+            background: #e0f2fe;
         }
 
         .btn-sm {
             padding: 5px 9px;
             font-size: 0.72rem;
-            border-radius: 4px;
-            border: none;
+            border-radius: 6px;
+            border: 1.5px solid var(--border-dark);
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 800;
+            box-shadow: 2px 2px 0 var(--border-dark);
         }
         .btn-success { background-color: #2563eb; color: #fff; }
-        .btn-warning { background-color: #d97706; color: #fff; }
+        .btn-warning { background-color: #facc15; color: #0f172a; }
         .btn-info { background-color: #0284c7; color: #fff; }
         .btn-danger { background-color: #dc2626; color: #fff; }
 
         .filter-select {
-            background: #131d31;
-            border: 1px solid #283858;
-            color: #60a5fa;
+            background: var(--card-white);
+            border: 1.5px solid var(--border-dark);
+            color: var(--ink);
             padding: 5px 8px;
-            border-radius: 4px;
-            font-size: 0.78rem;
-            font-weight: bold;
+            border-radius: 6px;
+            font-size: 0.76rem;
+            font-weight: 800;
             outline: none;
         }
 
@@ -705,42 +804,44 @@
 
         /* TEMA ESPECIAL: CORRIDA DOS TURNOS */
         .race-banner {
-            background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
-            border: 2px solid #22c55e;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #065f46 0%, #16a34a 100%);
+            border: 2px solid var(--border-dark);
+            border-radius: 12px;
             padding: 18px;
             text-align: center;
             margin-bottom: 16px;
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.25);
+            box-shadow: 4px 4px 0 var(--border-dark);
         }
 
         .race-banner h2 {
-            color: #4ade80;
-            font-size: 1.4rem;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.5;
             text-transform: uppercase;
-            letter-spacing: 2px;
             margin-bottom: 6px;
-            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
         }
 
         .race-banner p {
             font-size: 0.8rem;
-            color: #a7f3d0;
-            line-height: 1.4;
+            color: #dcfce7;
+            font-weight: 600;
         }
 
         .race-rules {
-            background: #090e1a;
-            border: 1px dashed #22c55e;
-            border-radius: 6px;
+            background: var(--card-soft);
+            border: 2px dashed #16a34a;
+            border-radius: 10px;
             padding: 14px;
             margin-bottom: 16px;
             font-size: 0.78rem;
+            color: var(--ink);
         }
 
         .race-rules ul {
             padding-left: 18px;
-            color: #e1e1e6;
+            color: var(--ink);
             margin-top: 6px;
         }
 
@@ -767,23 +868,22 @@
     <div class="pixel-bg" id="pixelBg"></div>
 
     <div class="main-wrapper" id="mainWrapper">
-        
-        <div class="rp-banner-header">
-            <div class="brand-area">
-                <div class="brand-icon">🛒</div>
-                <div>
-                    <h1>Mercado Habbo RP</h1>
-                    <p>Sistema Integrado de Turnos & Produtividade</p>
-                </div>
-            </div>
-            <div class="badge-live">Online</div>
-        </div>
 
+        <!-- BANNER SUPERIOR ESTILO RANKING RP -->
+        <div class="top-hero-banner">
+            <div class="hero-pill">HABBO RP • MERCADO • CONTROLE DE TURNOS</div>
+            <h1>PAINEL OPERACIONAL</h1>
+            <p>Acompanhe a produtividade da semana, o pódio dos turnos atuais e o controle geral.</p>
+            <div class="hero-status-bar">
+                <div class="badge-live">Turno Ativo</div>
+            </div>
+        </div>
+        
         <div class="panel-card">
 
             <!-- TELA DE LOGIN -->
             <div id="loginScreen">
-                <div class="section-title">DESTAQUES E SUPERVISÃO</div>
+                <div class="section-sub-label">⭐ DESTAQUES E SUPERVISÃO</div>
                 <div class="supervisor-card">
                     <div>
                         <div class="resp-sub">SUPERVISOR DA SEMANA</div>
@@ -792,7 +892,7 @@
                     <span style="font-size:1.5rem;">⭐</span>
                 </div>
 
-                <div class="section-title">ACESSO AO SISTEMA</div>
+                <div class="section-sub-label">🔑 ACESSO AO SISTEMA</div>
                 <div class="input-group">
                     <label for="usernameInput">DIGITE SEU NICKNAME NO HABBO</label>
                     <input type="text" id="usernameInput" class="input-field" placeholder="Ex: Solyta, Afrontoso, Chantal..." autocomplete="off">
@@ -804,7 +904,7 @@
 
                 <button class="btn-main" onclick="loginUser()">ACESSAR MEU PAINEL</button>
                 <button class="btn-sub" onclick="showAdminLogin()">Área Administrativa (Gerentes/Supervisores)</button>
-                <button class="btn-sub" style="border-color: #22c55e; color: #4ade80;" onclick="showRaceScreen()">🏁 Corrida dos Turnos</button>
+                <button class="btn-sub" style="border-color: #15803d; color: #15803d; background: #f0fdf4;" onclick="showRaceScreen()">🏁 Corrida dos Turnos</button>
             </div>
 
             <!-- TELA DA CORRIDA DOS TURNOS (TEMA ESPECIAL) -->
@@ -815,7 +915,7 @@
                 </div>
 
                 <div class="race-rules">
-                    <div style="color: #4ade80; font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">📋 Regulamento & Critérios da Corrida:</div>
+                    <div style="color: #15803d; font-weight: 800; margin-bottom: 6px; text-transform: uppercase;">📋 Regulamento & Critérios da Corrida:</div>
                     <ul>
                         <li>Ser funcionário <strong>ativo</strong> no mercado.</li>
                         <li>Não possuir nenhuma <strong>advertência</strong> ativa na semana.</li>
@@ -824,17 +924,17 @@
                 </div>
 
                 <!-- PAINEL DE CONTROLE RESTRITO (SENHA) -->
-                <div id="raceAdminControls" style="display:none; background: rgba(34, 197, 94, 0.08); border: 1px solid #22c55e; padding: 10px; border-radius: 6px; margin-bottom: 14px; text-align: center;">
-                    <span style="font-size: 0.75rem; color: #4ade80; font-weight: bold;">🔓 MODO ADMINISTRADOR ATIVO NA CORRIDA</span>
+                <div id="raceAdminControls" style="display:none; background: #f0fdf4; border: 2px solid #16a34a; padding: 10px; border-radius: 8px; margin-bottom: 14px; text-align: center;">
+                    <span style="font-size: 0.75rem; color: #15803d; font-weight: 800;">🔓 MODO ADMINISTRADOR ATIVO NA CORRIDA</span>
                 </div>
                 <div id="raceLoginPrompt" style="margin-bottom: 14px;">
-                    <button class="btn-sub" style="border-color: #22c55e; color: #4ade80; width: 100%;" onclick="unlockRaceAdmin()">🔒 Entrar com Senha para Gerenciar Prêmios/Participantes</button>
+                    <button class="btn-sub" style="border-color: #15803d; color: #15803d; width: 100%;" onclick="unlockRaceAdmin()">🔒 Entrar com Senha para Gerenciar Prêmios/Participantes</button>
                 </div>
 
                 <!-- TABELA DE PRÊMIOS DA CORRIDA -->
-                <div class="warning-panel" style="border-color: #22c55e;">
-                    <div class="section-title" style="color: #4ade80; border-left-color: #22c55e;">🏆 PRÊMIOS DA CORRIDA (5 SLOTS COM EMOJIS)</div>
-                    <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
+                <div class="warning-panel" style="border-color: #16a34a;">
+                    <div class="section-title">🏆 PRÊMIOS DA CORRIDA (5 SLOTS)</div>
+                    <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
                         Preencha os prêmios de cada posição e clique em salvar para registrar na nuvem:
                     </p>
                     <div style="overflow-x: auto; margin-bottom: 8px;">
@@ -856,9 +956,9 @@
                 </div>
 
                 <!-- RANKING DOS PARTICIPANTES DA CORRIDA -->
-                <div class="warning-panel" style="border-color: #3b82f6;">
-                    <div class="section-title" style="color: #60a5fa;">🏎️ RANKING DE PARTICIPANTES</div>
-                    <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
+                <div class="warning-panel" style="border-color: var(--blue-2);">
+                    <div class="section-title">🏎️ RANKING DE PARTICIPANTES</div>
+                    <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
                         Insira os participantes. O ranking organiza-se automaticamente por quem tem mais turnos feitos!
                     </p>
                     <div id="raceAddContainer" style="display: none; gap: 6px; margin-bottom: 10px;">
@@ -888,7 +988,7 @@
 
             <!-- TELA DO FUNCIONÁRIO -->
             <div id="userScreen">
-                <div class="section-title">INFORMAÇÕES PESSOAIS</div>
+                <div class="section-sub-label">👤 INFORMAÇÕES PESSOAIS</div>
                 <div class="profile-box">
                     <div class="avatar-frame" id="avatarFrame"></div>
                     <div class="profile-info">
@@ -902,18 +1002,18 @@
                         </div>
                         <div class="info-item">
                             <span class="lbl">SITUAÇÃO</span>
-                            <span class="val" style="color:#60a5fa;">Ativo</span>
+                            <span class="val" style="color:#15803d;">Ativo</span>
                         </div>
                         <div class="info-item">
                             <span class="lbl">AÇÕES</span>
-                            <span class="val" style="cursor:pointer; text-decoration:underline; font-size:0.75rem;" onclick="logout()">Sair</span>
+                            <span class="val" style="cursor:pointer; text-decoration:underline; font-size:0.75rem; color:var(--blue-1);" onclick="logout()">Sair</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- ALTERAR FOTO DE PERFIL -->
-                <div class="input-group" style="background:#090e1a; padding:10px; border-radius:6px; border:1px solid #1e293b; margin-bottom:14px;">
-                    <label style="color:#60a5fa;">🖼️ ALTERAR SUA FOTO DE PERFIL (LINK)</label>
+                <div class="input-group" style="background:var(--card-soft); padding:10px; border-radius:8px; border:1.5px solid var(--border-dark); margin-bottom:14px;">
+                    <label style="color:var(--blue-1);">🖼️ ALTERAR SUA FOTO DE PERFIL (LINK)</label>
                     <div style="display:flex; gap:6px; margin-top:4px;">
                         <input type="text" id="customAvatarInput" class="input-field" placeholder="Cole o link direto da imagem..." style="font-size:0.75rem; flex:1;">
                         <button class="btn-sm btn-success" onclick="saveCustomAvatar()">Salvar</button>
@@ -921,15 +1021,15 @@
                 </div>
 
                 <!-- PAINEL DE ADVERTÊNCIAS DO USUÁRIO -->
-                <div class="warning-panel" style="border-color:#f87171; margin-bottom:14px;">
-                    <div class="section-title" style="color:#f87171; border-left-color:#f87171;">⚠️ MINHAS ADVERTÊNCIAS / PUNIÇÕES</div>
-                    <div id="userWarningsContainer" style="font-size:0.8rem; color:#e1e1e6; max-height:120px; overflow-y:auto;">
-                        <span style="color:#7b93b8;">Nenhuma advertência registrada.</span>
+                <div class="warning-panel" style="border-color:#dc2626; margin-bottom:14px;">
+                    <div class="section-sub-label" style="color:#b91c1c;">⚠️ MINHAS ADVERTÊNCIAS / PUNIÇÕES</div>
+                    <div id="userWarningsContainer" style="font-size:0.8rem; color:var(--ink); max-height:120px; overflow-y:auto;">
+                        <span style="color:var(--muted);">Nenhuma advertência registrada.</span>
                     </div>
                 </div>
 
-                <div class="section-title">PRODUTIVIDADE DA SEMANA ATUAL</div>
-                <div class="profile-info" style="margin-bottom:14px; background:#090e1a; padding:10px; border-radius:6px; border:1px solid #1e293b;">
+                <div class="section-sub-label">📊 PRODUTIVIDADE DA SEMANA ATUAL</div>
+                <div class="profile-info" style="margin-bottom:14px; background:var(--card-soft); padding:10px; border-radius:8px; border:1.5px solid var(--border-dark);">
                     <div class="info-item">
                         <span class="lbl" id="refDateLabel">TURNOS INICIAIS</span>
                         <span class="val" id="uInitial">1900</span>
@@ -974,30 +1074,27 @@
             <!-- TELA DE GERÊNCIA E SUPERVISÃO -->
             <div id="adminScreen">
                 <div class="section-title">
-                    <span>PAINEL DE GERÊNCIA E SUPERVISÃO</span>
-                    <button class="btn-sub" style="width:auto; padding:3px 10px; margin:0; font-size:0.72rem;" onclick="logout()">Sair</button>
+                    <span>🏆 PÓDIO TOP 3 DA SEMANA (TURNOS ATUAIS)</span>
+                    <button class="btn-sub" style="width:auto; padding:6px 12px; margin:0;" onclick="logout()">Sair</button>
                 </div>
 
-                <!-- NOVO: TOP 3 DA SEMANA (SOMENTE TURNOS ATUAIS / FINAIS) -->
-                <div class="warning-panel" style="border-color: #eab308;">
-                    <div class="section-title" style="color: #facc15; border-left-color: #eab308;">
-                        <span>🏆 RANKING TOP 3 DA SEMANA (TURNOS ATUAIS)</span>
-                        <span style="font-size: 0.65rem; color: #94a3b8; font-weight: normal;">Baseado nos Turnos Finais</span>
-                    </div>
-                    <div class="top3-grid" id="adminTop3Container">
-                        <!-- Preenchido via JS -->
-                    </div>
+                <!-- PÓDIO TOP 3 BASEADO SOMENTE NOS TURNOS ATUAIS -->
+                <div class="podium-box">
+                    <p style="font-size:0.74rem; color:var(--muted); font-weight:600; margin-bottom:6px;">
+                        Classificação dos 3 maiores valores de <strong>Turno Atual</strong> registrados na semana.
+                    </p>
+                    <div class="podium-grid" id="adminTop3Podium"></div>
                 </div>
 
                 <div class="schedule-box">
-                    <div class="section-title">CRONOGRAMA DE SUPERVISÃO ATÉ O FIM DE 2026</div>
+                    <div class="section-sub-label">📅 CRONOGRAMA DE SUPERVISÃO ATÉ O FIM DE 2026</div>
                     <div class="schedule-list" id="scheduleList"></div>
                 </div>
 
                 <!-- PAINEL DE CADASTRO EM TABELA DE NOVATOS -->
-                <div class="bulk-add-panel" style="border-color: #3b82f6;">
+                <div class="bulk-add-panel">
                     <div class="section-title">➕ CADASTRAR NOVATOS (TABELA)</div>
-                    <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
+                    <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
                         Preencha cada dado na sua respectiva coluna. Clique em "+ Adicionar Linha" para inserir vários de uma vez:
                     </p>
                     <div style="overflow-x:auto; margin-bottom: 10px;">
@@ -1075,7 +1172,7 @@
                             </select>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>MOTIVO DA PUNIÇÃO</label>
+                            <label>MOTIVO DA PUNÇÃO</label>
                             <input type="text" id="advMotivo" class="input-field" placeholder="Ex: Ausência em turno">
                         </div>
                         <div class="input-group" style="margin:0;">
@@ -1089,16 +1186,16 @@
 
                     <div class="discord-output-box" id="discordOutputContainer" style="display:none;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                            <span style="font-size:0.7rem; color:#7b93b8; font-weight:bold;">FORMATO PARA DISCORD:</span>
+                            <span style="font-size:0.7rem; color:#93c5fd; font-weight:bold;">FORMATO PARA DISCORD:</span>
                             <button class="btn-sm btn-info" onclick="copyDiscordText()">📋 Copiar para o Discord</button>
                         </div>
                         <pre id="discordTextOutput"></pre>
                     </div>
 
                     <!-- CAIXA DE NOTAS: QUEM NÃO BATEU A COTA -->
-                    <div style="margin-top: 16px; border-top: 1px solid #1e293b; padding-top: 14px;">
-                        <div class="section-title">📋 NOTAS DE COTA NÃO ATINGIDA (DISCORD)</div>
-                        <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
+                    <div style="margin-top: 16px; border-top: 1.5px solid #cbd5e1; padding-top: 14px;">
+                        <div class="section-sub-label">📋 NOTAS DE COTA NÃO ATINGIDA (DISCORD)</div>
+                        <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 8px;">
                             Gera automaticamente o relatório para copiar e colar de quem não bateu a meta:
                         </p>
                         <button class="btn-sm btn-info" style="width:100%; padding:8px; margin-bottom:8px;" onclick="generateUnreachedList()">
@@ -1106,16 +1203,16 @@
                         </button>
                         <div class="discord-output-box" id="unreachedOutputContainer" style="display:none;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                                <span style="font-size:0.7rem; color:#7b93b8; font-weight:bold;">TEXTO FORMATADO:</span>
+                                <span style="font-size:0.7rem; color:#93c5fd; font-weight:bold;">TEXTO FORMATADO:</span>
                                 <button class="btn-sm btn-success" onclick="copyUnreachedText()">📋 Copiar Relatório</button>
                             </div>
                             <pre id="unreachedTextOutput"></pre>
                         </div>
                     </div>
 
-                    <div class="warning-panel" style="margin-top: 14px; border-color: #2563eb;">
-                        <div class="section-title">📥 IMPORTAÇÃO RÁPIDA DE TURNOS EM MASSA</div>
-                        <p style="font-size: 0.75rem; color: #7b93b8; margin-bottom: 8px;">
+                    <div class="warning-panel" style="margin-top: 14px; border-color: var(--blue-2); background: var(--card-white);">
+                        <div class="section-sub-label">📥 IMPORTAÇÃO RÁPIDA DE TURNOS EM MASSA</div>
+                        <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 8px;">
                             Cole abaixo os dados copiados (Nick e Turnos Finais separados por espaço ou tabulação):
                         </p>
                         <textarea id="bulkImportText" class="input-field" rows="4" placeholder="Ex:&#10;Afrontoso    3545&#10;Solyta    2002" style="width:100%; font-family:monospace; font-size:0.8rem; margin-bottom:8px;"></textarea>
@@ -1127,7 +1224,7 @@
 
                 <div class="admin-controls">
                     <div style="display:flex; flex-direction:column; gap:4px;">
-                        <span style="font-size:0.75rem; color:#7b93b8;">SEMANA ATIVA:</span>
+                        <span style="font-size:0.7rem; color:var(--muted); font-weight:800;">SEMANA ATIVA:</span>
                         <select id="weekSelector" class="filter-select" onchange="changeWeekManual(this.value)">
                             <!-- Preenchido via JavaScript -->
                         </select>
@@ -1138,7 +1235,6 @@
                             <option value="alpha">Ord: Alfabética (A-Z)</option>
                             <option value="turns-desc">Ord: Turnos Feitos (Maior)</option>
                             <option value="turns-asc">Ord: Turnos Feitos (Menor)</option>
-                            <option value="current-desc">Ord: Turnos Atuais (Maior)</option>
                             <option value="role">Ord: Cargo Hierárquico</option>
                         </select>
                         <select id="imageFilterToggle" class="filter-select action-col" onchange="renderAdminTable()">
@@ -1151,9 +1247,9 @@
                 </div>
 
                 <div id="printableTableArea">
-                    <div style="padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid #1e293b;">
-                        <h2 style="font-size:1.1rem; color:#60a5fa; text-transform:uppercase;">MERCADO RP - Controle Semanal de Produtividade</h2>
-                        <span style="font-size:0.8rem; color:#7b93b8;" id="printWeekSpan">09/11/2026 à 15/11/2026</span>
+                    <div style="padding-bottom:10px; margin-bottom:10px; border-bottom:2px solid var(--border-light);">
+                        <h2 class="pixel-font" style="font-size:0.85rem; color:var(--blue-1); text-transform:uppercase; line-height:1.5;">MERCADO RP • CLASSIFICAÇÃO GERAL</h2>
+                        <span style="font-size:0.8rem; color:var(--muted); font-weight:700;" id="printWeekSpan">09/11/2026 à 15/11/2026</span>
                     </div>
                     <div class="table-responsive" id="tableResponsiveBox">
                         <table class="habbo-table">
@@ -1224,6 +1320,7 @@
             { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
+        // DADOS EXTRATÍSTICOS DO PRINT ATUAL (09/11 a 15/11)
         const defaultEmployees = [
             { name: "Afrontoso", id: "290", role: "Gerente", initial: 3496, current: 3545, customAvatar: "", warnings: [] },
             { name: "Monica", id: "1025", role: "Supervisor", initial: 2312, current: 2344, customAvatar: "", warnings: [] },
@@ -1261,4 +1358,1115 @@
         ];
         let raceParticipants = [];
         let racePrizes = [
-            { place: "🥇 1º Lugar", slots: [{symbol: "💰", text
+            { place: "🥇 1º Lugar", slots: [{symbol: "💰", text: "500 c$"}, {symbol: "🔫", text: "Skin AK-47"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "🧨", text: "Dinamite"}] },
+            { place: "🥈 2º Lugar", slots: [{symbol: "💰", text: "300 c$"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "📄", text: "Documento"}, {symbol: "", text: ""}] },
+            { place: "🥉 3º Lugar", slots: [{symbol: "💰", text: "150 c$"}, {symbol: "🧪", text: "Poção"}, {symbol: "🎣", text: "Item de Pesca"}, {symbol: "", text: ""}, {symbol: "", text: ""}] }
+        ];
+        let currentWeekText = "09/11/2026 à 15/11/2026";
+        let activeUser = null;
+        let currentInput = "0";
+        let isRaceAdminUnlocked = false;
+
+        // FUNDO PIXEL
+        const bgIcons = ['🛒', '📦', '🪙', '🍎', '🥤', '🍞', '🏬'];
+        const bgContainer = document.getElementById('pixelBg');
+        for (let i = 0; i < 20; i++) {
+            let icon = document.createElement('div');
+            icon.className = 'pixel-icon';
+            icon.innerText = bgIcons[Math.floor(Math.random() * bgIcons.length)];
+            icon.style.left = Math.random() * 100 + '%';
+            icon.style.animationDuration = (6 + Math.random() * 8) + 's';
+            icon.style.animationDelay = (Math.random() * 5) + 's';
+            bgContainer.appendChild(icon);
+        }
+
+        // =====================================================================
+        // SINCRONIZAÇÃO SEGURA COM O FIRESTORE
+        // =====================================================================
+        const docRef = db.collection("mercadoData").doc("mainDoc");
+        let dataLoaded = false;
+        let unsubscribeSnapshot = null;
+
+        const syncBanner = document.createElement("div");
+        syncBanner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;padding:6px 10px;text-align:center;font-size:0.8rem;font-weight:bold;display:none;background:#b45309;color:#fff;";
+        document.body.appendChild(syncBanner);
+        function setSyncStatus(msg) {
+            if (msg) { syncBanner.innerText = msg; syncBanner.style.display = "block"; }
+            else { syncBanner.style.display = "none"; }
+        }
+
+        function findEmp(list, name) {
+            const n = (name || "").trim().toLowerCase();
+            return list.find(e => e && e.name && e.name.trim().toLowerCase() === n);
+        }
+
+        function normalizeEmployees(list) {
+            return list.map(emp => {
+                let defMatch = defaultEmployees.find(d => d.name.toLowerCase() === emp.name.toLowerCase());
+                return {
+                    id: emp.id !== undefined ? emp.id : (defMatch ? defMatch.id : ""),
+                    name: emp.name,
+                    role: emp.role || "Operador de Loja",
+                    initial: emp.initial !== undefined ? emp.initial : 0,
+                    current: emp.current !== undefined ? emp.current : 0,
+                    customAvatar: emp.customAvatar || "",
+                    warnings: emp.warnings || []
+                };
+            });
+        }
+
+        function getAvatarUrl(emp) {
+            if (emp && emp.customAvatar) return emp.customAvatar;
+            return `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${encodeURIComponent(emp.name)}&action=std&direction=2&head_direction=2&gesture=sml&size=m`;
+        }
+
+        // =====================================================================
+        // PÓDIO TOP 3 DA SEMANA (USANDO SOMENTE OS TURNOS ATUAIS)
+        // =====================================================================
+        function renderAdminTop3Podium() {
+            const container = document.getElementById("adminTop3Podium");
+            if (!container) return;
+
+            const rankedByCurrent = [...employees]
+                .map(emp => ({
+                    ...emp,
+                    currentTurns: Number(emp.current) || 0
+                }))
+                .sort((a, b) => b.currentTurns - a.currentTurns || a.name.localeCompare(b.name))
+                .slice(0, 3);
+
+            if (rankedByCurrent.length === 0) {
+                container.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; color:var(--muted); font-size:0.8rem;">Nenhum funcionário encontrado.</p>`;
+                return;
+            }
+
+            // Ordem visual do pódio estilo print: 2º Lugar (esq), 1º Lugar (centro), 3º Lugar (dir)
+            const visualSlots = [
+                { pos: 2, medal: "🥈", label: "2º Lugar", emp: rankedByCurrent[1] || null },
+                { pos: 1, medal: "🥇", label: "1º Lugar", emp: rankedByCurrent[0] || null },
+                { pos: 3, medal: "🥉", label: "3º Lugar", emp: rankedByCurrent[2] || null }
+            ];
+
+            container.innerHTML = visualSlots.map(slot => {
+                if (!slot.emp) {
+                    return `
+                        <div class="podium-card pos-${slot.pos}">
+                            <div class="podium-rank-pill">${slot.medal} ${slot.label}</div>
+                            <div class="podium-nick" style="color:var(--muted);">—</div>
+                            <div class="podium-pts">0 <span>TURNOS</span></div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="podium-card pos-${slot.pos}">
+                        <div class="podium-rank-pill">${slot.medal} ${slot.label}</div>
+                        <div class="podium-avatar" style="background-image: url('${getAvatarUrl(slot.emp)}');"></div>
+                        <div class="podium-nick">${slot.emp.name}</div>
+                        <div class="podium-role-badge">${slot.emp.role}</div>
+                        <div class="podium-pts">${slot.emp.currentTurns} <span>TURNOS</span></div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function captureDirtyInputs() {
+            const dirty = {};
+            document.querySelectorAll('#tableBody input[data-name]').forEach(inp => {
+                const td = inp.closest('td');
+                if (td && inp.value !== td.getAttribute('data-val')) dirty[inp.dataset.name] = inp.value;
+            });
+            const ae = document.activeElement;
+            const focusName = (ae && ae.dataset && ae.dataset.name && ae.closest && ae.closest('#tableBody')) ? ae.dataset.name : null;
+            return { dirty, focusName };
+        }
+
+        function restoreDirtyInputs(state) {
+            document.querySelectorAll('#tableBody input[data-name]').forEach(inp => {
+                if (Object.prototype.hasOwnProperty.call(state.dirty, inp.dataset.name)) {
+                    inp.value = state.dirty[inp.dataset.name];
+                    inp.style.outline = "2px solid #eab308";
+                    inp.title = "Valor digitado ainda não salvo";
+                }
+                if (state.focusName && inp.dataset.name === state.focusName) inp.focus();
+            });
+        }
+
+        function renderEverything() {
+            const keep = captureDirtyInputs();
+            const ae = document.activeElement;
+            const editingPrizes = isRaceAdminUnlocked && ae && ae.closest && ae.closest('#racePrizesTableBody');
+
+            initApp();
+            populateWeekSelector();
+            document.getElementById("printWeekSpan").innerText = currentWeekText;
+            renderAdminTop3Podium();
+            renderSchedule();
+            renderAbsentTable();
+            renderAdminTable();
+            if (!editingPrizes) renderRaceScreen();
+            restoreDirtyInputs(keep);
+
+            if (activeUser) {
+                let updated = employees.find(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
+                if (updated) {
+                    activeUser = updated;
+                    renderUserProfile();
+                }
+            }
+        }
+
+        async function seedDefaultsIfMissing() {
+            try {
+                await db.runTransaction(async (tx) => {
+                    const snap = await tx.get(docRef);
+                    if (snap.exists) return;
+                    tx.set(docRef, {
+                        employees: JSON.parse(JSON.stringify(defaultEmployees)),
+                        absentRecords: absentRecords,
+                        raceParticipants: [],
+                        racePrizes: racePrizes,
+                        currentWeekText: currentWeekText
+                    });
+                });
+            } catch (e) {
+                console.error("Erro ao criar documento inicial:", e);
+            }
+        }
+
+        function startListener() {
+            if (unsubscribeSnapshot) { try { unsubscribeSnapshot(); } catch (e) {} }
+            unsubscribeSnapshot = docRef.onSnapshot({ includeMetadataChanges: true }, (doc) => {
+                if (doc.metadata.fromCache) {
+                    setSyncStatus(dataLoaded
+                        ? "⚠️ Sem conexão com a nuvem — salvamentos bloqueados até reconectar"
+                        : "⏳ Conectando à nuvem...");
+                    return;
+                }
+                setSyncStatus(null);
+
+                if (!doc.exists) {
+                    seedDefaultsIfMissing();
+                    return;
+                }
+
+                const data = doc.data();
+                employees = Array.isArray(data.employees) ? normalizeEmployees(data.employees) : JSON.parse(JSON.stringify(defaultEmployees));
+                absentRecords = data.absentRecords || [];
+                raceParticipants = data.raceParticipants || [];
+                if (data.racePrizes && data.racePrizes.length > 0) racePrizes = data.racePrizes;
+                if (data.currentWeekText) currentWeekText = data.currentWeekText;
+
+                dataLoaded = true;
+                renderEverything();
+            }, (error) => {
+                console.error("Erro ao sincronizar com o Firebase: ", error);
+                setSyncStatus("⚠️ Erro de conexão com a nuvem — tentando reconectar...");
+                setTimeout(startListener, 5000);
+            });
+        }
+
+        startListener();
+        window.addEventListener("online", startListener);
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") startListener();
+        });
+
+        async function mutateCloud(mutator) {
+            if (!dataLoaded) {
+                alert("Ainda não conectou com a nuvem. Aguarde alguns segundos e tente de novo (nada foi salvo).");
+                return false;
+            }
+            try {
+                let committed = false;
+                await db.runTransaction(async (tx) => {
+                    const snap = await tx.get(docRef);
+                    const cloud = snap.exists ? snap.data() : {};
+                    const fresh = {
+                        employees: Array.isArray(cloud.employees) ? cloud.employees : JSON.parse(JSON.stringify(defaultEmployees)),
+                        absentRecords: cloud.absentRecords || [],
+                        raceParticipants: cloud.raceParticipants || [],
+                        racePrizes: (cloud.racePrizes && cloud.racePrizes.length > 0) ? cloud.racePrizes : racePrizes,
+                        currentWeekText: cloud.currentWeekText || currentWeekText
+                    };
+                    if (mutator(fresh) === false) return;
+                    tx.set(docRef, fresh, { merge: true });
+                    committed = true;
+                });
+                return committed;
+            } catch (error) {
+                console.error("Erro ao salvar no Firestore: ", error);
+                alert("⚠️ NÃO foi possível salvar na nuvem (verifique a conexão). Seus dados NÃO foram alterados — tente novamente.");
+                return false;
+            }
+        }
+
+        function initApp() {
+            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[3];
+            document.getElementById("currentSupervisorBanner").innerText = `${match.resp} (${match.week})`;
+        }
+
+        function populateWeekSelector() {
+            const selector = document.getElementById("weekSelector");
+            if (!selector) return;
+            selector.innerHTML = "";
+            rotationSchedule.forEach(s => {
+                let opt = document.createElement("option");
+                opt.value = s.week;
+                opt.innerText = `${s.week} (Sup: ${s.resp})`;
+                if (s.week === currentWeekText) opt.selected = true;
+                selector.appendChild(opt);
+            });
+        }
+
+        async function changeWeekManual(selectedWeek) {
+            const ok = await mutateCloud(d => { d.currentWeekText = selectedWeek; });
+            if (!ok) populateWeekSelector();
+        }
+
+        function showRaceScreen() {
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("raceScreen").style.display = "block";
+            document.getElementById("mainWrapper").classList.add("wide");
+            renderRaceScreen();
+        }
+
+        function backToLogin() {
+            document.getElementById("raceScreen").style.display = "none";
+            document.getElementById("loginScreen").style.display = "block";
+            document.getElementById("mainWrapper").classList.remove("wide");
+        }
+
+        function unlockRaceAdmin() {
+            const pass = prompt("Digite a senha de administrador para liberar a edição da Corrida:");
+            if (pass === "tudomercado363") {
+                isRaceAdminUnlocked = true;
+                document.getElementById("raceLoginPrompt").style.display = "none";
+                document.getElementById("raceAdminControls").style.display = "block";
+                renderRaceScreen();
+                alert("Modo de edição da Corrida desbloqueado com sucesso!");
+            } else if (pass) {
+                alert("Senha incorreta!");
+            }
+        }
+
+        // FUNÇÕES DA CORRIDA DOS TURNOS
+
+        async function addRacePrizeRow() {
+            if (!isRaceAdminUnlocked) {
+                alert("Apenas administradores podem adicionar prêmios!");
+                return;
+            }
+            await mutateCloud(d => {
+                d.racePrizes.push({
+                    place: `${d.racePrizes.length + 1}º Lugar`,
+                    slots: [
+                        {symbol: "💰", text: ""},
+                        {symbol: "", text: ""},
+                        {symbol: "", text: ""},
+                        {symbol: "", text: ""},
+                        {symbol: "", text: ""}
+                    ]
+                });
+            });
+        }
+
+        async function saveRacePrizes() {
+            if (!isRaceAdminUnlocked) {
+                alert("Apenas administradores podem salvar os prêmios!");
+                return;
+            }
+
+            const rows = document.querySelectorAll("#racePrizesTableBody tr");
+            let newPrizes = [];
+
+            rows.forEach((tr, prizeIdx) => {
+                const placeInput = tr.querySelector(".prize-place-input");
+                if (!placeInput) return;
+
+                const place = placeInput.value.trim() || `${prizeIdx + 1}º Lugar`;
+
+                let slots = [];
+                for (let sIdx = 0; sIdx < 5; sIdx++) {
+                    const symbolSelect = tr.querySelector(`.slot-symbol-${prizeIdx}-${sIdx}`);
+                    const textInput = tr.querySelector(`.slot-text-${prizeIdx}-${sIdx}`);
+                    slots.push({
+                        symbol: symbolSelect ? symbolSelect.value : "",
+                        text: textInput ? textInput.value : ""
+                    });
+                }
+
+                newPrizes.push({ place, slots });
+            });
+
+            const ok = await mutateCloud(d => { d.racePrizes = newPrizes; });
+            if (ok) alert("Prêmios da corrida salvos com sucesso na nuvem!");
+        }
+
+        async function removeRacePrize(index) {
+            if (!isRaceAdminUnlocked) {
+                alert("Apenas administradores podem remover prêmios!");
+                return;
+            }
+            await mutateCloud(d => { d.racePrizes.splice(index, 1); });
+        }
+
+        async function addRaceParticipant() {
+            if (!isRaceAdminUnlocked) {
+                alert("Apenas administradores podem inscrever participantes!");
+                return;
+            }
+            const input = document.getElementById("newRaceParticipant");
+            const nick = input.value.trim();
+            if (!nick) {
+                alert("Digite o nick do participante!");
+                return;
+            }
+
+            if (raceParticipants.some(p => p.toLowerCase() === nick.toLowerCase())) {
+                alert("Este participante já está inscrito na corrida!");
+                return;
+            }
+
+            const ok = await mutateCloud(d => {
+                if (d.raceParticipants.some(p => p.toLowerCase() === nick.toLowerCase())) return false;
+                d.raceParticipants.push(nick);
+            });
+            if (ok) input.value = "";
+        }
+
+        async function removeRaceParticipant(nick) {
+            if (!isRaceAdminUnlocked) {
+                alert("Apenas administradores podem remover participantes!");
+                return;
+            }
+            await mutateCloud(d => {
+                d.raceParticipants = d.raceParticipants.filter(p => p.toLowerCase() !== nick.toLowerCase());
+            });
+        }
+
+        function renderRaceScreen() {
+            const actionCols = document.querySelectorAll(".race-admin-col");
+            const actionDivs = document.querySelectorAll(".race-admin-action");
+            const addContainer = document.getElementById("raceAddContainer");
+
+            actionCols.forEach(col => col.style.display = isRaceAdminUnlocked ? "" : "none");
+            actionDivs.forEach(div => div.style.display = isRaceAdminUnlocked ? "flex" : "none");
+            if (addContainer) addContainer.style.display = isRaceAdminUnlocked ? "flex" : "none";
+
+            const prizesTbody = document.getElementById("racePrizesTableBody");
+            if (prizesTbody) {
+                prizesTbody.innerHTML = "";
+                const emojiChoices = ['', '💰', '🔫', '🔋', '🧪', '🧨', '📄', '🎣', '⛏️', '🌱', '🥇', '🥈', '🥉', '🎁', '⭐', '💎'];
+
+                if (racePrizes.length === 0) {
+                    prizesTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--muted); padding:12px;">Nenhum prêmio cadastrado. Desbloqueie o painel para adicionar.</td></tr>`;
+                } else {
+                    racePrizes.forEach((p, prizeIdx) => {
+                        let tr = document.createElement("tr");
+
+                        let slotsHtml = `<div class="prize-slot-group">`;
+                        for (let sIdx = 0; sIdx < 5; sIdx++) {
+                            let slot = (p.slots && p.slots[sIdx]) ? p.slots[sIdx] : {symbol: "", text: ""};
+                            let symbolOptions = emojiChoices.map(sym => 
+                                `<option value="${sym}" ${sym === slot.symbol ? 'selected' : ''}>${sym || '--'}</option>`
+                            ).join("");
+
+                            slotsHtml += `
+                                <div class="prize-slot-item">
+                                    <select class="editable-select slot-symbol-${prizeIdx}-${sIdx}" ${!isRaceAdminUnlocked ? 'disabled' : ''} style="width: 60px; text-align: center;">${symbolOptions}</select>
+                                    <input type="text" class="editable-input slot-text-${prizeIdx}-${sIdx}" ${!isRaceAdminUnlocked ? 'readonly' : ''} placeholder="Prêmio ${sIdx + 1}" value="${slot.text || ''}" style="width: 240px; text-align: left; padding: 4px 8px;">
+                                </div>
+                            `;
+                        }
+                        slotsHtml += `</div>`;
+
+                        let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRacePrize(${prizeIdx})">❌</button></td>` : '';
+
+                        tr.innerHTML = `
+                            <td><input type="text" class="editable-input prize-place-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.place || ''}" style="width:110px; font-weight:bold;"></td>
+                            <td>${slotsHtml}</td>
+                            ${actionTd}
+                        `;
+                        prizesTbody.appendChild(tr);
+                    });
+                }
+            }
+
+            const partsTbody = document.getElementById("raceParticipantsTableBody");
+            if (partsTbody) {
+                partsTbody.innerHTML = "";
+
+                if (raceParticipants.length === 0) {
+                    let colSpanVal = isRaceAdminUnlocked ? 6 : 5;
+                    partsTbody.innerHTML = `<tr><td colspan="${colSpanVal}" style="text-align:center; color:var(--muted); padding:14px;">Nenhum participante inscrito na corrida ainda. ${isRaceAdminUnlocked ? 'Insira acima!' : 'Desbloqueie com a senha para inscrever.'}</td></tr>`;
+                } else {
+                    let list = raceParticipants.map(nick => {
+                        let emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
+                        let feitos = emp ? (emp.current - emp.initial) : 0;
+                        if (feitos < 0) feitos = 0;
+                        let hasWarn = emp && emp.warnings && emp.warnings.length > 0;
+                        let isAbsent = absentRecords.some(r => r.nick.trim().toLowerCase() === nick.toLowerCase());
+                        
+                        let eligible = emp && !hasWarn && !isAbsent && feitos >= 40;
+
+                        return { nick, role: emp ? emp.role : "Desconhecido", feitos, eligible };
+                    });
+
+                    list.sort((a, b) => b.feitos - a.feitos);
+
+                    list.forEach((item, idx) => {
+                        let tr = document.createElement("tr");
+                        let badge = item.eligible ? 
+                            `<span class="badge-status badge-success">Elegível ✅</span>` : 
+                            `<span class="badge-status badge-danger">Não atende regras ❌</span>`;
+
+                        let medalha = idx === 0 ? "🥇 " : idx === 1 ? "🥈 " : idx === 2 ? "🥉 " : `#${idx + 1} `;
+                        let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRaceParticipant('${item.nick}')">❌</button></td>` : '';
+
+                        tr.innerHTML = `
+                            <td><strong>${medalha}</strong></td>
+                            <td><strong>${item.nick}</strong></td>
+                            <td>${item.role}</td>
+                            <td><strong>${item.feitos} turnos</strong></td>
+                            <td>${badge}</td>
+                            ${actionTd}
+                        `;
+                        partsTbody.appendChild(tr);
+                    });
+                }
+            }
+        }
+
+        function loginUser() {
+            const nick = document.getElementById("usernameInput").value.trim().toLowerCase();
+            const errorMsg = document.getElementById("errorMessage");
+
+            if (!nick) {
+                errorMsg.innerText = "Por favor, digite seu nickname!";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            if (!dataLoaded) {
+                errorMsg.innerText = "Conectando à nuvem... tente novamente em alguns segundos.";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            const found = employees.find(e => e.name.toLowerCase() === nick);
+
+            if (found) {
+                activeUser = found;
+                errorMsg.style.display = "none";
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("userScreen").style.display = "block";
+
+                renderUserProfile();
+
+                currentInput = "0";
+                updateDisplay();
+                calculateShift();
+            } else {
+                errorMsg.innerText = "Funcionário não encontrado no sistema!";
+                errorMsg.style.display = "block";
+            }
+        }
+
+        function renderUserProfile() {
+            if (!activeUser) return;
+            const meta = roleMetas[activeUser.role] || 15;
+            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[3];
+
+            document.getElementById("uName").innerText = activeUser.name;
+            document.getElementById("uRole").innerText = activeUser.role;
+            document.getElementById("uInitial").innerText = activeUser.initial;
+            document.getElementById("uMeta").innerText = meta + " turnos";
+            document.getElementById("refDateLabel").innerText = `TURNOS INICIAIS (${match.refDate || 'Iniciais'})`;
+
+            document.getElementById("avatarFrame").style.backgroundImage = `url('${getAvatarUrl(activeUser)}')`;
+            document.getElementById("customAvatarInput").value = activeUser.customAvatar || "";
+
+            const warnContainer = document.getElementById("userWarningsContainer");
+            warnContainer.innerHTML = "";
+            if (activeUser.warnings && activeUser.warnings.length > 0) {
+                activeUser.warnings.forEach((w) => {
+                    let div = document.createElement("div");
+                    div.style.cssText = "background:#fef2f2; padding:8px; border-radius:6px; margin-bottom:6px; border-left:4px solid #dc2626;";
+                    div.innerHTML = `<strong>${w.num}</strong> - Motivo: ${w.motivo}<br><span style="font-size:0.7rem; color:var(--muted);">Print: ${w.imgur && w.imgur !== '-x-' ? `<a href="${w.imgur}" target="_blank" style="color:var(--blue-1);">Ver Print</a>` : '-x-'}</span>`;
+                    warnContainer.appendChild(div);
+                });
+            } else {
+                warnContainer.innerHTML = `<span style="color:var(--muted);">Nenhuma advertência registrada. Parabéns!</span>`;
+            }
+        }
+
+        async function saveCustomAvatar() {
+            const link = document.getElementById("customAvatarInput").value.trim();
+            if (!activeUser) return;
+            const name = activeUser.name;
+
+            const ok = await mutateCloud(d => {
+                const t = findEmp(d.employees, name);
+                if (!t) return false;
+                t.customAvatar = link;
+            });
+            if (ok) alert("Foto de perfil atualizada com sucesso!");
+        }
+
+        function showAdminLogin() {
+            const pass = prompt("Digite a senha de administrador:");
+            if (pass === "tudomercado363") {
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("adminScreen").style.display = "block";
+                document.getElementById("mainWrapper").classList.add("wide");
+                document.getElementById("printWeekSpan").innerText = currentWeekText;
+                
+                const newTbody = document.getElementById("newEmpTableBody");
+                if (newTbody && newTbody.children.length === 0) {
+                    addNewEmpTableRow();
+                }
+
+                populateWeekSelector();
+                renderAdminTop3Podium();
+                renderSchedule();
+                renderAdminTable();
+            } else if (pass) {
+                alert("Senha incorreta!");
+            }
+        }
+
+        function logout() {
+            activeUser = null;
+            document.getElementById("userScreen").style.display = "none";
+            document.getElementById("adminScreen").style.display = "none";
+            document.getElementById("loginScreen").style.display = "block";
+            document.getElementById("mainWrapper").classList.remove("wide");
+            document.getElementById("usernameInput").value = "";
+        }
+
+        const display = document.getElementById("display");
+
+        function updateDisplay() { display.innerText = currentInput; }
+
+        function appendNum(num) {
+            if (currentInput === "0") currentInput = num;
+            else currentInput += num;
+            updateDisplay();
+        }
+
+        function clearNum() { currentInput = "0"; updateDisplay(); }
+
+        function deleteNum() {
+            if (currentInput.length > 1) currentInput = currentInput.slice(0, -1);
+            else currentInput = "0";
+            updateDisplay();
+        }
+
+        function calculateShift() {
+            let currVal = parseInt(currentInput);
+            if (isNaN(currVal)) currVal = 0;
+
+            let meta = roleMetas[activeUser.role] || 15;
+            let feitos = (currVal >= activeUser.initial) ? (currVal - activeUser.initial) : currVal;
+
+            let faltando = meta - feitos;
+            const resCard = document.getElementById("resultCard");
+            const resText = document.getElementById("resultText");
+
+            if (faltando > 0) {
+                resCard.className = "result-card danger";
+                resText.innerHTML = `Feitos nesta semana: <strong>${feitos}</strong><br><span style="color:#dc2626;">Faltam ${faltando} turnos para a meta</span>`;
+            } else {
+                resCard.className = "result-card";
+                resText.innerHTML = `Feitos nesta semana: <strong>${feitos}</strong><br><span style="color:#15803d;">🎉 Meta Alcançada!</span>`;
+            }
+        }
+
+        function renderSchedule() {
+            const container = document.getElementById("scheduleList");
+            container.innerHTML = "";
+
+            rotationSchedule.forEach(s => {
+                const isActive = s.week === currentWeekText;
+                const div = document.createElement("div");
+                div.className = `schedule-item ${isActive ? 'active' : ''}`;
+                div.innerHTML = `
+                    <span>${s.week}</span>
+                    <strong>${s.resp} ${isActive ? '(Atual)' : ''}</strong>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+
+            let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
+            let imageFilterMode = document.getElementById("imageFilterToggle") ? document.getElementById("imageFilterToggle").value : "all";
+            
+            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx }));
+
+            if (imageFilterMode === "gt15") {
+                visibleEmployees = visibleEmployees.filter(emp => {
+                    let feitos = emp.current - emp.initial;
+                    if (feitos < 0) feitos = 0;
+                    let isAbsent = hasActiveAbsent(emp.name);
+                    return feitos > 15 || isAbsent;
+                });
+            }
+
+            if (filterMode === "alpha") {
+                visibleEmployees.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (filterMode === "turns-desc") {
+                visibleEmployees.sort((a, b) => (b.current - b.initial) - (a.current - a.initial));
+            } else if (filterMode === "turns-asc") {
+                visibleEmployees.sort((a, b) => (a.current - a.initial) - (b.current - b.initial));
+            } else if (filterMode === "role") {
+                visibleEmployees.sort((a, b) => (roleHierarchy[a.role] || 99) - (roleHierarchy[b.role] || 99));
+            }
+
+            visibleEmployees.forEach((emp) => {
+                let index = emp.originalIndex;
+                let meta = roleMetas[emp.role] || 15;
+                let feitos = emp.current - emp.initial;
+                if (feitos < 0) feitos = 0;
+                let alcançou = feitos >= meta;
+
+                let isAbsent = hasActiveAbsent(emp.name);
+
+                let roleOptions = Object.keys(roleMetas).map(r => 
+                    `<option value="${r}" ${r === emp.role ? 'selected' : ''}>${r}</option>`
+                ).join("");
+
+                let tr = document.createElement("tr");
+                
+                let statusBadge = "";
+                if (isAbsent) {
+                    statusBadge = `<span class="badge-status badge-aval">⭐ COM AVAL</span>`;
+                } else {
+                    statusBadge = `<span class="badge-status ${alcançou ? 'badge-success' : 'badge-danger'}">
+                        ${alcançou ? 'Alcançada' : 'Não alcançada'}
+                    </span>`;
+                }
+
+                tr.innerHTML = `
+                    <td>
+                        <strong>${emp.name}</strong> ${emp.id ? `<span style="color:var(--muted); font-size:0.75rem;">(ID: ${emp.id})</span>` : ''}
+                        <button class="btn-edit-pencil action-col" title="Editar Nick/ID" onclick="editEmpInfo(${index})">✏️</button>
+                    </td>
+                    <td class="role-cell" data-role="${emp.role}">
+                        <select class="editable-select" onchange="updateEmpRole(${index}, this.value)">
+                            ${roleOptions}
+                        </select>
+                    </td>
+                    <td>${emp.initial}</td>
+                    <td class="turn-cell" data-val="${emp.current}">
+                        <input type="number" class="editable-input" id="emp-curr-${index}" data-name="${String(emp.name).replace(/"/g, '&quot;')}" value="${emp.current}">
+                    </td>
+                    <td><strong>${feitos}</strong></td>
+                    <td>${statusBadge}</td>
+                    <td class="action-col">
+                        <button class="btn-sm btn-success" onclick="saveSingleTurn(${index})">💾 Salvar</button>
+                        <button class="btn-sm btn-sub" style="width:auto; padding:5px 8px; margin:0;" onclick="removeEmp(${index})">❌</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function hasActiveAbsent(name) {
+            return absentRecords.some(r => r.nick.trim().toLowerCase() === name.trim().toLowerCase());
+        }
+
+        async function editEmpInfo(index) {
+            const emp = employees[index];
+            if (!emp) return;
+            const oldName = emp.name;
+            const newName = prompt("Editar Nickname do funcionário:", emp.name);
+            if (!newName || !newName.trim()) return;
+
+            const newId = prompt("Editar ID do funcionário no jogo:", emp.id || "");
+
+            const ok = await mutateCloud(d => {
+                const t = findEmp(d.employees, oldName);
+                if (!t) { alert("Funcionário não encontrado (alguém pode ter removido)."); return false; }
+                t.name = newName.trim();
+                t.id = newId ? newId.trim() : "";
+            });
+            if (ok) alert("ID e Nick atualizados e salvos na nuvem com sucesso!");
+        }
+
+        async function updateEmpRole(index, newRole) {
+            const name = employees[index].name;
+            const ok = await mutateCloud(d => {
+                const t = findEmp(d.employees, name);
+                if (!t) return false;
+                t.role = newRole;
+            });
+            if (!ok) renderAdminTable();
+        }
+
+        async function saveSingleTurn(index) {
+            const name = employees[index].name;
+            const valInput = document.getElementById(`emp-curr-${index}`).value;
+            const newTurn = parseInt(valInput);
+            if (isNaN(newTurn)) {
+                alert("Digite um número válido.");
+                return;
+            }
+            const ok = await mutateCloud(d => {
+                const t = findEmp(d.employees, name);
+                if (!t) { alert("Funcionário não encontrado (alguém pode ter removido)."); return false; }
+                t.current = newTurn;
+            });
+            if (ok) alert(`Turnos de ${name} atualizados para ${newTurn} e salvos na nuvem!`);
+        }
+
+        async function removeEmp(index) {
+            const name = employees[index].name;
+            if (confirm(`Remover ${name} da lista?`)) {
+                await mutateCloud(d => {
+                    d.employees = d.employees.filter(e => e.name.toLowerCase() !== name.toLowerCase());
+                });
+            }
+        }
+
+        function addNewEmpTableRow() {
+            const tbody = document.getElementById("newEmpTableBody");
+            if (!tbody) return;
+
+            let roleOptions = Object.keys(roleMetas).map(r => `<option value="${r}">${r}</option>`).join("");
+
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><input type="text" class="editable-input new-nick" placeholder="Nick" style="width:100%;"></td>
+                <td><input type="text" class="editable-input new-id" placeholder="ID" style="width:100%;"></td>
+                <td><select class="editable-select new-role" style="width:100%;">${roleOptions}</select></td>
+                <td><input type="number" class="editable-input new-init" value="0" style="width:100%;"></td>
+                <td><input type="number" class="editable-input new-curr" value="0" style="width:100%;"></td>
+                <td><button class="btn-sm btn-sub" style="width:auto; margin:0; padding:4px 8px;" onclick="this.parentElement.parentElement.remove()">❌</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        async function saveAllNewEmpRows() {
+            const rows = document.querySelectorAll("#newEmpTableBody tr");
+            const entries = [];
+
+            rows.forEach(tr => {
+                const name = tr.querySelector(".new-nick").value.trim();
+                const id = tr.querySelector(".new-id").value.trim();
+                const role = tr.querySelector(".new-role").value;
+                const initial = parseInt(tr.querySelector(".new-init").value) || 0;
+                const current = parseInt(tr.querySelector(".new-curr").value) || 0;
+                if (name) entries.push({ name, id, role, initial, current });
+            });
+
+            if (entries.length === 0) {
+                alert("Preencha pelo menos o Nickname de um funcionário na tabela antes de salvar.");
+                return;
+            }
+
+            const ok = await mutateCloud(d => {
+                entries.forEach(n => {
+                    let existing = findEmp(d.employees, n.name);
+                    if (!existing) {
+                        d.employees.push({ name: n.name, id: n.id, role: n.role, initial: n.initial, current: n.current, customAvatar: "", warnings: [] });
+                    } else {
+                        existing.id = n.id || existing.id;
+                        existing.role = n.role;
+                        existing.initial = n.initial;
+                        existing.current = n.current;
+                    }
+                });
+            });
+
+            if (ok) {
+                document.getElementById("newEmpTableBody").innerHTML = "";
+                addNewEmpTableRow();
+                alert(`Sucesso! ${entries.length} funcionário(s) cadastrado(s) e salvo(s) na nuvem!`);
+            }
+        }
+
+        async function addAbsentRecord() {
+            const nick = document.getElementById("absentNick").value.trim();
+            const period = document.getElementById("absentPeriod").value.trim();
+            const reason = document.getElementById("absentReason").value.trim();
+
+            if (!nick || !period) {
+                alert("Preencha ao menos o Nick e o Período da ausência!");
+                return;
+            }
+
+            const ok = await mutateCloud(d => { d.absentRecords.push({ nick, period, reason: reason || "N/A" }); });
+            if (ok) {
+                document.getElementById("absentNick").value = "";
+                document.getElementById("absentPeriod").value = "";
+                document.getElementById("absentReason").value = "";
+                alert("Aval / Ausência registrado e salvo na nuvem!");
+            }
+        }
+
+        function renderAbsentTable() {
+            const tbody = document.getElementById("absentTableBody");
+            tbody.innerHTML = "";
+
+            absentRecords.forEach((rec, idx) => {
+                let tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${rec.nick}</strong></td>
+                    <td>${rec.period}</td>
+                    <td>${rec.reason}</td>
+                    <td><button class="btn-sm btn-warning" style="margin:0; padding:3px 6px;" onclick="removeAbsentRecord(${idx})">Encerrar</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function removeAbsentRecord(idx) {
+            const rec = absentRecords[idx];
+            if (!rec) return;
+            if (confirm("Deseja encerrar e remover o aval/ausência deste funcionário?")) {
+                const ok = await mutateCloud(d => {
+                    const i = d.absentRecords.findIndex(r => r.nick === rec.nick && r.period === rec.period && r.reason === rec.reason);
+                    if (i === -1) return false;
+                    d.absentRecords.splice(i, 1);
+                });
+                if (ok) alert("Aval encerrado com sucesso!");
+            }
+        }
+
+        async function advanceWeek() {
+            const pass = prompt("Digite a senha de administrador para virar a semana:");
+            if (pass !== "tudomercado363") {
+                alert("Senha incorreta!");
+                return;
+            }
+
+            if (confirm("Deseja virar a semana? Os Turnos Finais atuais passarão a ser os Turnos Iniciais para todos, garantindo o avanço correto!")) {
+                const weekAtClick = currentWeekText;
+                let nextWeek = weekAtClick;
+                const currentIndex = rotationSchedule.findIndex(s => s.week === weekAtClick);
+                if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
+                    nextWeek = rotationSchedule[currentIndex + 1].week;
+                } else {
+                    const newWeek = prompt("Digite o período da nova semana:", "16/11/2026 à 22/11/2026");
+                    if (newWeek && newWeek.trim() !== "") {
+                        nextWeek = newWeek.trim();
+                    } else {
+                        return;
+                    }
+                }
+
+                const ok = await mutateCloud(d => {
+                    if (d.currentWeekText !== weekAtClick) {
+                        alert("A semana já foi alterada por outra pessoa. Atualize a página e confira antes de virar.");
+                        return false;
+                    }
+                    d.employees.forEach(emp => { emp.initial = emp.current; });
+                    d.currentWeekText = nextWeek;
+                });
+                if (ok) alert("Semana virada com sucesso! Turnos iniciais atualizados com os finais e salvos na nuvem.");
+            }
+        }
+
+        async function generateWarningText() {
+            const nick = document.getElementById("advNick").value.trim();
+            const numAdv = document.getElementById("advNum").value;
+            const motivo = document.getElementById("advMotivo").value.trim();
+            let imgur = document.getElementById("advImgur").value.trim();
+            if (!imgur) imgur = "-x-";
+
+            if (!nick || !motivo) {
+                alert("Preencha ao menos o Nick e o Motivo da advertência!");
+                return;
+            }
+
+            const pass = prompt("Digite a senha de administrador para salvar e registrar a advertência:");
+            if (pass !== "tudomercado363") {
+                alert("Senha incorreta! Advertência não aplicada.");
+                return;
+            }
+
+            const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
+            
+            let formattedNickAndId = nick;
+            if (emp && emp.id) {
+                formattedNickAndId = `${emp.name} (${emp.id})`;
+            }
+
+            if (emp) {
+                const warn = { num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') };
+                const ok = await mutateCloud(d => {
+                    const t = findEmp(d.employees, emp.name);
+                    if (!t) return false;
+                    if (!t.warnings) t.warnings = [];
+                    t.warnings.push(warn);
+                });
+                if (!ok) return;
+            }
+
+            const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
+                `👤 **Funcionário(a):** ${formattedNickAndId}\n` +
+                `💼 **Cargo:** ${emp ? emp.role : 'Funcionário'}\n` +
+                `⚠️ **Punição:** ${numAdv}\n` +
+                `📝 **Motivo:** ${motivo}\n` +
+                `🖼️ **Comprovação (Print):** ${imgur}\n` +
+                `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
+                `*Esta advertência foi registrada na Administração do Mercado RP.*`;
+
+            document.getElementById("discordTextOutput").innerText = discordFormatted;
+            document.getElementById("discordOutputContainer").style.display = "block";
+            alert("Senha correta! Advertência registrada e salva na nuvem com sucesso.");
+        }
+
+        function generateUnreachedList() {
+            let unreached = employees.filter(emp => {
+                let meta = roleMetas[emp.role] || 15;
+                let feitos = emp.current - emp.initial;
+                if (feitos < 0) feitos = 0;
+                if (hasActiveAbsent(emp.name)) return false;
+                return feitos < meta;
+            });
+
+            if (unreached.length === 0) {
+                document.getElementById("unreachedTextOutput").innerText = "Todos os funcionários atingiram a meta nesta semana (ou estão de licença/com aval)!";
+                document.getElementById("unreachedOutputContainer").style.display = "block";
+                return;
+            }
+
+            let blocks = [];
+            unreached.forEach(emp => {
+                let displayName = emp.id ? `${emp.name} (${emp.id})` : emp.name;
+                blocks.push(`**Nick:** ${displayName}\n**motivo:** cota de turnos não atingida\n**Nº DE Advertência:** \n**Print:** -x-`);
+            });
+
+            let finalOutput = blocks.join("\n-\n");
+
+            document.getElementById("unreachedTextOutput").innerText = finalOutput;
+            document.getElementById("unreachedOutputContainer").style.display = "block";
+        }
+
+        function copyDiscordText() {
+            const text = document.getElementById("discordTextOutput").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Texto copiado para a área de transferência!");
+            });
+        }
+
+        function copyUnreachedText() {
+            const text = document.getElementById("unreachedTextOutput").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Relatório copiado para a área de transferência!");
+            });
+        }
+
+        function generateTableImage() {
+            const area = document.getElementById("printableTableArea");
+            const responsiveBox = document.getElementById("tableResponsiveBox");
+            const actionCols = document.querySelectorAll(".action-col");
+
+            actionCols.forEach(c => c.style.display = "none");
+
+            const turnCells = document.querySelectorAll(".turn-cell");
+            const roleCells = document.querySelectorAll(".role-cell");
+
+            turnCells.forEach(cell => {
+                const val = cell.getAttribute("data-val");
+                cell.innerHTML = `<strong>${val}</strong>`;
+            });
+
+            roleCells.forEach(cell => {
+                const role = cell.getAttribute("data-role");
+                cell.innerHTML = role;
+            });
+
+            responsiveBox.classList.add("force-full-print");
+
+            html2canvas(area, {
+                backgroundColor: "#ffffff",
+                scale: 2,
+                useCORS: true,
+                windowWidth: 1200
+            }).then(canvas => {
+                responsiveBox.classList.remove("force-full-print");
+                actionCols.forEach(c => c.style.display = "");
+                renderAdminTable();
+
+                const link = document.createElement('a');
+                link.download = `Mercado_Habbo_${currentWeekText.replace(/[/]/g, '-')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        async function processBulkImport() {
+            const rawText = document.getElementById("bulkImportText").value.trim();
+            if (!rawText) {
+                alert("Cole os dados na caixa de texto primeiro!");
+                return;
+            }
+
+            const entries = [];
+            rawText.split("\n").forEach(line => {
+                const cleanLine = line.trim();
+                if (!cleanLine) return;
+                const match = cleanLine.match(/^(.*?)\s+(\d+)$/);
+                if (match) entries.push({ inputName: match[1].trim(), value: parseInt(match[2]) });
+            });
+
+            if (entries.length === 0) {
+                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
+                return;
+            }
+
+            let updatedCount = 0;
+            let addedCount = 0;
+
+            const ok = await mutateCloud(d => {
+                updatedCount = 0;
+                addedCount = 0;
+                entries.forEach(({ inputName, value }) => {
+                    const cleanInput = inputName.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    let emp = d.employees.find(e => {
+                        if (!e || !e.name) return false;
+                        const dbName = e.name.trim().toLowerCase();
+                        const cleanDb = dbName.replace(/[^a-z0-9]/g, '');
+                        return cleanDb === cleanInput || dbName === inputName.toLowerCase();
+                    });
+
+                    if (emp) {
+                        emp.current = value;
+                        if (!emp.initial || emp.initial < 15) {
+                            emp.initial = value >= 15 ? value : 15;
+                        }
+                        updatedCount++;
+                    } else {
+                        d.employees.push({
+                            name: inputName,
+                            id: "",
+                            role: "Operador de Loja",
+                            initial: value >= 15 ? value : 15,
+                            current: value,
+                            customAvatar: "",
+                            warnings: []
+                        });
+                        addedCount++;
+                    }
+                });
+            });
+
+            if (ok) {
+                document.getElementById("bulkImportText").value = "";
+                alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
+            }
+        }
+
+        document.getElementById("usernameInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") loginUser();
+        });
+    </script>
+</body>
+</html>
