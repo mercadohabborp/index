@@ -1145,38 +1145,72 @@
             bgContainer.appendChild(icon);
         }
 
-        // CARREGAR DADOS DO FIRESTORE COM BLINDAGEM CONTRA SOBRESCRITA VAZIA
-        db.collection("mercadoData").doc("mainDoc").onSnapshot((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                if (data.employees && data.employees.length > 0) {
-                    employees = data.employees.map(emp => {
-                        let defMatch = defaultEmployees.find(d => d.name.toLowerCase() === emp.name.toLowerCase());
-                        return {
-                            id: emp.id !== undefined ? emp.id : (defMatch ? defMatch.id : ""),
-                            name: emp.name,
-                            role: emp.role || "Operador de Loja",
-                            initial: emp.initial !== undefined ? emp.initial : 0,
-                            current: emp.current !== undefined ? emp.current : 0,
-                            customAvatar: emp.customAvatar || "",
-                            warnings: emp.warnings || []
-                        };
-                    });
-                } else {
-                    employees = defaultEmployees;
+        // =====================================================================
+        // SINCRONIZAÇÃO SEGURA COM O FIRESTORE
+        // - Nunca usa os dados "padrão" (antigos) como substitutos quando a nuvem falha
+        // - Só libera edição depois de receber dados REAIS do servidor
+        // - Cada salvamento é uma TRANSAÇÃO: lê a versão mais recente da nuvem,
+        //   altera só o que foi pedido e grava. Assim ninguém sobrescreve o trabalho de outro.
+        // =====================================================================
+        const docRef = db.collection("mercadoData").doc("mainDoc");
+        let dataLoaded = false;
+        let unsubscribeSnapshot = null;
+
+        const syncBanner = document.createElement("div");
+        syncBanner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;padding:6px 10px;text-align:center;font-size:0.8rem;font-weight:bold;display:none;background:#b45309;color:#fff;";
+        document.body.appendChild(syncBanner);
+        function setSyncStatus(msg) {
+            if (msg) { syncBanner.innerText = msg; syncBanner.style.display = "block"; }
+            else { syncBanner.style.display = "none"; }
+        }
+
+        function findEmp(list, name) {
+            const n = (name || "").trim().toLowerCase();
+            return list.find(e => e && e.name && e.name.trim().toLowerCase() === n);
+        }
+
+        function normalizeEmployees(list) {
+            return list.map(emp => {
+                let defMatch = defaultEmployees.find(d => d.name.toLowerCase() === emp.name.toLowerCase());
+                return {
+                    id: emp.id !== undefined ? emp.id : (defMatch ? defMatch.id : ""),
+                    name: emp.name,
+                    role: emp.role || "Operador de Loja",
+                    initial: emp.initial !== undefined ? emp.initial : 0,
+                    current: emp.current !== undefined ? emp.current : 0,
+                    customAvatar: emp.customAvatar || "",
+                    warnings: emp.warnings || []
+                };
+            });
+        }
+
+        // Guarda o que o admin digitou e ainda não salvou, para não perder quando a tela atualizar
+        function captureDirtyInputs() {
+            const dirty = {};
+            document.querySelectorAll('#tableBody input[data-name]').forEach(inp => {
+                const td = inp.closest('td');
+                if (td && inp.value !== td.getAttribute('data-val')) dirty[inp.dataset.name] = inp.value;
+            });
+            const ae = document.activeElement;
+            const focusName = (ae && ae.dataset && ae.dataset.name && ae.closest && ae.closest('#tableBody')) ? ae.dataset.name : null;
+            return { dirty, focusName };
+        }
+
+        function restoreDirtyInputs(state) {
+            document.querySelectorAll('#tableBody input[data-name]').forEach(inp => {
+                if (Object.prototype.hasOwnProperty.call(state.dirty, inp.dataset.name)) {
+                    inp.value = state.dirty[inp.dataset.name];
+                    inp.style.outline = "2px solid #fbbf24"; // destaque: ainda não salvo
+                    inp.title = "Valor digitado ainda não salvo";
                 }
-                absentRecords = data.absentRecords || absentRecords;
-                raceParticipants = data.raceParticipants || [];
-                if (data.racePrizes && data.racePrizes.length > 0) {
-                    racePrizes = data.racePrizes;
-                }
-                if (data.currentWeekText) {
-                    currentWeekText = data.currentWeekText;
-                }
-            } else {
-                employees = defaultEmployees;
-                saveData();
-            }
+                if (state.focusName && inp.dataset.name === state.focusName) inp.focus();
+            });
+        }
+
+        function renderEverything() {
+            const keep = captureDirtyInputs();
+            const ae = document.activeElement;
+            const editingPrizes = isRaceAdminUnlocked && ae && ae.closest && ae.closest('#racePrizesTableBody');
 
             initApp();
             populateWeekSelector();
@@ -1184,7 +1218,8 @@
             renderSchedule();
             renderAbsentTable();
             renderAdminTable();
-            renderRaceScreen();
+            if (!editingPrizes) renderRaceScreen(); // não apaga prêmios que estão sendo digitados
+            restoreDirtyInputs(keep);
 
             if (activeUser) {
                 let updated = employees.find(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
@@ -1193,13 +1228,97 @@
                     renderUserProfile();
                 }
             }
-        }, (error) => {
-            console.error("Erro ao sincronizar com o Firebase: ", error);
-            employees = defaultEmployees;
-            initApp();
-            populateWeekSelector();
-            renderAdminTable();
+        }
+
+        async function seedDefaultsIfMissing() {
+            try {
+                await db.runTransaction(async (tx) => {
+                    const snap = await tx.get(docRef);
+                    if (snap.exists) return;
+                    tx.set(docRef, {
+                        employees: JSON.parse(JSON.stringify(defaultEmployees)),
+                        absentRecords: absentRecords,
+                        raceParticipants: [],
+                        racePrizes: racePrizes,
+                        currentWeekText: currentWeekText
+                    });
+                });
+            } catch (e) {
+                console.error("Erro ao criar documento inicial:", e);
+            }
+        }
+
+        function startListener() {
+            if (unsubscribeSnapshot) { try { unsubscribeSnapshot(); } catch (e) {} }
+            unsubscribeSnapshot = docRef.onSnapshot({ includeMetadataChanges: true }, (doc) => {
+                // Dados vindos do cache local podem estar velhos: nunca aplicar nem gravar por cima deles
+                if (doc.metadata.fromCache) {
+                    setSyncStatus(dataLoaded
+                        ? "⚠️ Sem conexão com a nuvem — salvamentos bloqueados até reconectar"
+                        : "⏳ Conectando à nuvem...");
+                    return;
+                }
+                setSyncStatus(null);
+
+                if (!doc.exists) {
+                    // Só cria os dados iniciais se o SERVIDOR confirmar que o documento não existe
+                    seedDefaultsIfMissing();
+                    return;
+                }
+
+                const data = doc.data();
+                employees = Array.isArray(data.employees) ? normalizeEmployees(data.employees) : JSON.parse(JSON.stringify(defaultEmployees));
+                absentRecords = data.absentRecords || [];
+                raceParticipants = data.raceParticipants || [];
+                if (data.racePrizes && data.racePrizes.length > 0) racePrizes = data.racePrizes;
+                if (data.currentWeekText) currentWeekText = data.currentWeekText;
+
+                dataLoaded = true;
+                renderEverything();
+            }, (error) => {
+                // Em erro o listener morre. Reconecta sozinho, SEM trocar os dados por valores antigos.
+                console.error("Erro ao sincronizar com o Firebase: ", error);
+                setSyncStatus("⚠️ Erro de conexão com a nuvem — tentando reconectar...");
+                setTimeout(startListener, 5000);
+            });
+        }
+
+        startListener();
+        window.addEventListener("online", startListener);
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") startListener(); // ao voltar para a aba, busca o estado atual
         });
+
+        // Salva dentro de uma transação, sempre em cima da versão mais recente da nuvem.
+        // O "mutator" recebe os dados frescos e altera só o necessário; retornar false cancela.
+        async function mutateCloud(mutator) {
+            if (!dataLoaded) {
+                alert("Ainda não conectou com a nuvem. Aguarde alguns segundos e tente de novo (nada foi salvo).");
+                return false;
+            }
+            try {
+                let committed = false;
+                await db.runTransaction(async (tx) => {
+                    const snap = await tx.get(docRef);
+                    const cloud = snap.exists ? snap.data() : {};
+                    const fresh = {
+                        employees: Array.isArray(cloud.employees) ? cloud.employees : JSON.parse(JSON.stringify(defaultEmployees)),
+                        absentRecords: cloud.absentRecords || [],
+                        raceParticipants: cloud.raceParticipants || [],
+                        racePrizes: (cloud.racePrizes && cloud.racePrizes.length > 0) ? cloud.racePrizes : racePrizes,
+                        currentWeekText: cloud.currentWeekText || currentWeekText
+                    };
+                    if (mutator(fresh) === false) return;
+                    tx.set(docRef, fresh, { merge: true });
+                    committed = true;
+                });
+                return committed;
+            } catch (error) {
+                console.error("Erro ao salvar no Firestore: ", error);
+                alert("⚠️ NÃO foi possível salvar na nuvem (verifique a conexão). Seus dados NÃO foram alterados — tente novamente.");
+                return false;
+            }
+        }
 
         function initApp() {
             const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[3];
@@ -1219,25 +1338,10 @@
             });
         }
 
-        function changeWeekManual(selectedWeek) {
-            currentWeekText = selectedWeek;
-            saveData();
-            initApp();
-            renderSchedule();
-            renderAdminTable();
-            document.getElementById("printWeekSpan").innerText = currentWeekText;
-        }
 
-        function saveData() {
-            db.collection("mercadoData").doc("mainDoc").set({
-                employees: employees,
-                absentRecords: absentRecords,
-                raceParticipants: raceParticipants,
-                racePrizes: racePrizes,
-                currentWeekText: currentWeekText
-            }, { merge: true }).catch((error) => {
-                console.error("Erro ao salvar no Firestore: ", error);
-            });
+        async function changeWeekManual(selectedWeek) {
+            const ok = await mutateCloud(d => { d.currentWeekText = selectedWeek; });
+            if (!ok) populateWeekSelector();
         }
 
         function showRaceScreen() {
@@ -1267,26 +1371,28 @@
         }
 
         // FUNÇÕES DA CORRIDA DOS TURNOS
-        function addRacePrizeRow() {
+
+        async function addRacePrizeRow() {
             if (!isRaceAdminUnlocked) {
                 alert("Apenas administradores podem adicionar prêmios!");
                 return;
             }
-            racePrizes.push({
-                place: `${racePrizes.length + 1}º Lugar`,
-                slots: [
-                    {symbol: "💰", text: ""},
-                    {symbol: "", text: ""},
-                    {symbol: "", text: ""},
-                    {symbol: "", text: ""},
-                    {symbol: "", text: ""}
-                ]
+            await mutateCloud(d => {
+                d.racePrizes.push({
+                    place: `${d.racePrizes.length + 1}º Lugar`,
+                    slots: [
+                        {symbol: "💰", text: ""},
+                        {symbol: "", text: ""},
+                        {symbol: "", text: ""},
+                        {symbol: "", text: ""},
+                        {symbol: "", text: ""}
+                    ]
+                });
             });
-            saveData();
-            renderRaceScreen();
         }
 
-        function saveRacePrizes() {
+
+        async function saveRacePrizes() {
             if (!isRaceAdminUnlocked) {
                 alert("Apenas administradores podem salvar os prêmios!");
                 return;
@@ -1300,7 +1406,7 @@
                 if (!placeInput) return;
 
                 const place = placeInput.value.trim() || `${prizeIdx + 1}º Lugar`;
-                
+
                 let slots = [];
                 for (let sIdx = 0; sIdx < 5; sIdx++) {
                     const symbolSelect = tr.querySelector(`.slot-symbol-${prizeIdx}-${sIdx}`);
@@ -1314,22 +1420,21 @@
                 newPrizes.push({ place, slots });
             });
 
-            racePrizes = newPrizes;
-            saveData();
-            alert("Prêmios da corrida salvos com sucesso na nuvem!");
+            const ok = await mutateCloud(d => { d.racePrizes = newPrizes; });
+            if (ok) alert("Prêmios da corrida salvos com sucesso na nuvem!");
         }
 
-        function removeRacePrize(index) {
+
+        async function removeRacePrize(index) {
             if (!isRaceAdminUnlocked) {
                 alert("Apenas administradores podem remover prêmios!");
                 return;
             }
-            racePrizes.splice(index, 1);
-            saveData();
-            renderRaceScreen();
+            await mutateCloud(d => { d.racePrizes.splice(index, 1); });
         }
 
-        function addRaceParticipant() {
+
+        async function addRaceParticipant() {
             if (!isRaceAdminUnlocked) {
                 alert("Apenas administradores podem inscrever participantes!");
                 return;
@@ -1346,20 +1451,22 @@
                 return;
             }
 
-            raceParticipants.push(nick);
-            input.value = "";
-            saveData();
-            renderRaceScreen();
+            const ok = await mutateCloud(d => {
+                if (d.raceParticipants.some(p => p.toLowerCase() === nick.toLowerCase())) return false;
+                d.raceParticipants.push(nick);
+            });
+            if (ok) input.value = "";
         }
 
-        function removeRaceParticipant(nick) {
+
+        async function removeRaceParticipant(nick) {
             if (!isRaceAdminUnlocked) {
                 alert("Apenas administradores podem remover participantes!");
                 return;
             }
-            raceParticipants = raceParticipants.filter(p => p.toLowerCase() !== nick.toLowerCase());
-            saveData();
-            renderRaceScreen();
+            await mutateCloud(d => {
+                d.raceParticipants = d.raceParticipants.filter(p => p.toLowerCase() !== nick.toLowerCase());
+            });
         }
 
         function renderRaceScreen() {
@@ -1467,6 +1574,12 @@
                 return;
             }
 
+            if (!dataLoaded) {
+                errorMsg.innerText = "Conectando à nuvem... tente novamente em alguns segundos.";
+                errorMsg.style.display = "block";
+                return;
+            }
+
             const found = employees.find(e => e.name.toLowerCase() === nick);
 
             if (found) {
@@ -1515,19 +1628,18 @@
             }
         }
 
-        function saveCustomAvatar() {
+
+        async function saveCustomAvatar() {
             const link = document.getElementById("customAvatarInput").value.trim();
             if (!activeUser) return;
+            const name = activeUser.name;
 
-            activeUser.customAvatar = link;
-            let idx = employees.findIndex(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
-            if (idx !== -1) {
-                employees[idx].customAvatar = link;
-                saveData();
-            }
-
-            renderUserProfile();
-            alert("Foto de perfil atualizada com sucesso!");
+            const ok = await mutateCloud(d => {
+                const t = findEmp(d.employees, name);
+                if (!t) return false;
+                t.customAvatar = link;
+            });
+            if (ok) alert("Foto de perfil atualizada com sucesso!");
         }
 
         function showAdminLogin() {
@@ -1678,7 +1790,7 @@
                     </td>
                     <td>${emp.initial}</td>
                     <td class="turn-cell" data-val="${emp.current}">
-                        <input type="number" class="editable-input" id="emp-curr-${index}" value="${emp.current}">
+                        <input type="number" class="editable-input" id="emp-curr-${index}" data-name="${String(emp.name).replace(/"/g, '&quot;')}" value="${emp.current}">
                     </td>
                     <td><strong>${feitos}</strong></td>
                     <td>${statusBadge}</td>
@@ -1695,42 +1807,60 @@
             return absentRecords.some(r => r.nick.trim().toLowerCase() === name.trim().toLowerCase());
         }
 
-        function editEmpInfo(index) {
+
+        async function editEmpInfo(index) {
             const emp = employees[index];
+            if (!emp) return;
+            const oldName = emp.name;
             const newName = prompt("Editar Nickname do funcionário:", emp.name);
             if (!newName || !newName.trim()) return;
 
             const newId = prompt("Editar ID do funcionário no jogo:", emp.id || "");
-            
-            employees[index].name = newName.trim();
-            employees[index].id = newId ? newId.trim() : "";
-            saveData();
-            renderAdminTable();
-            alert("ID e Nick atualizados e salvos na nuvem com sucesso!");
+
+            const ok = await mutateCloud(d => {
+                const t = findEmp(d.employees, oldName);
+                if (!t) { alert("Funcionário não encontrado (alguém pode ter removido)."); return false; }
+                t.name = newName.trim();
+                t.id = newId ? newId.trim() : "";
+            });
+            if (ok) alert("ID e Nick atualizados e salvos na nuvem com sucesso!");
         }
 
-        function updateEmpRole(index, newRole) {
-            employees[index].role = newRole;
-            saveData();
-            renderAdminTable();
+
+        async function updateEmpRole(index, newRole) {
+            const name = employees[index].name;
+            const ok = await mutateCloud(d => {
+                const t = findEmp(d.employees, name);
+                if (!t) return false;
+                t.role = newRole;
+            });
+            if (!ok) renderAdminTable();
         }
 
-        function saveSingleTurn(index) {
+
+        async function saveSingleTurn(index) {
+            const name = employees[index].name;
             const valInput = document.getElementById(`emp-curr-${index}`).value;
             const newTurn = parseInt(valInput);
-            if (!isNaN(newTurn)) {
-                employees[index].current = newTurn;
-                saveData();
-                renderAdminTable();
-                alert(`Turnos de ${employees[index].name} atualizados e salvos na nuvem!`);
+            if (isNaN(newTurn)) {
+                alert("Digite um número válido.");
+                return;
             }
+            const ok = await mutateCloud(d => {
+                const t = findEmp(d.employees, name);
+                if (!t) { alert("Funcionário não encontrado (alguém pode ter removido)."); return false; }
+                t.current = newTurn;
+            });
+            if (ok) alert(`Turnos de ${name} atualizados para ${newTurn} e salvos na nuvem!`);
         }
 
-        function removeEmp(index) {
-            if (confirm(`Remover ${employees[index].name} da lista?`)) {
-                employees.splice(index, 1);
-                saveData();
-                renderAdminTable();
+
+        async function removeEmp(index) {
+            const name = employees[index].name;
+            if (confirm(`Remover ${name} da lista?`)) {
+                await mutateCloud(d => {
+                    d.employees = d.employees.filter(e => e.name.toLowerCase() !== name.toLowerCase());
+                });
             }
         }
 
@@ -1752,9 +1882,10 @@
             tbody.appendChild(tr);
         }
 
-        function saveAllNewEmpRows() {
+
+        async function saveAllNewEmpRows() {
             const rows = document.querySelectorAll("#newEmpTableBody tr");
-            let addedCount = 0;
+            const entries = [];
 
             rows.forEach(tr => {
                 const name = tr.querySelector(".new-nick").value.trim();
@@ -1762,42 +1893,37 @@
                 const role = tr.querySelector(".new-role").value;
                 const initial = parseInt(tr.querySelector(".new-init").value) || 0;
                 const current = parseInt(tr.querySelector(".new-curr").value) || 0;
-
-                if (name) {
-                    let existing = employees.find(e => e.name.toLowerCase() === name.toLowerCase());
-                    if (!existing) {
-                        employees.push({
-                            name: name,
-                            id: id,
-                            role: role,
-                            initial: initial,
-                            current: current,
-                            customAvatar: "",
-                            warnings: []
-                        });
-                        addedCount++;
-                    } else {
-                        existing.id = id || existing.id;
-                        existing.role = role;
-                        existing.initial = initial;
-                        existing.current = current;
-                        addedCount++;
-                    }
-                }
+                if (name) entries.push({ name, id, role, initial, current });
             });
 
-            if (addedCount > 0) {
-                saveData();
-                renderAdminTable();
+            if (entries.length === 0) {
+                alert("Preencha pelo menos o Nickname de um funcionário na tabela antes de salvar.");
+                return;
+            }
+
+            const ok = await mutateCloud(d => {
+                entries.forEach(n => {
+                    let existing = findEmp(d.employees, n.name);
+                    if (!existing) {
+                        d.employees.push({ name: n.name, id: n.id, role: n.role, initial: n.initial, current: n.current, customAvatar: "", warnings: [] });
+                    } else {
+                        existing.id = n.id || existing.id;
+                        existing.role = n.role;
+                        existing.initial = n.initial;
+                        existing.current = n.current;
+                    }
+                });
+            });
+
+            if (ok) {
                 document.getElementById("newEmpTableBody").innerHTML = "";
                 addNewEmpTableRow();
-                alert(`Sucesso! ${addedCount} funcionário(s) cadastrado(s) e salvo(s) na nuvem!`);
-            } else {
-                alert("Preencha pelo menos o Nickname de um funcionário na tabela antes de salvar.");
+                alert(`Sucesso! ${entries.length} funcionário(s) cadastrado(s) e salvo(s) na nuvem!`);
             }
         }
 
-        function addAbsentRecord() {
+
+        async function addAbsentRecord() {
             const nick = document.getElementById("absentNick").value.trim();
             const period = document.getElementById("absentPeriod").value.trim();
             const reason = document.getElementById("absentReason").value.trim();
@@ -1807,15 +1933,13 @@
                 return;
             }
 
-            absentRecords.push({ nick, period, reason: reason || "N/A" });
-            saveData();
-            renderAbsentTable();
-            renderAdminTable();
-
-            document.getElementById("absentNick").value = "";
-            document.getElementById("absentPeriod").value = "";
-            document.getElementById("absentReason").value = "";
-            alert("Aval / Ausência registrado e salvo na nuvem!");
+            const ok = await mutateCloud(d => { d.absentRecords.push({ nick, period, reason: reason || "N/A" }); });
+            if (ok) {
+                document.getElementById("absentNick").value = "";
+                document.getElementById("absentPeriod").value = "";
+                document.getElementById("absentReason").value = "";
+                alert("Aval / Ausência registrado e salvo na nuvem!");
+            }
         }
 
         function renderAbsentTable() {
@@ -1834,17 +1958,22 @@
             });
         }
 
-        function removeAbsentRecord(idx) {
+
+        async function removeAbsentRecord(idx) {
+            const rec = absentRecords[idx];
+            if (!rec) return;
             if (confirm("Deseja encerrar e remover o aval/ausência deste funcionário?")) {
-                absentRecords.splice(idx, 1);
-                saveData();
-                renderAbsentTable();
-                renderAdminTable();
-                alert("Aval encerrado com sucesso!");
+                const ok = await mutateCloud(d => {
+                    const i = d.absentRecords.findIndex(r => r.nick === rec.nick && r.period === rec.period && r.reason === rec.reason);
+                    if (i === -1) return false;
+                    d.absentRecords.splice(i, 1);
+                });
+                if (ok) alert("Aval encerrado com sucesso!");
             }
         }
 
-        function advanceWeek() {
+
+        async function advanceWeek() {
             const pass = prompt("Digite a senha de administrador para virar a semana:");
             if (pass !== "tudomercado363") {
                 alert("Senha incorreta!");
@@ -1852,31 +1981,33 @@
             }
 
             if (confirm("Deseja virar a semana? Os Turnos Finais atuais passarão a ser os Turnos Iniciais para todos, garantindo o avanço correto!")) {
-                employees.forEach(emp => {
-                    emp.initial = emp.current;
-                });
-
-                const currentIndex = rotationSchedule.findIndex(s => s.week === currentWeekText);
+                const weekAtClick = currentWeekText;
+                let nextWeek = weekAtClick;
+                const currentIndex = rotationSchedule.findIndex(s => s.week === weekAtClick);
                 if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
-                    currentWeekText = rotationSchedule[currentIndex + 1].week;
+                    nextWeek = rotationSchedule[currentIndex + 1].week;
                 } else {
                     const newWeek = prompt("Digite o período da nova semana:", "16/11/2026 à 22/11/2026");
                     if (newWeek && newWeek.trim() !== "") {
-                        currentWeekText = newWeek.trim();
+                        nextWeek = newWeek.trim();
+                    } else {
+                        return;
                     }
                 }
 
-                saveData();
-                populateWeekSelector();
-                document.getElementById("printWeekSpan").innerText = currentWeekText;
-                initApp();
-                renderSchedule();
-                renderAdminTable();
-                alert("Semana virada com sucesso! Turnos iniciais atualizados com os finais e salvos na nuvem.");
+                const ok = await mutateCloud(d => {
+                    if (d.currentWeekText !== weekAtClick) {
+                        alert("A semana já foi alterada por outra pessoa. Atualize a página e confira antes de virar.");
+                        return false;
+                    }
+                    d.employees.forEach(emp => { emp.initial = emp.current; });
+                    d.currentWeekText = nextWeek;
+                });
+                if (ok) alert("Semana virada com sucesso! Turnos iniciais atualizados com os finais e salvos na nuvem.");
             }
         }
 
-        function generateWarningText() {
+        async function generateWarningText() {
             const nick = document.getElementById("advNick").value.trim();
             const numAdv = document.getElementById("advNum").value;
             const motivo = document.getElementById("advMotivo").value.trim();
@@ -1902,9 +2033,14 @@
             }
 
             if (emp) {
-                if (!emp.warnings) emp.warnings = [];
-                emp.warnings.push({ num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') });
-                saveData();
+                const warn = { num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') };
+                const ok = await mutateCloud(d => {
+                    const t = findEmp(d.employees, emp.name);
+                    if (!t) return false;
+                    if (!t.warnings) t.warnings = [];
+                    t.warnings.push(warn);
+                });
+                if (!ok) return;
             }
 
             const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
@@ -2001,28 +2137,36 @@
             });
         }
 
-        function processBulkImport() {
+
+        async function processBulkImport() {
             const rawText = document.getElementById("bulkImportText").value.trim();
             if (!rawText) {
                 alert("Cole os dados na caixa de texto primeiro!");
                 return;
             }
 
-            const lines = rawText.split("\n");
+            const entries = [];
+            rawText.split("\n").forEach(line => {
+                const cleanLine = line.trim();
+                if (!cleanLine) return;
+                const match = cleanLine.match(/^(.*?)\s+(\d+)$/);
+                if (match) entries.push({ inputName: match[1].trim(), value: parseInt(match[2]) });
+            });
+
+            if (entries.length === 0) {
+                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
+                return;
+            }
+
             let updatedCount = 0;
             let addedCount = 0;
 
-            lines.forEach(line => {
-                const cleanLine = line.trim();
-                if (!cleanLine) return;
-
-                const match = cleanLine.match(/^(.*?)\s+(\d+)$/);
-                if (match) {
-                    const inputName = match[1].trim();
-                    const newTurnVal = parseInt(match[2]);
+            const ok = await mutateCloud(d => {
+                updatedCount = 0;
+                addedCount = 0;
+                entries.forEach(({ inputName, value }) => {
                     const cleanInput = inputName.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-                    let emp = employees.find(e => {
+                    let emp = d.employees.find(e => {
                         if (!e || !e.name) return false;
                         const dbName = e.name.trim().toLowerCase();
                         const cleanDb = dbName.replace(/[^a-z0-9]/g, '');
@@ -2030,33 +2174,29 @@
                     });
 
                     if (emp) {
-                        emp.current = newTurnVal;
+                        emp.current = value;
                         if (!emp.initial || emp.initial < 15) {
-                            emp.initial = newTurnVal >= 15 ? newTurnVal : 15;
+                            emp.initial = value >= 15 ? value : 15;
                         }
                         updatedCount++;
                     } else {
-                        employees.push({
+                        d.employees.push({
                             name: inputName,
                             id: "",
                             role: "Operador de Loja",
-                            initial: newTurnVal >= 15 ? newTurnVal : 15,
-                            current: newTurnVal,
+                            initial: value >= 15 ? value : 15,
+                            current: value,
                             customAvatar: "",
                             warnings: []
                         });
                         addedCount++;
                     }
-                }
+                });
             });
 
-            if (updatedCount > 0 || addedCount > 0) {
-                saveData();
-                renderAdminTable();
+            if (ok) {
                 document.getElementById("bulkImportText").value = "";
                 alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
-            } else {
-                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
             }
         }
 
