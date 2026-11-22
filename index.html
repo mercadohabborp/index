@@ -20,9 +20,13 @@
         }
 
         body {
-            background-color: #070d18;
-            background-image: radial-gradient(circle at 50% 0%, #0f2342 0%, #070d18 70%);
-            color: #e1e1e6;
+            background-color: #0b111e;
+            background-image: 
+                linear-gradient(rgba(30, 58, 138, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 58, 138, 0.08) 1px, transparent 1px),
+                radial-gradient(circle at 50% 0%, #172a4f 0%, #0b111e 75%);
+            background-size: 24px 24px, 24px 24px, 100% 100%;
+            color: #e2e8f0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -46,103 +50,201 @@
         .pixel-icon {
             position: absolute;
             font-size: 22px;
-            opacity: 0.12;
+            opacity: 0.1;
             animation: floatDown linear infinite;
         }
 
         @keyframes floatDown {
             0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.18; }
-            90% { opacity: 0.18; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
             100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
         }
 
         .main-wrapper {
             width: 100%;
-            max-width: 440px;
+            max-width: 460px;
             z-index: 10;
             transition: max-width 0.3s ease;
         }
 
         .main-wrapper.wide {
-            max-width: 1100px;
+            max-width: 1120px;
         }
 
-        .panel-card {
-            background-color: #0a1322;
-            border: 1px solid #162a4a;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            margin-bottom: 16px;
-        }
-
-        .panel-header {
+        /* Estilo Portal / Blog RP */
+        .rp-banner-header {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+            border: 2px solid #3b82f6;
+            border-bottom: 4px solid #172554;
+            border-radius: 10px 10px 0 0;
+            padding: 18px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            border-bottom: 1px solid #162a4a;
-            padding-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
-        .panel-header h1 {
-            font-size: 1.25rem;
+        .rp-banner-header .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rp-banner-header .brand-icon {
+            background: #0f172a;
+            border: 2px solid #60a5fa;
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.4);
+        }
+
+        .rp-banner-header h1 {
+            font-size: 1.2rem;
             color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .panel-header h1 span {
-            color: #3b82f6;
+        .rp-banner-header p {
+            font-size: 0.72rem;
+            color: #bfdbfe;
+            margin-top: 2px;
+        }
+
+        .panel-card {
+            background-color: #0f172a;
+            border: 2px solid #1e293b;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 20px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+            margin-bottom: 16px;
         }
 
         .badge-live {
-            font-size: 0.65rem;
-            color: #3b82f6;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            padding: 3px 8px;
-            border-radius: 12px;
+            font-size: 0.68rem;
+            font-weight: bold;
+            color: #4ade80;
+            background: rgba(22, 101, 52, 0.45);
+            border: 1px solid #22c55e;
+            padding: 4px 10px;
+            border-radius: 20px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .badge-live::before {
             content: "";
-            width: 6px;
-            height: 6px;
-            background-color: #3b82f6;
+            width: 7px;
+            height: 7px;
+            background-color: #4ade80;
             border-radius: 50%;
+            box-shadow: 0 0 8px #4ade80;
             display: inline-block;
         }
 
         .section-title {
-            font-size: 0.72rem;
-            color: #3b82f6;
+            font-size: 0.74rem;
+            color: #93c5fd;
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+            padding: 6px 10px;
+            border-radius: 0 4px 4px 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
             font-weight: 700;
         }
 
-        .section-title::before {
-            content: "■";
-            font-size: 0.6rem;
+        /* Pódio Top 3 na área de Administração */
+        .top3-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
+        .podium-card {
+            background: linear-gradient(180deg, #162238 0%, #0b1220 100%);
+            border: 1px solid #2a3f66;
+            border-bottom: 3px solid #3b82f6;
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .podium-card.rank-1 {
+            border-color: #eab308;
+            background: linear-gradient(180deg, rgba(234, 179, 8, 0.16) 0%, #0b1220 100%);
+        }
+
+        .podium-card.rank-2 {
+            border-color: #94a3b8;
+            background: linear-gradient(180deg, rgba(148, 163, 184, 0.14) 0%, #0b1220 100%);
+        }
+
+        .podium-card.rank-3 {
+            border-color: #d97706;
+            background: linear-gradient(180deg, rgba(217, 119, 6, 0.14) 0%, #0b1220 100%);
+        }
+
+        .podium-medal {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .podium-details {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .podium-pos {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #94a3b8;
+        }
+
+        .podium-name {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .podium-turns {
+            font-size: 0.82rem;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-top: 2px;
+        }
+
+        .rank-1 .podium-turns { color: #facc15; }
+        .rank-2 .podium-turns { color: #cbd5e1; }
+        .rank-3 .podium-turns { color: #fbbf24; }
+
         .profile-box {
-            background-color: #060b14;
-            border: 1px solid #12223c;
+            background-color: #090e1a;
+            border: 1px solid #1e293b;
             border-radius: 6px;
             padding: 14px;
             display: flex;
@@ -156,7 +258,7 @@
             height: 80px;
             background: #0f1c30 center no-repeat;
             background-size: cover;
-            border: 1px solid #1d365d;
+            border: 2px solid #2563eb;
             border-radius: 6px;
             flex-shrink: 0;
         }
@@ -199,8 +301,9 @@
         }
 
         .supervisor-card {
-            background: #060b14;
-            border: 1px solid #12223c;
+            background: #090e1a;
+            border: 1px solid #1e293b;
+            border-bottom: 3px solid #2563eb;
             border-radius: 6px;
             padding: 12px 14px;
             display: flex;
@@ -221,8 +324,8 @@
         }
 
         .display-box {
-            background-color: #060b14;
-            border: 1px solid #12223c;
+            background-color: #090e1a;
+            border: 1px solid #1e293b;
             border-radius: 6px;
             padding: 12px;
             margin-bottom: 14px;
@@ -244,7 +347,7 @@
         }
 
         .result-card {
-            background-color: #060b14;
+            background-color: #090e1a;
             border: 1px dashed #60a5fa;
             border-radius: 6px;
             padding: 12px;
@@ -280,31 +383,39 @@
         }
 
         .btn-key {
-            background-color: #0f1c30;
-            border: 1px solid #1a2f4d;
-            border-radius: 5px;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-bottom: 3px solid #0f172a;
+            border-radius: 6px;
             color: #e1e1e6;
             font-size: 1.1rem;
             font-weight: bold;
             padding: 12px 0;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.1s;
         }
 
         .btn-key:hover {
-            background-color: #162a4a;
+            background-color: #27354f;
+        }
+
+        .btn-key:active {
+            transform: translateY(2px);
+            border-bottom-width: 1px;
         }
 
         .btn-key.action-c {
-            background-color: rgba(248, 113, 113, 0.15);
+            background-color: rgba(248, 113, 113, 0.18);
+            border-color: rgba(248, 113, 113, 0.4);
             color: #f87171;
         }
 
         .btn-key.action-ok {
             grid-column: span 3;
             background-color: #2563eb;
+            border-color: #3b82f6;
+            border-bottom: 3px solid #1e3a8a;
             color: #ffffff;
-            border: none;
             margin-top: 4px;
         }
 
@@ -321,14 +432,15 @@
 
         .input-group label {
             font-size: 0.72rem;
-            color: #7b93b8;
+            color: #94a3b8;
+            font-weight: 600;
             text-transform: uppercase;
         }
 
         .input-field {
-            background-color: #060b14;
-            border: 1px solid #12223c;
-            border-radius: 5px;
+            background-color: #090e1a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
             padding: 10px 12px;
             color: #ffffff;
             font-size: 0.9rem;
@@ -342,7 +454,8 @@
         .btn-main {
             background-color: #2563eb;
             border: none;
-            border-radius: 5px;
+            border-bottom: 3px solid #1e3a8a;
+            border-radius: 6px;
             color: #ffffff;
             font-size: 0.9rem;
             font-weight: bold;
@@ -358,12 +471,14 @@
         }
 
         .btn-sub {
-            background-color: #0f1c30;
-            border: 1px solid #1a2f4d;
-            color: #7b93b8;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-bottom: 2px solid #0f172a;
+            color: #cbd5e1;
             font-size: 0.8rem;
+            font-weight: 600;
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 6px;
             width: 100%;
             margin-top: 4px;
             cursor: pointer;
@@ -371,7 +486,7 @@
 
         .btn-sub:hover {
             color: #ffffff;
-            background-color: #162a4a;
+            background-color: #26354d;
         }
 
         .error-msg {
@@ -379,9 +494,10 @@
             font-size: 0.78rem;
             text-align: center;
             display: none;
-            background: rgba(248, 113, 113, 0.1);
+            background: rgba(248, 113, 113, 0.12);
+            border: 1px solid rgba(248, 113, 113, 0.3);
             padding: 8px;
-            border-radius: 4px;
+            border-radius: 5px;
             margin-bottom: 10px;
         }
 
@@ -395,16 +511,16 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
-            background: #060b14;
+            background: #090e1a;
             padding: 10px 12px;
             border-radius: 6px;
             margin-bottom: 14px;
-            border: 1px solid #12223c;
+            border: 1px solid #1e293b;
         }
 
         .schedule-box {
-            background: #060b14;
-            border: 1px solid #12223c;
+            background: #090e1a;
+            border: 1px solid #1e293b;
             border-radius: 6px;
             padding: 12px;
             margin-bottom: 14px;
@@ -419,7 +535,7 @@
         }
 
         .schedule-item {
-            background: #0f1c30;
+            background: #131d31;
             padding: 6px 8px;
             border-radius: 4px;
             font-size: 0.75rem;
@@ -430,12 +546,12 @@
 
         .schedule-item.active {
             border-left-color: #60a5fa;
-            background: rgba(96, 165, 250, 0.15);
+            background: rgba(59, 130, 246, 0.2);
         }
 
         .warning-panel, .absent-panel, .bulk-add-panel {
-            background: #060b14;
-            border: 1px solid #12223c;
+            background: #090e1a;
+            border: 1px solid #1e293b;
             border-radius: 6px;
             padding: 14px;
             margin-bottom: 16px;
@@ -449,8 +565,8 @@
         }
 
         .discord-output-box {
-            background: #03060a;
-            border: 1px dashed #1d4ed8;
+            background: #050811;
+            border: 1px dashed #2563eb;
             border-radius: 6px;
             padding: 12px;
             margin-top: 10px;
@@ -465,10 +581,10 @@
         }
 
         #printableTableArea {
-            background-color: #060b14;
+            background-color: #090e1a;
             padding: 16px;
             border-radius: 6px;
-            border: 1px solid #12223c;
+            border: 1px solid #1e293b;
             width: 100%;
         }
 
@@ -486,12 +602,12 @@
         }
 
         table.habbo-table th {
-            background-color: #03060a;
+            background-color: #050811;
             color: #60a5fa;
             padding: 10px 12px;
             text-transform: uppercase;
             font-size: 0.72rem;
-            border-bottom: 1px solid #12223c;
+            border-bottom: 2px solid #1e293b;
             position: sticky;
             top: 0;
             z-index: 2;
@@ -499,24 +615,28 @@
 
         table.habbo-table td {
             padding: 10px 12px;
-            border-bottom: 1px solid #0f1c30;
+            border-bottom: 1px solid #131d31;
             white-space: nowrap;
+        }
+
+        table.habbo-table tbody tr:hover {
+            background-color: rgba(30, 41, 59, 0.35);
         }
 
         .badge-status {
             padding: 3px 8px;
-            border-radius: 3px;
+            border-radius: 4px;
             font-size: 0.72rem;
             font-weight: bold;
             display: inline-block;
         }
-        .badge-success { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
-        .badge-danger { background: rgba(248, 113, 113, 0.2); color: #f87171; }
-        .badge-aval { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+        .badge-success { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-danger { background: rgba(248, 113, 113, 0.2); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+        .badge-aval { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
 
         .editable-input {
-            background: #0f1c30;
-            border: 1px solid #1a2f4d;
+            background: #131d31;
+            border: 1px solid #283858;
             color: #ffffff;
             padding: 4px 8px;
             border-radius: 4px;
@@ -526,8 +646,8 @@
         }
 
         .editable-select {
-            background: #0f1c30;
-            border: 1px solid #1a2f4d;
+            background: #131d31;
+            border: 1px solid #283858;
             color: #ffffff;
             padding: 4px 6px;
             border-radius: 4px;
@@ -550,23 +670,23 @@
         }
 
         .btn-sm {
-            padding: 4px 8px;
+            padding: 5px 9px;
             font-size: 0.72rem;
-            border-radius: 3px;
+            border-radius: 4px;
             border: none;
             cursor: pointer;
             font-weight: bold;
         }
         .btn-success { background-color: #2563eb; color: #fff; }
-        .btn-warning { background-color: #e2a03f; color: #fff; }
+        .btn-warning { background-color: #d97706; color: #fff; }
         .btn-info { background-color: #0284c7; color: #fff; }
         .btn-danger { background-color: #dc2626; color: #fff; }
 
         .filter-select {
-            background: #0f1c30;
-            border: 1px solid #1a2f4d;
+            background: #131d31;
+            border: 1px solid #283858;
             color: #60a5fa;
-            padding: 4px 8px;
+            padding: 5px 8px;
             border-radius: 4px;
             font-size: 0.78rem;
             font-weight: bold;
@@ -591,7 +711,7 @@
             padding: 18px;
             text-align: center;
             margin-bottom: 16px;
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.25);
         }
 
         .race-banner h2 {
@@ -610,7 +730,7 @@
         }
 
         .race-rules {
-            background: #060b14;
+            background: #090e1a;
             border: 1px dashed #22c55e;
             border-radius: 6px;
             padding: 14px;
@@ -648,11 +768,18 @@
 
     <div class="main-wrapper" id="mainWrapper">
         
-        <div class="panel-card">
-            <div class="panel-header">
-                <h1>Painel Operacional <span>• Mercado</span></h1>
-                <div class="badge-live">Turno Ativo</div>
+        <div class="rp-banner-header">
+            <div class="brand-area">
+                <div class="brand-icon">🛒</div>
+                <div>
+                    <h1>Mercado Habbo RP</h1>
+                    <p>Sistema Integrado de Turnos & Produtividade</p>
+                </div>
             </div>
+            <div class="badge-live">Online</div>
+        </div>
+
+        <div class="panel-card">
 
             <!-- TELA DE LOGIN -->
             <div id="loginScreen">
@@ -662,7 +789,7 @@
                         <div class="resp-sub">SUPERVISOR DA SEMANA</div>
                         <div class="resp-name" id="currentSupervisorBanner">Carregando...</div>
                     </div>
-                    <span style="font-size:1.4rem;">⭐</span>
+                    <span style="font-size:1.5rem;">⭐</span>
                 </div>
 
                 <div class="section-title">ACESSO AO SISTEMA</div>
@@ -706,7 +833,7 @@
 
                 <!-- TABELA DE PRÊMIOS DA CORRIDA -->
                 <div class="warning-panel" style="border-color: #22c55e;">
-                    <div class="section-title" style="color: #4ade80;">🏆 PRÊMIOS DA CORRIDA (5 SLOTS COM EMOJIS)</div>
+                    <div class="section-title" style="color: #4ade80; border-left-color: #22c55e;">🏆 PRÊMIOS DA CORRIDA (5 SLOTS COM EMOJIS)</div>
                     <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
                         Preencha os prêmios de cada posição e clique em salvar para registrar na nuvem:
                     </p>
@@ -785,24 +912,24 @@
                 </div>
 
                 <!-- ALTERAR FOTO DE PERFIL -->
-                <div class="input-group" style="background:#060b14; padding:10px; border-radius:6px; border:1px solid #12223c; margin-bottom:14px;">
+                <div class="input-group" style="background:#090e1a; padding:10px; border-radius:6px; border:1px solid #1e293b; margin-bottom:14px;">
                     <label style="color:#60a5fa;">🖼️ ALTERAR SUA FOTO DE PERFIL (LINK)</label>
                     <div style="display:flex; gap:6px; margin-top:4px;">
-                        <input type="text" id="customAvatarInput" class="input-field" placeholder="Cole o link direto da imagem..." style="font-size:0.75rem;">
+                        <input type="text" id="customAvatarInput" class="input-field" placeholder="Cole o link direto da imagem..." style="font-size:0.75rem; flex:1;">
                         <button class="btn-sm btn-success" onclick="saveCustomAvatar()">Salvar</button>
                     </div>
                 </div>
 
                 <!-- PAINEL DE ADVERTÊNCIAS DO USUÁRIO -->
                 <div class="warning-panel" style="border-color:#f87171; margin-bottom:14px;">
-                    <div class="section-title" style="color:#f87171;">⚠️ MINHAS ADVERTÊNCIAS / PUNIÇÕES</div>
+                    <div class="section-title" style="color:#f87171; border-left-color:#f87171;">⚠️ MINHAS ADVERTÊNCIAS / PUNIÇÕES</div>
                     <div id="userWarningsContainer" style="font-size:0.8rem; color:#e1e1e6; max-height:120px; overflow-y:auto;">
                         <span style="color:#7b93b8;">Nenhuma advertência registrada.</span>
                     </div>
                 </div>
 
                 <div class="section-title">PRODUTIVIDADE DA SEMANA ATUAL</div>
-                <div class="profile-info" style="margin-bottom:14px; background:#060b14; padding:10px; border-radius:6px; border:1px solid #12223c;">
+                <div class="profile-info" style="margin-bottom:14px; background:#090e1a; padding:10px; border-radius:6px; border:1px solid #1e293b;">
                     <div class="info-item">
                         <span class="lbl" id="refDateLabel">TURNOS INICIAIS</span>
                         <span class="val" id="uInitial">1900</span>
@@ -846,9 +973,20 @@
 
             <!-- TELA DE GERÊNCIA E SUPERVISÃO -->
             <div id="adminScreen">
-                <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="section-title">
                     <span>PAINEL DE GERÊNCIA E SUPERVISÃO</span>
-                    <button class="btn-sub" style="width:auto; padding:4px 8px; margin:0;" onclick="logout()">Sair</button>
+                    <button class="btn-sub" style="width:auto; padding:3px 10px; margin:0; font-size:0.72rem;" onclick="logout()">Sair</button>
+                </div>
+
+                <!-- NOVO: TOP 3 DA SEMANA (SOMENTE TURNOS ATUAIS / FINAIS) -->
+                <div class="warning-panel" style="border-color: #eab308;">
+                    <div class="section-title" style="color: #facc15; border-left-color: #eab308;">
+                        <span>🏆 RANKING TOP 3 DA SEMANA (TURNOS ATUAIS)</span>
+                        <span style="font-size: 0.65rem; color: #94a3b8; font-weight: normal;">Baseado nos Turnos Finais</span>
+                    </div>
+                    <div class="top3-grid" id="adminTop3Container">
+                        <!-- Preenchido via JS -->
+                    </div>
                 </div>
 
                 <div class="schedule-box">
@@ -937,7 +1075,7 @@
                             </select>
                         </div>
                         <div class="input-group" style="margin:0;">
-                            <label>MOTIVO DA PUNÇÃO</label>
+                            <label>MOTIVO DA PUNIÇÃO</label>
                             <input type="text" id="advMotivo" class="input-field" placeholder="Ex: Ausência em turno">
                         </div>
                         <div class="input-group" style="margin:0;">
@@ -958,7 +1096,7 @@
                     </div>
 
                     <!-- CAIXA DE NOTAS: QUEM NÃO BATEU A COTA -->
-                    <div style="margin-top: 16px; border-top: 1px solid #12223c; padding-top: 14px;">
+                    <div style="margin-top: 16px; border-top: 1px solid #1e293b; padding-top: 14px;">
                         <div class="section-title">📋 NOTAS DE COTA NÃO ATINGIDA (DISCORD)</div>
                         <p style="font-size: 0.72rem; color: #7b93b8; margin-bottom: 8px;">
                             Gera automaticamente o relatório para copiar e colar de quem não bateu a meta:
@@ -1000,6 +1138,7 @@
                             <option value="alpha">Ord: Alfabética (A-Z)</option>
                             <option value="turns-desc">Ord: Turnos Feitos (Maior)</option>
                             <option value="turns-asc">Ord: Turnos Feitos (Menor)</option>
+                            <option value="current-desc">Ord: Turnos Atuais (Maior)</option>
                             <option value="role">Ord: Cargo Hierárquico</option>
                         </select>
                         <select id="imageFilterToggle" class="filter-select action-col" onchange="renderAdminTable()">
@@ -1012,7 +1151,7 @@
                 </div>
 
                 <div id="printableTableArea">
-                    <div style="padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid #12223c;">
+                    <div style="padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid #1e293b;">
                         <h2 style="font-size:1.1rem; color:#60a5fa; text-transform:uppercase;">MERCADO RP - Controle Semanal de Produtividade</h2>
                         <span style="font-size:0.8rem; color:#7b93b8;" id="printWeekSpan">09/11/2026 à 15/11/2026</span>
                     </div>
@@ -1085,7 +1224,6 @@
             { week: "28/12/2026 à 03/01/2027", resp: "Solyta", refDate: "Até 27/12" }
         ];
 
-        // DADOS EXTRATÍSTICOS DO PRINT ATUAL (09/11 a 15/11)
         const defaultEmployees = [
             { name: "Afrontoso", id: "290", role: "Gerente", initial: 3496, current: 3545, customAvatar: "", warnings: [] },
             { name: "Monica", id: "1025", role: "Supervisor", initial: 2312, current: 2344, customAvatar: "", warnings: [] },
@@ -1123,1086 +1261,4 @@
         ];
         let raceParticipants = [];
         let racePrizes = [
-            { place: "🥇 1º Lugar", slots: [{symbol: "💰", text: "500 c$"}, {symbol: "🔫", text: "Skin AK-47"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "🧨", text: "Dinamite"}] },
-            { place: "🥈 2º Lugar", slots: [{symbol: "💰", text: "300 c$"}, {symbol: "🔋", text: "Energético"}, {symbol: "🧪", text: "Poção"}, {symbol: "📄", text: "Documento"}, {symbol: "", text: ""}] },
-            { place: "🥉 3º Lugar", slots: [{symbol: "💰", text: "150 c$"}, {symbol: "🧪", text: "Poção"}, {symbol: "🎣", text: "Item de Pesca"}, {symbol: "", text: ""}, {symbol: "", text: ""}] }
-        ];
-        let currentWeekText = "09/11/2026 à 15/11/2026";
-        let activeUser = null;
-        let currentInput = "0";
-        let isRaceAdminUnlocked = false;
-
-        // FUNDO PIXEL
-        const bgIcons = ['🛒', '📦', '🪙', '🍎', '🥤', '🍞', '🏬'];
-        const bgContainer = document.getElementById('pixelBg');
-        for (let i = 0; i < 20; i++) {
-            let icon = document.createElement('div');
-            icon.className = 'pixel-icon';
-            icon.innerText = bgIcons[Math.floor(Math.random() * bgIcons.length)];
-            icon.style.left = Math.random() * 100 + '%';
-            icon.style.animationDuration = (6 + Math.random() * 8) + 's';
-            icon.style.animationDelay = (Math.random() * 5) + 's';
-            bgContainer.appendChild(icon);
-        }
-
-        // =====================================================================
-        // SINCRONIZAÇÃO SEGURA COM O FIRESTORE
-        // - Nunca usa os dados "padrão" (antigos) como substitutos quando a nuvem falha
-        // - Só libera edição depois de receber dados REAIS do servidor
-        // - Cada salvamento é uma TRANSAÇÃO: lê a versão mais recente da nuvem,
-        //   altera só o que foi pedido e grava. Assim ninguém sobrescreve o trabalho de outro.
-        // =====================================================================
-        const docRef = db.collection("mercadoData").doc("mainDoc");
-        let dataLoaded = false;
-        let unsubscribeSnapshot = null;
-
-        const syncBanner = document.createElement("div");
-        syncBanner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;padding:6px 10px;text-align:center;font-size:0.8rem;font-weight:bold;display:none;background:#b45309;color:#fff;";
-        document.body.appendChild(syncBanner);
-        function setSyncStatus(msg) {
-            if (msg) { syncBanner.innerText = msg; syncBanner.style.display = "block"; }
-            else { syncBanner.style.display = "none"; }
-        }
-
-        function findEmp(list, name) {
-            const n = (name || "").trim().toLowerCase();
-            return list.find(e => e && e.name && e.name.trim().toLowerCase() === n);
-        }
-
-        function normalizeEmployees(list) {
-            return list.map(emp => {
-                let defMatch = defaultEmployees.find(d => d.name.toLowerCase() === emp.name.toLowerCase());
-                return {
-                    id: emp.id !== undefined ? emp.id : (defMatch ? defMatch.id : ""),
-                    name: emp.name,
-                    role: emp.role || "Operador de Loja",
-                    initial: emp.initial !== undefined ? emp.initial : 0,
-                    current: emp.current !== undefined ? emp.current : 0,
-                    customAvatar: emp.customAvatar || "",
-                    warnings: emp.warnings || []
-                };
-            });
-        }
-
-        // Guarda o que o admin digitou e ainda não salvou, para não perder quando a tela atualizar
-        function captureDirtyInputs() {
-            const dirty = {};
-            document.querySelectorAll('#tableBody input[data-name]').forEach(inp => {
-                const td = inp.closest('td');
-                if (td && inp.value !== td.getAttribute('data-val')) dirty[inp.dataset.name] = inp.value;
-            });
-            const ae = document.activeElement;
-            const focusName = (ae && ae.dataset && ae.dataset.name && ae.closest && ae.closest('#tableBody')) ? ae.dataset.name : null;
-            return { dirty, focusName };
-        }
-
-        function restoreDirtyInputs(state) {
-            document.querySelectorAll('#tableBody input[data-name]').forEach(inp => {
-                if (Object.prototype.hasOwnProperty.call(state.dirty, inp.dataset.name)) {
-                    inp.value = state.dirty[inp.dataset.name];
-                    inp.style.outline = "2px solid #fbbf24"; // destaque: ainda não salvo
-                    inp.title = "Valor digitado ainda não salvo";
-                }
-                if (state.focusName && inp.dataset.name === state.focusName) inp.focus();
-            });
-        }
-
-        function renderEverything() {
-            const keep = captureDirtyInputs();
-            const ae = document.activeElement;
-            const editingPrizes = isRaceAdminUnlocked && ae && ae.closest && ae.closest('#racePrizesTableBody');
-
-            initApp();
-            populateWeekSelector();
-            document.getElementById("printWeekSpan").innerText = currentWeekText;
-            renderSchedule();
-            renderAbsentTable();
-            renderAdminTable();
-            if (!editingPrizes) renderRaceScreen(); // não apaga prêmios que estão sendo digitados
-            restoreDirtyInputs(keep);
-
-            if (activeUser) {
-                let updated = employees.find(e => e.name.toLowerCase() === activeUser.name.toLowerCase());
-                if (updated) {
-                    activeUser = updated;
-                    renderUserProfile();
-                }
-            }
-        }
-
-        async function seedDefaultsIfMissing() {
-            try {
-                await db.runTransaction(async (tx) => {
-                    const snap = await tx.get(docRef);
-                    if (snap.exists) return;
-                    tx.set(docRef, {
-                        employees: JSON.parse(JSON.stringify(defaultEmployees)),
-                        absentRecords: absentRecords,
-                        raceParticipants: [],
-                        racePrizes: racePrizes,
-                        currentWeekText: currentWeekText
-                    });
-                });
-            } catch (e) {
-                console.error("Erro ao criar documento inicial:", e);
-            }
-        }
-
-        function startListener() {
-            if (unsubscribeSnapshot) { try { unsubscribeSnapshot(); } catch (e) {} }
-            unsubscribeSnapshot = docRef.onSnapshot({ includeMetadataChanges: true }, (doc) => {
-                // Dados vindos do cache local podem estar velhos: nunca aplicar nem gravar por cima deles
-                if (doc.metadata.fromCache) {
-                    setSyncStatus(dataLoaded
-                        ? "⚠️ Sem conexão com a nuvem — salvamentos bloqueados até reconectar"
-                        : "⏳ Conectando à nuvem...");
-                    return;
-                }
-                setSyncStatus(null);
-
-                if (!doc.exists) {
-                    // Só cria os dados iniciais se o SERVIDOR confirmar que o documento não existe
-                    seedDefaultsIfMissing();
-                    return;
-                }
-
-                const data = doc.data();
-                employees = Array.isArray(data.employees) ? normalizeEmployees(data.employees) : JSON.parse(JSON.stringify(defaultEmployees));
-                absentRecords = data.absentRecords || [];
-                raceParticipants = data.raceParticipants || [];
-                if (data.racePrizes && data.racePrizes.length > 0) racePrizes = data.racePrizes;
-                if (data.currentWeekText) currentWeekText = data.currentWeekText;
-
-                dataLoaded = true;
-                renderEverything();
-            }, (error) => {
-                // Em erro o listener morre. Reconecta sozinho, SEM trocar os dados por valores antigos.
-                console.error("Erro ao sincronizar com o Firebase: ", error);
-                setSyncStatus("⚠️ Erro de conexão com a nuvem — tentando reconectar...");
-                setTimeout(startListener, 5000);
-            });
-        }
-
-        startListener();
-        window.addEventListener("online", startListener);
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") startListener(); // ao voltar para a aba, busca o estado atual
-        });
-
-        // Salva dentro de uma transação, sempre em cima da versão mais recente da nuvem.
-        // O "mutator" recebe os dados frescos e altera só o necessário; retornar false cancela.
-        async function mutateCloud(mutator) {
-            if (!dataLoaded) {
-                alert("Ainda não conectou com a nuvem. Aguarde alguns segundos e tente de novo (nada foi salvo).");
-                return false;
-            }
-            try {
-                let committed = false;
-                await db.runTransaction(async (tx) => {
-                    const snap = await tx.get(docRef);
-                    const cloud = snap.exists ? snap.data() : {};
-                    const fresh = {
-                        employees: Array.isArray(cloud.employees) ? cloud.employees : JSON.parse(JSON.stringify(defaultEmployees)),
-                        absentRecords: cloud.absentRecords || [],
-                        raceParticipants: cloud.raceParticipants || [],
-                        racePrizes: (cloud.racePrizes && cloud.racePrizes.length > 0) ? cloud.racePrizes : racePrizes,
-                        currentWeekText: cloud.currentWeekText || currentWeekText
-                    };
-                    if (mutator(fresh) === false) return;
-                    tx.set(docRef, fresh, { merge: true });
-                    committed = true;
-                });
-                return committed;
-            } catch (error) {
-                console.error("Erro ao salvar no Firestore: ", error);
-                alert("⚠️ NÃO foi possível salvar na nuvem (verifique a conexão). Seus dados NÃO foram alterados — tente novamente.");
-                return false;
-            }
-        }
-
-        function initApp() {
-            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[3];
-            document.getElementById("currentSupervisorBanner").innerText = `${match.resp} (${match.week})`;
-        }
-
-        function populateWeekSelector() {
-            const selector = document.getElementById("weekSelector");
-            if (!selector) return;
-            selector.innerHTML = "";
-            rotationSchedule.forEach(s => {
-                let opt = document.createElement("option");
-                opt.value = s.week;
-                opt.innerText = `${s.week} (Sup: ${s.resp})`;
-                if (s.week === currentWeekText) opt.selected = true;
-                selector.appendChild(opt);
-            });
-        }
-
-
-        async function changeWeekManual(selectedWeek) {
-            const ok = await mutateCloud(d => { d.currentWeekText = selectedWeek; });
-            if (!ok) populateWeekSelector();
-        }
-
-        function showRaceScreen() {
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("raceScreen").style.display = "block";
-            document.getElementById("mainWrapper").classList.add("wide");
-            renderRaceScreen();
-        }
-
-        function backToLogin() {
-            document.getElementById("raceScreen").style.display = "none";
-            document.getElementById("loginScreen").style.display = "block";
-            document.getElementById("mainWrapper").classList.remove("wide");
-        }
-
-        function unlockRaceAdmin() {
-            const pass = prompt("Digite a senha de administrador para liberar a edição da Corrida:");
-            if (pass === "tudomercado363") {
-                isRaceAdminUnlocked = true;
-                document.getElementById("raceLoginPrompt").style.display = "none";
-                document.getElementById("raceAdminControls").style.display = "block";
-                renderRaceScreen();
-                alert("Modo de edição da Corrida desbloqueado com sucesso!");
-            } else if (pass) {
-                alert("Senha incorreta!");
-            }
-        }
-
-        // FUNÇÕES DA CORRIDA DOS TURNOS
-
-        async function addRacePrizeRow() {
-            if (!isRaceAdminUnlocked) {
-                alert("Apenas administradores podem adicionar prêmios!");
-                return;
-            }
-            await mutateCloud(d => {
-                d.racePrizes.push({
-                    place: `${d.racePrizes.length + 1}º Lugar`,
-                    slots: [
-                        {symbol: "💰", text: ""},
-                        {symbol: "", text: ""},
-                        {symbol: "", text: ""},
-                        {symbol: "", text: ""},
-                        {symbol: "", text: ""}
-                    ]
-                });
-            });
-        }
-
-
-        async function saveRacePrizes() {
-            if (!isRaceAdminUnlocked) {
-                alert("Apenas administradores podem salvar os prêmios!");
-                return;
-            }
-
-            const rows = document.querySelectorAll("#racePrizesTableBody tr");
-            let newPrizes = [];
-
-            rows.forEach((tr, prizeIdx) => {
-                const placeInput = tr.querySelector(".prize-place-input");
-                if (!placeInput) return;
-
-                const place = placeInput.value.trim() || `${prizeIdx + 1}º Lugar`;
-
-                let slots = [];
-                for (let sIdx = 0; sIdx < 5; sIdx++) {
-                    const symbolSelect = tr.querySelector(`.slot-symbol-${prizeIdx}-${sIdx}`);
-                    const textInput = tr.querySelector(`.slot-text-${prizeIdx}-${sIdx}`);
-                    slots.push({
-                        symbol: symbolSelect ? symbolSelect.value : "",
-                        text: textInput ? textInput.value : ""
-                    });
-                }
-
-                newPrizes.push({ place, slots });
-            });
-
-            const ok = await mutateCloud(d => { d.racePrizes = newPrizes; });
-            if (ok) alert("Prêmios da corrida salvos com sucesso na nuvem!");
-        }
-
-
-        async function removeRacePrize(index) {
-            if (!isRaceAdminUnlocked) {
-                alert("Apenas administradores podem remover prêmios!");
-                return;
-            }
-            await mutateCloud(d => { d.racePrizes.splice(index, 1); });
-        }
-
-
-        async function addRaceParticipant() {
-            if (!isRaceAdminUnlocked) {
-                alert("Apenas administradores podem inscrever participantes!");
-                return;
-            }
-            const input = document.getElementById("newRaceParticipant");
-            const nick = input.value.trim();
-            if (!nick) {
-                alert("Digite o nick do participante!");
-                return;
-            }
-
-            if (raceParticipants.some(p => p.toLowerCase() === nick.toLowerCase())) {
-                alert("Este participante já está inscrito na corrida!");
-                return;
-            }
-
-            const ok = await mutateCloud(d => {
-                if (d.raceParticipants.some(p => p.toLowerCase() === nick.toLowerCase())) return false;
-                d.raceParticipants.push(nick);
-            });
-            if (ok) input.value = "";
-        }
-
-
-        async function removeRaceParticipant(nick) {
-            if (!isRaceAdminUnlocked) {
-                alert("Apenas administradores podem remover participantes!");
-                return;
-            }
-            await mutateCloud(d => {
-                d.raceParticipants = d.raceParticipants.filter(p => p.toLowerCase() !== nick.toLowerCase());
-            });
-        }
-
-        function renderRaceScreen() {
-            const actionCols = document.querySelectorAll(".race-admin-col");
-            const actionDivs = document.querySelectorAll(".race-admin-action");
-            const addContainer = document.getElementById("raceAddContainer");
-
-            actionCols.forEach(col => col.style.display = isRaceAdminUnlocked ? "" : "none");
-            actionDivs.forEach(div => div.style.display = isRaceAdminUnlocked ? "flex" : "none");
-            if (addContainer) addContainer.style.display = isRaceAdminUnlocked ? "flex" : "none";
-
-            // Renderizar Prêmios
-            const prizesTbody = document.getElementById("racePrizesTableBody");
-            if (prizesTbody) {
-                prizesTbody.innerHTML = "";
-                const emojiChoices = ['', '💰', '🔫', '🔋', '🧪', '🧨', '📄', '🎣', '⛏️', '🌱', '🥇', '🥈', '🥉', '🎁', '⭐', '💎'];
-
-                if (racePrizes.length === 0) {
-                    prizesTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#7b93b8; padding:12px;">Nenhum prêmio cadastrado. Desbloqueie o painel para adicionar.</td></tr>`;
-                } else {
-                    racePrizes.forEach((p, prizeIdx) => {
-                        let tr = document.createElement("tr");
-
-                        let slotsHtml = `<div class="prize-slot-group">`;
-                        for (let sIdx = 0; sIdx < 5; sIdx++) {
-                            let slot = (p.slots && p.slots[sIdx]) ? p.slots[sIdx] : {symbol: "", text: ""};
-                            let symbolOptions = emojiChoices.map(sym => 
-                                `<option value="${sym}" ${sym === slot.symbol ? 'selected' : ''}>${sym || '--'}</option>`
-                            ).join("");
-
-                            slotsHtml += `
-                                <div class="prize-slot-item">
-                                    <select class="editable-select slot-symbol-${prizeIdx}-${sIdx}" ${!isRaceAdminUnlocked ? 'disabled' : ''} style="width: 60px; text-align: center;">${symbolOptions}</select>
-                                    <input type="text" class="editable-input slot-text-${prizeIdx}-${sIdx}" ${!isRaceAdminUnlocked ? 'readonly' : ''} placeholder="Prêmio ${sIdx + 1}" value="${slot.text || ''}" style="width: 240px; text-align: left; padding: 4px 8px;">
-                                </div>
-                            `;
-                        }
-                        slotsHtml += `</div>`;
-
-                        let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRacePrize(${prizeIdx})">❌</button></td>` : '';
-
-                        tr.innerHTML = `
-                            <td><input type="text" class="editable-input prize-place-input" ${!isRaceAdminUnlocked ? 'readonly' : ''} value="${p.place || ''}" style="width:110px; font-weight:bold;"></td>
-                            <td>${slotsHtml}</td>
-                            ${actionTd}
-                        `;
-                        prizesTbody.appendChild(tr);
-                    });
-                }
-            }
-
-            // Renderizar Participantes
-            const partsTbody = document.getElementById("raceParticipantsTableBody");
-            if (partsTbody) {
-                partsTbody.innerHTML = "";
-
-                if (raceParticipants.length === 0) {
-                    let colSpanVal = isRaceAdminUnlocked ? 6 : 5;
-                    partsTbody.innerHTML = `<tr><td colspan="${colSpanVal}" style="text-align:center; color:#7b93b8; padding:14px;">Nenhum participante inscrito na corrida ainda. ${isRaceAdminUnlocked ? 'Insira acima!' : 'Desbloqueie com a senha para inscrever.'}</td></tr>`;
-                } else {
-                    let list = raceParticipants.map(nick => {
-                        let emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
-                        let feitos = emp ? (emp.current - emp.initial) : 0;
-                        if (feitos < 0) feitos = 0;
-                        let hasWarn = emp && emp.warnings && emp.warnings.length > 0;
-                        let isAbsent = absentRecords.some(r => r.nick.trim().toLowerCase() === nick.toLowerCase());
-                        
-                        let eligible = emp && !hasWarn && !isAbsent && feitos >= 40;
-
-                        return { nick, role: emp ? emp.role : "Desconhecido", feitos, eligible };
-                    });
-
-                    list.sort((a, b) => b.feitos - a.feitos);
-
-                    list.forEach((item, idx) => {
-                        let tr = document.createElement("tr");
-                        let badge = item.eligible ? 
-                            `<span class="badge-status badge-success">Elegível ✅</span>` : 
-                            `<span class="badge-status badge-danger">Não atende regras ❌</span>`;
-
-                        let medalha = idx === 0 ? "🥇 " : idx === 1 ? "🥈 " : idx === 2 ? "🥉 " : `#${idx + 1} `;
-                        let actionTd = isRaceAdminUnlocked ? `<td><button class="btn-sm btn-sub" style="margin:0; padding:3px 6px;" onclick="removeRaceParticipant('${item.nick}')">❌</button></td>` : '';
-
-                        tr.innerHTML = `
-                            <td><strong>${medalha}</strong></td>
-                            <td><strong>${item.nick}</strong></td>
-                            <td>${item.role}</td>
-                            <td><strong>${item.feitos} turnos</strong></td>
-                            <td>${badge}</td>
-                            ${actionTd}
-                        `;
-                        partsTbody.appendChild(tr);
-                    });
-                }
-            }
-        }
-
-        function loginUser() {
-            const nick = document.getElementById("usernameInput").value.trim().toLowerCase();
-            const errorMsg = document.getElementById("errorMessage");
-
-            if (!nick) {
-                errorMsg.innerText = "Por favor, digite seu nickname!";
-                errorMsg.style.display = "block";
-                return;
-            }
-
-            if (!dataLoaded) {
-                errorMsg.innerText = "Conectando à nuvem... tente novamente em alguns segundos.";
-                errorMsg.style.display = "block";
-                return;
-            }
-
-            const found = employees.find(e => e.name.toLowerCase() === nick);
-
-            if (found) {
-                activeUser = found;
-                errorMsg.style.display = "none";
-                document.getElementById("loginScreen").style.display = "none";
-                document.getElementById("userScreen").style.display = "block";
-
-                renderUserProfile();
-
-                currentInput = "0";
-                updateDisplay();
-                calculateShift();
-            } else {
-                errorMsg.innerText = "Funcionário não encontrado no sistema!";
-                errorMsg.style.display = "block";
-            }
-        }
-
-        function renderUserProfile() {
-            if (!activeUser) return;
-            const meta = roleMetas[activeUser.role] || 15;
-            const match = rotationSchedule.find(s => s.week === currentWeekText) || rotationSchedule[3];
-
-            document.getElementById("uName").innerText = activeUser.name;
-            document.getElementById("uRole").innerText = activeUser.role;
-            document.getElementById("uInitial").innerText = activeUser.initial;
-            document.getElementById("uMeta").innerText = meta + " turnos";
-            document.getElementById("refDateLabel").innerText = `TURNOS INICIAIS (${match.refDate || 'Iniciais'})`;
-
-            const avatarBg = activeUser.customAvatar ? activeUser.customAvatar : `https://www.habbo.com.br/habbo-imaging/avatarimage?user=${activeUser.name}&action=std&direction=2&head_direction=2&gesture=sml&size=m`;
-            document.getElementById("avatarFrame").style.backgroundImage = `url('${avatarBg}')`;
-            document.getElementById("customAvatarInput").value = activeUser.customAvatar || "";
-
-            const warnContainer = document.getElementById("userWarningsContainer");
-            warnContainer.innerHTML = "";
-            if (activeUser.warnings && activeUser.warnings.length > 0) {
-                activeUser.warnings.forEach((w, idx) => {
-                    let div = document.createElement("div");
-                    div.style.cssText = "background:#0f1c30; padding:8px; border-radius:4px; margin-bottom:6px; border-left:3px solid #f87171;";
-                    div.innerHTML = `<strong>${w.num}</strong> - Motivo: ${w.motivo}<br><span style="font-size:0.7rem; color:#7b93b8;">Print: ${w.imgur && w.imgur !== '-x-' ? `<a href="${w.imgur}" target="_blank" style="color:#60a5fa;">Ver Print</a>` : '-x-'}</span>`;
-                    warnContainer.appendChild(div);
-                });
-            } else {
-                warnContainer.innerHTML = `<span style="color:#7b93b8;">Nenhuma advertência registrada. Parabéns!</span>`;
-            }
-        }
-
-
-        async function saveCustomAvatar() {
-            const link = document.getElementById("customAvatarInput").value.trim();
-            if (!activeUser) return;
-            const name = activeUser.name;
-
-            const ok = await mutateCloud(d => {
-                const t = findEmp(d.employees, name);
-                if (!t) return false;
-                t.customAvatar = link;
-            });
-            if (ok) alert("Foto de perfil atualizada com sucesso!");
-        }
-
-        function showAdminLogin() {
-            const pass = prompt("Digite a senha de administrador:");
-            if (pass === "tudomercado363") {
-                document.getElementById("loginScreen").style.display = "none";
-                document.getElementById("adminScreen").style.display = "block";
-                document.getElementById("mainWrapper").classList.add("wide");
-                document.getElementById("printWeekSpan").innerText = currentWeekText;
-                
-                const newTbody = document.getElementById("newEmpTableBody");
-                if (newTbody && newTbody.children.length === 0) {
-                    addNewEmpTableRow();
-                }
-
-                populateWeekSelector();
-                renderSchedule();
-                renderAdminTable();
-            } else if (pass) {
-                alert("Senha incorreta!");
-            }
-        }
-
-        function logout() {
-            activeUser = null;
-            document.getElementById("userScreen").style.display = "none";
-            document.getElementById("adminScreen").style.display = "none";
-            document.getElementById("loginScreen").style.display = "block";
-            document.getElementById("mainWrapper").classList.remove("wide");
-            document.getElementById("usernameInput").value = "";
-        }
-
-        const display = document.getElementById("display");
-
-        function updateDisplay() { display.innerText = currentInput; }
-
-        function appendNum(num) {
-            if (currentInput === "0") currentInput = num;
-            else currentInput += num;
-            updateDisplay();
-        }
-
-        function clearNum() { currentInput = "0"; updateDisplay(); }
-
-        function deleteNum() {
-            if (currentInput.length > 1) currentInput = currentInput.slice(0, -1);
-            else currentInput = "0";
-            updateDisplay();
-        }
-
-        function calculateShift() {
-            let currVal = parseInt(currentInput);
-            if (isNaN(currVal)) currVal = 0;
-
-            let meta = roleMetas[activeUser.role] || 15;
-            let feitos = (currVal >= activeUser.initial) ? (currVal - activeUser.initial) : currVal;
-
-            let faltando = meta - feitos;
-            const resCard = document.getElementById("resultCard");
-            const resText = document.getElementById("resultText");
-
-            if (faltando > 0) {
-                resCard.className = "result-card danger";
-                resText.innerHTML = `Feitos nesta semana: <span style="color:#ffffff;">${feitos}</span><br><span style="color:#f87171;">Faltam ${faltando} turnos para a meta</span>`;
-            } else {
-                resCard.className = "result-card";
-                resText.innerHTML = `Feitos nesta semana: <span style="color:#ffffff;">${feitos}</span><br><span style="color:#60a5fa;">🎉 Meta Alcançada!</span>`;
-            }
-        }
-
-        function renderSchedule() {
-            const container = document.getElementById("scheduleList");
-            container.innerHTML = "";
-
-            rotationSchedule.forEach(s => {
-                const isActive = s.week === currentWeekText;
-                const div = document.createElement("div");
-                div.className = `schedule-item ${isActive ? 'active' : ''}`;
-                div.innerHTML = `
-                    <span>${s.week}</span>
-                    <strong>${s.resp} ${isActive ? '(Atual)' : ''}</strong>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function renderAdminTable() {
-            const tbody = document.getElementById("tableBody");
-            tbody.innerHTML = "";
-
-            let filterMode = document.getElementById("sortFilter") ? document.getElementById("sortFilter").value : "default";
-            let imageFilterMode = document.getElementById("imageFilterToggle") ? document.getElementById("imageFilterToggle").value : "all";
-            
-            let visibleEmployees = employees.map((e, idx) => ({ ...e, originalIndex: idx }));
-
-            if (imageFilterMode === "gt15") {
-                visibleEmployees = visibleEmployees.filter(emp => {
-                    let feitos = emp.current - emp.initial;
-                    if (feitos < 0) feitos = 0;
-                    let isAbsent = hasActiveAbsent(emp.name);
-                    return feitos > 15 || isAbsent;
-                });
-            }
-
-            if (filterMode === "alpha") {
-                visibleEmployees.sort((a, b) => a.name.localeCompare(b.name));
-            } else if (filterMode === "turns-desc") {
-                visibleEmployees.sort((a, b) => (b.current - b.initial) - (a.current - a.initial));
-            } else if (filterMode === "turns-asc") {
-                visibleEmployees.sort((a, b) => (a.current - a.initial) - (b.current - b.initial));
-            } else if (filterMode === "role") {
-                visibleEmployees.sort((a, b) => (roleHierarchy[a.role] || 99) - (roleHierarchy[b.role] || 99));
-            }
-
-            visibleEmployees.forEach((emp) => {
-                let index = emp.originalIndex;
-                let meta = roleMetas[emp.role] || 15;
-                let feitos = emp.current - emp.initial;
-                if (feitos < 0) feitos = 0;
-                let alcançou = feitos >= meta;
-
-                let isAbsent = hasActiveAbsent(emp.name);
-
-                let roleOptions = Object.keys(roleMetas).map(r => 
-                    `<option value="${r}" ${r === emp.role ? 'selected' : ''}>${r}</option>`
-                ).join("");
-
-                let tr = document.createElement("tr");
-                
-                let statusBadge = "";
-                if (isAbsent) {
-                    statusBadge = `<span class="badge-status badge-aval">⭐ COM AVAL</span>`;
-                } else {
-                    statusBadge = `<span class="badge-status ${alcançou ? 'badge-success' : 'badge-danger'}">
-                        ${alcançou ? 'Alcançada' : 'Não alcançada'}
-                    </span>`;
-                }
-
-                tr.innerHTML = `
-                    <td>
-                        <strong>${emp.name}</strong> ${emp.id ? `<span style="color:#7b93b8; font-size:0.75rem;">(ID: ${emp.id})</span>` : ''}
-                        <button class="btn-edit-pencil action-col" title="Editar Nick/ID" onclick="editEmpInfo(${index})">✏️</button>
-                    </td>
-                    <td class="role-cell" data-role="${emp.role}">
-                        <select class="editable-select" onchange="updateEmpRole(${index}, this.value)">
-                            ${roleOptions}
-                        </select>
-                    </td>
-                    <td>${emp.initial}</td>
-                    <td class="turn-cell" data-val="${emp.current}">
-                        <input type="number" class="editable-input" id="emp-curr-${index}" data-name="${String(emp.name).replace(/"/g, '&quot;')}" value="${emp.current}">
-                    </td>
-                    <td><strong>${feitos}</strong></td>
-                    <td>${statusBadge}</td>
-                    <td class="action-col">
-                        <button class="btn-sm btn-success" onclick="saveSingleTurn(${index})">💾 Salvar</button>
-                        <button class="btn-sm btn-sub" style="margin:0;" onclick="removeEmp(${index})">❌</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function hasActiveAbsent(name) {
-            return absentRecords.some(r => r.nick.trim().toLowerCase() === name.trim().toLowerCase());
-        }
-
-
-        async function editEmpInfo(index) {
-            const emp = employees[index];
-            if (!emp) return;
-            const oldName = emp.name;
-            const newName = prompt("Editar Nickname do funcionário:", emp.name);
-            if (!newName || !newName.trim()) return;
-
-            const newId = prompt("Editar ID do funcionário no jogo:", emp.id || "");
-
-            const ok = await mutateCloud(d => {
-                const t = findEmp(d.employees, oldName);
-                if (!t) { alert("Funcionário não encontrado (alguém pode ter removido)."); return false; }
-                t.name = newName.trim();
-                t.id = newId ? newId.trim() : "";
-            });
-            if (ok) alert("ID e Nick atualizados e salvos na nuvem com sucesso!");
-        }
-
-
-        async function updateEmpRole(index, newRole) {
-            const name = employees[index].name;
-            const ok = await mutateCloud(d => {
-                const t = findEmp(d.employees, name);
-                if (!t) return false;
-                t.role = newRole;
-            });
-            if (!ok) renderAdminTable();
-        }
-
-
-        async function saveSingleTurn(index) {
-            const name = employees[index].name;
-            const valInput = document.getElementById(`emp-curr-${index}`).value;
-            const newTurn = parseInt(valInput);
-            if (isNaN(newTurn)) {
-                alert("Digite um número válido.");
-                return;
-            }
-            const ok = await mutateCloud(d => {
-                const t = findEmp(d.employees, name);
-                if (!t) { alert("Funcionário não encontrado (alguém pode ter removido)."); return false; }
-                t.current = newTurn;
-            });
-            if (ok) alert(`Turnos de ${name} atualizados para ${newTurn} e salvos na nuvem!`);
-        }
-
-
-        async function removeEmp(index) {
-            const name = employees[index].name;
-            if (confirm(`Remover ${name} da lista?`)) {
-                await mutateCloud(d => {
-                    d.employees = d.employees.filter(e => e.name.toLowerCase() !== name.toLowerCase());
-                });
-            }
-        }
-
-        function addNewEmpTableRow() {
-            const tbody = document.getElementById("newEmpTableBody");
-            if (!tbody) return;
-
-            let roleOptions = Object.keys(roleMetas).map(r => `<option value="${r}">${r}</option>`).join("");
-
-            let tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><input type="text" class="editable-input new-nick" placeholder="Nick" style="width:100%;"></td>
-                <td><input type="text" class="editable-input new-id" placeholder="ID" style="width:100%;"></td>
-                <td><select class="editable-select new-role" style="width:100%;">${roleOptions}</select></td>
-                <td><input type="number" class="editable-input new-init" value="0" style="width:100%;"></td>
-                <td><input type="number" class="editable-input new-curr" value="0" style="width:100%;"></td>
-                <td><button class="btn-sm btn-sub" style="margin:0; padding:4px 8px;" onclick="this.parentElement.parentElement.remove()">❌</button></td>
-            `;
-            tbody.appendChild(tr);
-        }
-
-
-        async function saveAllNewEmpRows() {
-            const rows = document.querySelectorAll("#newEmpTableBody tr");
-            const entries = [];
-
-            rows.forEach(tr => {
-                const name = tr.querySelector(".new-nick").value.trim();
-                const id = tr.querySelector(".new-id").value.trim();
-                const role = tr.querySelector(".new-role").value;
-                const initial = parseInt(tr.querySelector(".new-init").value) || 0;
-                const current = parseInt(tr.querySelector(".new-curr").value) || 0;
-                if (name) entries.push({ name, id, role, initial, current });
-            });
-
-            if (entries.length === 0) {
-                alert("Preencha pelo menos o Nickname de um funcionário na tabela antes de salvar.");
-                return;
-            }
-
-            const ok = await mutateCloud(d => {
-                entries.forEach(n => {
-                    let existing = findEmp(d.employees, n.name);
-                    if (!existing) {
-                        d.employees.push({ name: n.name, id: n.id, role: n.role, initial: n.initial, current: n.current, customAvatar: "", warnings: [] });
-                    } else {
-                        existing.id = n.id || existing.id;
-                        existing.role = n.role;
-                        existing.initial = n.initial;
-                        existing.current = n.current;
-                    }
-                });
-            });
-
-            if (ok) {
-                document.getElementById("newEmpTableBody").innerHTML = "";
-                addNewEmpTableRow();
-                alert(`Sucesso! ${entries.length} funcionário(s) cadastrado(s) e salvo(s) na nuvem!`);
-            }
-        }
-
-
-        async function addAbsentRecord() {
-            const nick = document.getElementById("absentNick").value.trim();
-            const period = document.getElementById("absentPeriod").value.trim();
-            const reason = document.getElementById("absentReason").value.trim();
-
-            if (!nick || !period) {
-                alert("Preencha ao menos o Nick e o Período da ausência!");
-                return;
-            }
-
-            const ok = await mutateCloud(d => { d.absentRecords.push({ nick, period, reason: reason || "N/A" }); });
-            if (ok) {
-                document.getElementById("absentNick").value = "";
-                document.getElementById("absentPeriod").value = "";
-                document.getElementById("absentReason").value = "";
-                alert("Aval / Ausência registrado e salvo na nuvem!");
-            }
-        }
-
-        function renderAbsentTable() {
-            const tbody = document.getElementById("absentTableBody");
-            tbody.innerHTML = "";
-
-            absentRecords.forEach((rec, idx) => {
-                let tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><strong>${rec.nick}</strong></td>
-                    <td>${rec.period}</td>
-                    <td>${rec.reason}</td>
-                    <td><button class="btn-sm btn-warning" style="margin:0; padding:3px 6px;" onclick="removeAbsentRecord(${idx})">Encerrar</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-
-        async function removeAbsentRecord(idx) {
-            const rec = absentRecords[idx];
-            if (!rec) return;
-            if (confirm("Deseja encerrar e remover o aval/ausência deste funcionário?")) {
-                const ok = await mutateCloud(d => {
-                    const i = d.absentRecords.findIndex(r => r.nick === rec.nick && r.period === rec.period && r.reason === rec.reason);
-                    if (i === -1) return false;
-                    d.absentRecords.splice(i, 1);
-                });
-                if (ok) alert("Aval encerrado com sucesso!");
-            }
-        }
-
-
-        async function advanceWeek() {
-            const pass = prompt("Digite a senha de administrador para virar a semana:");
-            if (pass !== "tudomercado363") {
-                alert("Senha incorreta!");
-                return;
-            }
-
-            if (confirm("Deseja virar a semana? Os Turnos Finais atuais passarão a ser os Turnos Iniciais para todos, garantindo o avanço correto!")) {
-                const weekAtClick = currentWeekText;
-                let nextWeek = weekAtClick;
-                const currentIndex = rotationSchedule.findIndex(s => s.week === weekAtClick);
-                if (currentIndex !== -1 && currentIndex < rotationSchedule.length - 1) {
-                    nextWeek = rotationSchedule[currentIndex + 1].week;
-                } else {
-                    const newWeek = prompt("Digite o período da nova semana:", "16/11/2026 à 22/11/2026");
-                    if (newWeek && newWeek.trim() !== "") {
-                        nextWeek = newWeek.trim();
-                    } else {
-                        return;
-                    }
-                }
-
-                const ok = await mutateCloud(d => {
-                    if (d.currentWeekText !== weekAtClick) {
-                        alert("A semana já foi alterada por outra pessoa. Atualize a página e confira antes de virar.");
-                        return false;
-                    }
-                    d.employees.forEach(emp => { emp.initial = emp.current; });
-                    d.currentWeekText = nextWeek;
-                });
-                if (ok) alert("Semana virada com sucesso! Turnos iniciais atualizados com os finais e salvos na nuvem.");
-            }
-        }
-
-        async function generateWarningText() {
-            const nick = document.getElementById("advNick").value.trim();
-            const numAdv = document.getElementById("advNum").value;
-            const motivo = document.getElementById("advMotivo").value.trim();
-            let imgur = document.getElementById("advImgur").value.trim();
-            if (!imgur) imgur = "-x-";
-
-            if (!nick || !motivo) {
-                alert("Preencha ao menos o Nick e o Motivo da advertência!");
-                return;
-            }
-
-            const pass = prompt("Digite a senha de administrador para salvar e registrar a advertência:");
-            if (pass !== "tudomercado363") {
-                alert("Senha incorreta! Advertência não aplicada.");
-                return;
-            }
-
-            const emp = employees.find(e => e.name.toLowerCase() === nick.toLowerCase());
-            
-            let formattedNickAndId = nick;
-            if (emp && emp.id) {
-                formattedNickAndId = `${emp.name} (${emp.id})`;
-            }
-
-            if (emp) {
-                const warn = { num: numAdv, motivo: motivo, imgur: imgur, date: new Date().toLocaleDateString('pt-BR') };
-                const ok = await mutateCloud(d => {
-                    const t = findEmp(d.employees, emp.name);
-                    if (!t) return false;
-                    if (!t.warnings) t.warnings = [];
-                    t.warnings.push(warn);
-                });
-                if (!ok) return;
-            }
-
-            const discordFormatted = `🚨 **MERCADO RP - NOTIFICAÇÃO DE ADVERTÊNCIA** 🚨\n\n` +
-                `👤 **Funcionário(a):** ${formattedNickAndId}\n` +
-                `💼 **Cargo:** ${emp ? emp.role : 'Funcionário'}\n` +
-                `⚠️ **Punição:** ${numAdv}\n` +
-                `📝 **Motivo:** ${motivo}\n` +
-                `🖼️ **Comprovação (Print):** ${imgur}\n` +
-                `📅 **Data:** ${new Date().toLocaleDateString('pt-BR')}\n\n` +
-                `*Esta advertência foi registrada na Administração do Mercado RP.*`;
-
-            document.getElementById("discordTextOutput").innerText = discordFormatted;
-            document.getElementById("discordOutputContainer").style.display = "block";
-            alert("Senha correta! Advertência registrada e salva na nuvem com sucesso.");
-        }
-
-        function generateUnreachedList() {
-            let unreached = employees.filter(emp => {
-                let meta = roleMetas[emp.role] || 15;
-                let feitos = emp.current - emp.initial;
-                if (feitos < 0) feitos = 0;
-                if (hasActiveAbsent(emp.name)) return false;
-                return feitos < meta;
-            });
-
-            if (unreached.length === 0) {
-                document.getElementById("unreachedTextOutput").innerText = "Todos os funcionários atingiram a meta nesta semana (ou estão de licença/com aval)!";
-                document.getElementById("unreachedOutputContainer").style.display = "block";
-                return;
-            }
-
-            let blocks = [];
-            unreached.forEach(emp => {
-                let displayName = emp.id ? `${emp.name} (${emp.id})` : emp.name;
-                blocks.push(`**Nick:** ${displayName}\n**motivo:** cota de turnos não atingida\n**Nº DE Advertência:** \n**Print:** -x-`);
-            });
-
-            let finalOutput = blocks.join("\n-\n");
-
-            document.getElementById("unreachedTextOutput").innerText = finalOutput;
-            document.getElementById("unreachedOutputContainer").style.display = "block";
-        }
-
-        function copyDiscordText() {
-            const text = document.getElementById("discordTextOutput").innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Texto copiado para a área de transferência!");
-            });
-        }
-
-        function copyUnreachedText() {
-            const text = document.getElementById("unreachedTextOutput").innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Relatório copiado para a área de transferência!");
-            });
-        }
-
-        function generateTableImage() {
-            const area = document.getElementById("printableTableArea");
-            const responsiveBox = document.getElementById("tableResponsiveBox");
-            const actionCols = document.querySelectorAll(".action-col");
-
-            actionCols.forEach(c => c.style.display = "none");
-
-            const turnCells = document.querySelectorAll(".turn-cell");
-            const roleCells = document.querySelectorAll(".role-cell");
-
-            turnCells.forEach(cell => {
-                const val = cell.getAttribute("data-val");
-                cell.innerHTML = `<strong>${val}</strong>`;
-            });
-
-            roleCells.forEach(cell => {
-                const role = cell.getAttribute("data-role");
-                cell.innerHTML = role;
-            });
-
-            responsiveBox.classList.add("force-full-print");
-
-            html2canvas(area, {
-                backgroundColor: "#060b14",
-                scale: 2,
-                useCORS: true,
-                windowWidth: 1200
-            }).then(canvas => {
-                responsiveBox.classList.remove("force-full-print");
-                actionCols.forEach(c => c.style.display = "");
-                renderAdminTable();
-
-                const link = document.createElement('a');
-                link.download = `Mercado_Habbo_${currentWeekText.replace(/[/]/g, '-')}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
-        }
-
-
-        async function processBulkImport() {
-            const rawText = document.getElementById("bulkImportText").value.trim();
-            if (!rawText) {
-                alert("Cole os dados na caixa de texto primeiro!");
-                return;
-            }
-
-            const entries = [];
-            rawText.split("\n").forEach(line => {
-                const cleanLine = line.trim();
-                if (!cleanLine) return;
-                const match = cleanLine.match(/^(.*?)\s+(\d+)$/);
-                if (match) entries.push({ inputName: match[1].trim(), value: parseInt(match[2]) });
-            });
-
-            if (entries.length === 0) {
-                alert("Não foi possível ler os dados. Verifique se o formato está como: Nome [espaço] Número.");
-                return;
-            }
-
-            let updatedCount = 0;
-            let addedCount = 0;
-
-            const ok = await mutateCloud(d => {
-                updatedCount = 0;
-                addedCount = 0;
-                entries.forEach(({ inputName, value }) => {
-                    const cleanInput = inputName.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    let emp = d.employees.find(e => {
-                        if (!e || !e.name) return false;
-                        const dbName = e.name.trim().toLowerCase();
-                        const cleanDb = dbName.replace(/[^a-z0-9]/g, '');
-                        return cleanDb === cleanInput || dbName === inputName.toLowerCase();
-                    });
-
-                    if (emp) {
-                        emp.current = value;
-                        if (!emp.initial || emp.initial < 15) {
-                            emp.initial = value >= 15 ? value : 15;
-                        }
-                        updatedCount++;
-                    } else {
-                        d.employees.push({
-                            name: inputName,
-                            id: "",
-                            role: "Operador de Loja",
-                            initial: value >= 15 ? value : 15,
-                            current: value,
-                            customAvatar: "",
-                            warnings: []
-                        });
-                        addedCount++;
-                    }
-                });
-            });
-
-            if (ok) {
-                document.getElementById("bulkImportText").value = "";
-                alert(`Sucesso! ${updatedCount} funcionários atualizados e ${addedCount} novos cadastrados e sincronizados na nuvem.`);
-            }
-        }
-
-        document.getElementById("usernameInput").addEventListener("keypress", function(e) {
-            if (e.key === "Enter") loginUser();
-        });
-    </script>
-</body>
-</html>
+            { place: "🥇 1º Lugar", slots: [{symbol: "💰", text
